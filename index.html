@@ -49,7 +49,7 @@ main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:fle
 .drop-file-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;line-height:1;padding:0}
 .drop-file-tag button:hover{color:var(--red)}
 .or-div{text-align:center;font-size:10px;color:var(--muted);letter-spacing:2px;margin:4px 0 8px;position:relative}
-.or-div::before,.or-div::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:var(--border)}
+.or-div::before,.or-div::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:var(--border)}
 .or-div::before{left:0}.or-div::after{right:0}
 
 textarea{width:100%;min-height:130px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;line-height:1.7;padding:12px;resize:vertical;outline:none;transition:border-color .2s}
@@ -202,6 +202,8 @@ select:focus{border-color:var(--red)}
     <div class="login-group"><label>Worker URL</label><input type="url" id="loginWorkerUrl" placeholder="https://..." spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Username</label><input type="text" id="loginUser" placeholder="Nhập tài khoản" spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Password</label><input type="password" id="loginPass" placeholder="Nhập mật khẩu" /></div>
+    <div class="or-div">HOẶC ĐĂNG NHẬP BẰNG KEY</div>
+    <div class="login-group"><label>Access Key</label><input type="text" id="loginKey" placeholder="NFNTOC29-XXXXXXXXXXXXXXXX" spellcheck="false" autocomplete="off" /></div>
     <button class="btn-login" onclick="handleLogin()">Đăng nhập</button>
     <div id="loginError"></div>
   </div>
@@ -229,6 +231,7 @@ select:focus{border-color:var(--red)}
       <button class="tab" onclick="switchTab('cloud')">☁️ Cloud Storage</button>
       <button class="tab" onclick="switchTab('config')">⚙ Config</button>
       <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
+      <button class="tab" id="tabKeyAdmin" style="display:none;" onclick="switchTab('keys')">🔑 Quản lý Key</button>
     </div>
 
     <div id="tab-input" class="tab-panel active">
@@ -290,6 +293,36 @@ select:focus{border-color:var(--red)}
       </div>
     </div>
 
+    <div id="tab-keys" class="tab-panel">
+      <div class="cfg-group" style="margin-bottom: 15px;">
+        <div class="cfg-group-title">🔑 Tạo Key Đăng Nhập Mới</div>
+        <div class="cfg-row" style="gap: 12px; align-items: center; margin-top: 10px;">
+          <div class="cfg-label">Thời hạn sử dụng:</div>
+          <select id="keyDurationSelect" style="padding: 8px 12px; font-size: 11px; flex: 1;">
+            <option value="10m">10 Phút</option>
+            <option value="30m">30 Phút</option>
+            <option value="1h">1 Tiếng</option>
+            <option value="6h">6 Tiếng</option>
+            <option value="24h">24 Tiếng</option>
+            <option value="48h">48 Tiếng</option>
+            <option value="30d">30 Ngày</option>
+            <option value="1y">1 Năm</option>
+          </select>
+          <button class="btn-check" style="flex: none; padding: 8px 16px; margin: 0; font-size: 11px;" onclick="generateNewKey()">⚡ Tạo Key</button>
+        </div>
+      </div>
+      
+      <div class="cfg-group">
+        <div class="cfg-group-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Danh Sách Key Hệ Thống</span>
+          <button class="btn-sm" style="padding: 2px 8px; font-size: 9px;" onclick="loadAdminKeys()">🔄 Làm mới</button>
+        </div>
+        <div id="keysListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:400px; overflow-y:auto;">
+          <div style="text-align:center; font-size:11px; color:var(--muted); padding:20px;">Đang tải danh sách...</div>
+        </div>
+      </div>
+    </div>
+
     <div id="mainControlsSection">
       <div class="controls">
         <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
@@ -322,6 +355,7 @@ let counts    = {hit:0,free:0,hold:0,dead:0,err:0};
 let running   = false;
 let loadedFiles = [];
 let cloudCookies = [];
+let generatedKeysList = [];
 
 const loginSec = document.getElementById('loginSection');
 const appCont  = document.getElementById('appContent');
@@ -336,34 +370,71 @@ async function checkGlobalAuth() {
   try {
     const res = await fetch(`${wUrl}/auth/verify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
     const data = await res.json();
-    if(data.ok) showAppView(); else handleLogout();
+    if(data.ok) {
+      localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
+      showAppView(); 
+    } else handleLogout();
   } catch(e) { showAppView(); }
 }
 function showLoginView() { loginSec.style.display = 'flex'; appCont.style.display = 'none'; }
-function showAppView() { loginSec.style.display = 'none'; appCont.style.display = 'flex'; }
+function showAppView() { 
+  loginSec.style.display = 'none'; 
+  appCont.style.display = 'flex'; 
+  
+  const role = localStorage.getItem('nf_user_role');
+  const tabAdmin = document.getElementById('tabKeyAdmin');
+  if (role === 'admin') {
+    if (tabAdmin) tabAdmin.style.display = 'block';
+  } else {
+    if (tabAdmin) tabAdmin.style.display = 'none';
+  }
+}
 async function handleLogin() {
   const wUrl = document.getElementById('loginWorkerUrl').value.trim().replace(/\/+$/, ''); 
+  if(!wUrl) return document.getElementById('loginError').textContent = "Nhập Worker URL!";
+  
+  const key = document.getElementById('loginKey').value.trim();
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
-  if(!wUrl || !user || !pass) return document.getElementById('loginError').textContent = "Nhập đủ thông tin!";
+  
+  let payload = {};
+  let endpoint = '/auth/login';
+  
+  if (key) {
+    if(!key.startsWith('NFNTOC29-')) return document.getElementById('loginError').textContent = "Định dạng Key không hợp lệ!";
+    payload = { key: key };
+    endpoint = '/auth/login-key';
+  } else {
+    if(!user || !pass) return document.getElementById('loginError').textContent = "Nhập đủ thông tin tài khoản!";
+    payload = { username: user, password: pass };
+  }
+  
   document.getElementById('loginError').textContent = "Đang kết nối...";
   try {
-    const res = await fetch(`${wUrl}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user, password: pass }) });
+    const res = await fetch(`${wUrl}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const data = await res.json();
-    if(data.ok) { localStorage.setItem('nf_app_token', data.token); localStorage.setItem('nf_worker_url', wUrl); document.getElementById('workerUrl').value = wUrl; showAppView(); toast('Đăng nhập thành công ✓'); }
-    else document.getElementById('loginError').textContent = data.error || "Sai thông tin.";
+    if(data.ok) { 
+      localStorage.setItem('nf_app_token', data.token); 
+      localStorage.setItem('nf_worker_url', wUrl); 
+      localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
+      document.getElementById('workerUrl').value = wUrl; 
+      showAppView(); 
+      toast('Đăng nhập thành công ✓'); 
+    }
+    else document.getElementById('loginError').textContent = data.error || "Sai thông tin đăng nhập.";
   } catch(e) { document.getElementById('loginError').textContent = "Lỗi kết nối URL Worker."; }
 }
-function handleLogout() { localStorage.removeItem('nf_app_token'); showLoginView(); }
+function handleLogout() { localStorage.removeItem('nf_app_token'); localStorage.removeItem('nf_user_role'); showLoginView(); }
 checkGlobalAuth();
 
 // TAB SWITCHER
 function switchTab(name) {
-  const panels = ['input', 'cloud', 'config', 'webhook'];
+  const panels = ['input', 'cloud', 'config', 'webhook', 'keys'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', panels[i] === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
   document.getElementById('mainControlsSection').style.display = name === 'input' ? 'block' : 'none';
   if(name === 'cloud') loadCloudCookies();
+  if(name === 'keys') loadAdminKeys();
 }
 
 const urlInput = document.getElementById('workerUrl');
@@ -618,6 +689,63 @@ async function recheckAllCloud() {
     } catch(e) { if(card) card.querySelector('.status-badge').innerHTML = '⚠ ERR'; }
   }
   toast("Recheck hoàn tất!");
+}
+
+// ════ KEY MANAGEMENT LOGIC (ADMIN ONLY) ════
+async function generateNewKey() {
+  const duration = document.getElementById('keyDurationSelect').value;
+  toast('Đang khởi tạo Key...');
+  const res = await apiFetch('/api/keys', 'POST', { duration });
+  if (res && res.ok) {
+    toast('Tạo Key thành công ✓');
+    loadAdminKeys();
+  } else {
+    toast(`Lỗi: ${res?.error || 'Không thể tạo key'}`);
+  }
+}
+
+async function loadAdminKeys() {
+  const container = document.getElementById('keysListContainer');
+  container.innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> Đang tải...</div>';
+  const res = await apiFetch('/api/keys');
+  if (res && res.ok) {
+    generatedKeysList = res.data || [];
+    renderKeysList();
+  } else {
+    container.innerHTML = `<div style="color:var(--red);text-align:center;padding:12px;font-size:12px;">Không khả dụng hoặc Bạn không có quyền Admin.</div>`;
+  }
+}
+
+function renderKeysList() {
+  const container = document.getElementById('keysListContainer');
+  if (!generatedKeysList.length) {
+    container.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Hệ thống chưa ghi nhận Key nào.</div>';
+    return;
+  }
+  container.innerHTML = generatedKeysList.map(k => {
+    const isExpired = Date.now() > k.expiresAt;
+    const badge = isExpired ? '<span style="color:var(--red);background:#2a1111;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">EXPIRED</span>' : '<span style="color:var(--green);background:var(--green-dim);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">ACTIVE</span>';
+    return `
+    <div class="cfg-group" style="background:var(--card); border:1px solid var(--border); padding:10px; display:flex; flex-direction:column; gap:6px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-family:var(--mono); font-size:12px; color:var(--text); font-weight:bold; word-break:break-all;">${esc(k.key)}</span>
+        ${badge}
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--muted)">
+        <span>Hết hạn: ${new Date(k.expiresAt).toLocaleString()}</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-sm" style="padding:3px 8px; font-size:10px;" onclick="copyText(this, '${esc(k.key)}')">📋 Copy</button>
+          <button class="btn-sm" style="padding:3px 8px; font-size:10px; color:var(--red); border-color:var(--red-dim);" onclick="deleteAdminKey('${esc(k.id)}')">✕ Xoá</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteAdminKey(id) {
+  if(!confirm("Xác nhận thu hồi và xóa Key này khỏi hệ thống?")) return;
+  const res = await apiFetch(`/api/keys/${id}`, 'DELETE');
+  if(res && res.ok) { toast('Đã xoá key thành công ✓'); loadAdminKeys(); } else { toast(`Thất bại: ${res?.error || 'Lỗi'}`); }
 }
 </script>
 </body>
