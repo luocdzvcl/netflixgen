@@ -17,21 +17,26 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+
 /* Header */
 header{width:100%;padding:16px 28px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
 .logo{font-size:20px;font-weight:900;letter-spacing:-.5px;color:var(--red);text-transform:uppercase}
 .logo span{color:var(--text);font-weight:300}
 .badge{font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
-/* Main */
+
+/* Main App Wrapper */
 main{width:100%;max-width:900px;padding:32px 16px 80px;display:flex;flex-direction:column;gap:20px}
+
 /* Card */
 .card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
 .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
 /* Tabs */
 .tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px}
 .tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s}
 .tab.active{background:var(--card);color:var(--text)}
 .tab-panel{display:none}.tab-panel.active{display:block}
+
 /* Worker URL */
 .url-row{display:flex;gap:8px;align-items:center}
 .url-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;outline:none;transition:border-color .2s}
@@ -39,6 +44,7 @@ main{width:100%;max-width:900px;padding:32px 16px 80px;display:flex;flex-directi
 .url-row input::placeholder{color:var(--muted)}
 .btn-sm{padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s}
 .btn-sm:hover{border-color:var(--red);color:var(--text)}
+
 /* Drop zone */
 .drop-zone{position:relative;border:2px dashed var(--border);border-radius:6px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
 .drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:rgba(229,9,20,.05)}
@@ -53,13 +59,16 @@ main{width:100%;max-width:900px;padding:32px 16px 80px;display:flex;flex-directi
 .or-div{text-align:center;font-size:10px;color:var(--muted);letter-spacing:2px;margin:4px 0 8px;position:relative}
 .or-div::before,.or-div::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:var(--border)}
 .or-div::before{left:0}.or-div::after{right:0}
+
 /* Textarea */
 textarea{width:100%;min-height:130px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;line-height:1.7;padding:12px;resize:vertical;outline:none;transition:border-color .2s}
 textarea:focus{border-color:var(--red)}
 textarea::placeholder{color:var(--muted)}
+
 /* Format pills */
 .formats{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .fmt{font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 8px;letter-spacing:.5px}
+
 /* Controls */
 .controls{display:flex;gap:10px;align-items:center;margin-top:14px}
 .btn-check{flex:1;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
@@ -67,10 +76,12 @@ textarea::placeholder{color:var(--muted)}
 .btn-check:disabled{background:var(--red-dim);cursor:not-allowed;opacity:.7}
 .btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s}
 .btn-clear:hover{border-color:var(--text);color:var(--text)}
+
 /* Progress */
 .progress-wrap{display:none;margin-top:14px;background:var(--surface);border-radius:4px;height:3px;overflow:hidden}
 .progress-bar{height:100%;background:var(--red);width:0%;transition:width .3s ease}
 .progress-label{font-size:10px;color:var(--muted);margin-top:5px;display:none}
+
 /* Config grid */
 .cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:600px){.cfg-grid{grid-template-columns:1fr}}
@@ -80,6 +91,7 @@ textarea::placeholder{color:var(--muted)}
 .cfg-row:last-child{margin-bottom:0}
 .cfg-label{font-size:11px;color:var(--text)}
 .cfg-label small{color:var(--muted);font-size:9px;display:block;line-height:1.3}
+
 /* Toggle */
 .toggle{position:relative;width:34px;height:18px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0;position:absolute}
@@ -87,13 +99,16 @@ textarea::placeholder{color:var(--muted)}
 .toggle input:checked+.toggle-track{background:var(--red)}
 .toggle-track::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s}
 .toggle input:checked+.toggle-track::after{left:18px}
+
 /* Select */
 select{background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:4px 8px;outline:none;cursor:pointer}
 select:focus{border-color:var(--red)}
+
 /* Webhook cfg */
 .webhook-url-row{margin-top:8px}
 .webhook-url-row input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:10px;padding:7px 10px;outline:none}
 .webhook-url-row input:focus{border-color:var(--red)}
+
 /* Stats */
 .stats{display:none;gap:10px;flex-wrap:wrap}
 .stat{flex:1;min-width:90px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
@@ -104,6 +119,7 @@ select:focus{border-color:var(--red)}
 .stat.hold .stat-num{color:var(--hold)}
 .stat.dead .stat-num{color:var(--red)}
 .stat.err  .stat-num{color:var(--muted)}
+
 /* Results */
 #results{display:flex;flex-direction:column;gap:8px}
 .result-card{background:var(--card);border-radius:6px;border-left:3px solid var(--border);overflow:hidden;animation:fadeIn .2s ease}
@@ -128,10 +144,12 @@ select:focus{border-color:var(--red)}
 .toggle-btn:hover{background:var(--border);color:var(--text)}
 .result-detail{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
 .result-detail.open{display:block}
+
 /* Info grid */
 .info-grid{display:grid;grid-template-columns:140px 1fr;gap:5px 14px;margin-top:12px;font-size:12px}
 .info-key{color:var(--muted);font-size:10px;letter-spacing:.4px;display:flex;align-items:center}
 .info-val{color:var(--text);font-family:var(--mono);font-size:11px;word-break:break-all}
+
 /* NFToken */
 .nft-section{margin-top:12px;padding:10px 12px;background:var(--blue-dim);border:1px solid var(--blue);border-radius:4px}
 .nft-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
@@ -139,6 +157,7 @@ select:focus{border-color:var(--red)}
 .nft-link{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;border-radius:4px;text-decoration:none;letter-spacing:.3px;transition:opacity .15s}
 .nft-link:hover{opacity:.85}
 .nft-expiry{margin-top:6px;font-size:10px;color:var(--blue);opacity:.7;font-family:var(--mono)}
+
 /* Action row */
 .action-row{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
 .btn-action{font-size:10px;padding:6px 12px;border-radius:3px;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;font-weight:600;transition:border-color .15s,color .15s}
@@ -147,184 +166,320 @@ select:focus{border-color:var(--red)}
 .btn-copy.copied{border-color:var(--green);color:var(--green)}
 .btn-dl{background:transparent;border:1px solid var(--border);color:var(--muted)}
 .btn-dl:hover{border-color:var(--green);color:var(--green)}
+
 /* Export bar */
 .export-bar{display:none;gap:8px;flex-wrap:wrap}
 .btn-export{padding:9px 16px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;font-weight:600;transition:border-color .2s,color .2s}
 .btn-export:hover{border-color:var(--green);color:var(--green)}
+
 /* Spinner */
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{display:inline-block;width:11px;height:11px;border:2px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
 footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align:center;border-top:1px solid var(--border);width:100%}
 footer a{color:var(--red);text-decoration:none}
 @media(max-width:600px){.info-grid{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════════════════
+   GIAO DIỆN LOGIN OVERLAY ĐỒNG BỘ MÀU CHỦ ĐẠO
+   ═══════════════════════════════════════════════════════ */
+#loginSection {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 20px;
+}
+.login-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+  padding: 30px; width: 100%; max-width: 360px; text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.login-card h2 { color: var(--red); font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: -0.5px;}
+.login-card h2 span { color: var(--text); font-weight: 300; }
+.login-group { text-align: left; margin-bottom: 15px; }
+.login-group label { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.login-group input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); padding: 11px 14px; outline: none; font-size: 13px; font-family: var(--sans); transition: border-color 0.2s;
+}
+.login-group input:focus { border-color: var(--red); }
+.btn-login {
+  width: 100%; padding: 12px; background: var(--red); border: none; border-radius: 4px;
+  color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-top: 10px; transition: background 0.2s;
+}
+.btn-login:hover { background: #c1070f; }
+#loginError { color: var(--red); font-size: 11px; margin-top: 15px; min-height: 16px; }
+.logout-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; font-size: 10px; border-radius: 3px; cursor: pointer; margin-left: auto; transition: color 0.2s, border-color 0.2s;}
+.logout-btn:hover { color: var(--text); border-color: var(--text); }
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">Netflix<span>Check</span></div>
-  <div class="badge">Web v4.5</div>
-</header>
 
-<main>
-
-<!-- Step 1: Worker URL -->
-<div class="card">
-  <div class="card-title">⚙ Bước 1 — Worker URL</div>
-  <div class="url-row">
-    <input id="workerUrl" type="url" placeholder="https://your-worker.your-subdomain.workers.dev" spellcheck="false" autocomplete="off"/>
-    <button class="btn-sm" onclick="saveUrl()">Lưu</button>
+<div id="loginSection" style="display: none;">
+  <div class="login-card">
+    <h2>Netflix<span>Check</span></h2>
+    <div class="login-group">
+      <label>Step 1: Worker URL</label>
+      <input type="url" id="loginWorkerUrl" placeholder="https://your-worker.workers.dev" spellcheck="false" autocomplete="off" />
+    </div>
+    <div class="login-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Nhập tài khoản whitelist" spellcheck="false" autocomplete="off" />
+    </div>
+    <div class="login-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Nhập mật khẩu" />
+    </div>
+    <button class="btn-login" onclick="handleLogin()">Đăng nhập</button>
+    <div id="loginError"></div>
   </div>
-  <div style="font-size:10px;color:var(--muted);margin-top:8px">Chưa có Worker? Xem hướng dẫn ↓</div>
 </div>
 
-<!-- Step 2: Input + Config tabs -->
-<div class="card">
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('input')">🍪 Cookie</button>
-    <button class="tab" onclick="switchTab('config')">⚙ Config</button>
-    <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
+<div id="appContent" style="display: none; width: 100%; display: flex; flex-direction: column; align-items: center;">
+  <header>
+    <div class="logo">Netflix<span>Check</span></div>
+    <div class="badge">Web v4.5</div>
+    <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
+  </header>
+
+  <main>
+  <div class="card">
+    <div class="card-title">⚙ Bước 1 — Worker URL</div>
+    <div class="url-row">
+      <input id="workerUrl" type="url" placeholder="https://your-worker.your-subdomain.workers.dev" spellcheck="false" autocomplete="off"/>
+      <button class="btn-sm" onclick="saveUrl()">Lưu</button>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:8px">Chưa có Worker? Xem hướng dẫn ↓</div>
   </div>
 
-  <!-- Input tab -->
-  <div id="tab-input" class="tab-panel active">
-    <div class="drop-zone" id="dropZone">
-      <input type="file" id="fileInput" accept=".txt,.json" multiple/>
-      <div class="drop-icon">📂</div>
-      <div class="drop-label"><strong>Kéo thả file vào đây</strong> hoặc click để chọn</div>
-      <div class="drop-label" style="font-size:10px;margin-top:3px">Hỗ trợ .txt · .json · nhiều file</div>
-      <div class="drop-files" id="dropFiles"></div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('input')">🍪 Cookie</button>
+      <button class="tab" onclick="switchTab('config')">⚙ Config</button>
+      <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
     </div>
-    <div class="or-div">hoặc paste thủ công</div>
-    <textarea id="cookieInput" placeholder="Paste cookie — nhiều cookie ngăn cách bằng dòng trống&#10;&#10;Hỗ trợ: Netscape .txt · JSON array · key=value string"></textarea>
-    <div class="formats">
-      <span class="fmt">✓ Netscape .txt</span>
-      <span class="fmt">✓ JSON array</span>
-      <span class="fmt">✓ key=value</span>
-      <span class="fmt">✓ Multi-file</span>
-      <span class="fmt">✓ NFToken</span>
-      <span class="fmt">✓ Webhook</span>
-    </div>
-  </div>
 
-  <!-- Config tab -->
-  <div id="tab-config" class="tab-panel">
-    <div class="cfg-grid">
-      <div class="cfg-group">
-        <div class="cfg-group-title">TXT Fields</div>
-        <div id="txtFieldsGrid"></div>
+    <div id="tab-input" class="tab-panel active">
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".txt,.json" multiple/>
+        <div class="drop-icon">📂</div>
+        <div class="drop-label"><strong>Kéo thả file vào đây</strong> hoặc click để chọn</div>
+        <div class="drop-label" style="font-size:10px;margin-top:3px">Hỗ trợ .txt · .json · nhiều file</div>
+        <div class="drop-files" id="dropFiles"></div>
       </div>
-      <div class="cfg-group">
-        <div class="cfg-group-title">Features</div>
+      <div class="or-div">hoặc paste thủ công</div>
+      <textarea id="cookieInput" placeholder="Paste cookie — nhiều cookie ngăn cách bằng dòng trống&#10;&#10;Hỗ trợ: Netscape .txt · JSON array · key=value string"></textarea>
+      <div class="formats">
+        <span class="fmt">✓ Netscape .txt</span>
+        <span class="fmt">✓ JSON array</span>
+        <span class="fmt">✓ key=value</span>
+        <span class="fmt">✓ Multi-file</span>
+        <span class="fmt">✓ NFToken</span>
+        <span class="fmt">✓ Webhook</span>
+      </div>
+    </div>
+
+    <div id="tab-config" class="tab-panel">
+      <div class="cfg-grid">
+        <div class="cfg-group">
+          <div class="cfg-group-title">TXT Fields</div>
+          <div id="txtFieldsGrid"></div>
+        </div>
+        <div class="cfg-group">
+          <div class="cfg-group-title">Features</div>
+          <div class="cfg-row">
+            <div class="cfg-label">NFToken Mode<small>pc / mobile / both / off</small></div>
+            <select id="cfg_nftoken">
+              <option value="both">Both</option>
+              <option value="pc">PC Only</option>
+              <option value="mobile">Mobile Only</option>
+              <option value="false">Off</option>
+            </select>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-label">NFToken for Free<small>Generate token for free accounts</small></div>
+            <label class="toggle"><input type="checkbox" id="cfg_nftoken_for_free"/><span class="toggle-track"></span></label>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-label">NFToken Attempts<small>Retry count (1–5)</small></div>
+            <select id="cfg_nftoken_attempts">
+              <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
+            </select>
+          </div>
+          <div class="cfg-row" style="margin-top:10px">
+            <div class="cfg-label">Add Emojis<small>Where to show emojis</small></div>
+            <select id="cfg_add_emojis">
+              <option value="webhook">Webhook only</option>
+              <option value="txt">TXT only</option>
+              <option value="both">Both</option>
+              <option value="false">Off</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-webhook" class="tab-panel">
+      <div class="cfg-group" style="margin-bottom:12px">
+        <div class="cfg-group-title">Discord Webhook</div>
         <div class="cfg-row">
-          <div class="cfg-label">NFToken Mode<small>pc / mobile / both / off</small></div>
-          <select id="cfg_nftoken">
-            <option value="both">Both</option>
-            <option value="pc">PC Only</option>
-            <option value="mobile">Mobile Only</option>
-            <option value="false">Off</option>
+          <div class="cfg-label">Enabled</div>
+          <label class="toggle"><input type="checkbox" id="wh_enabled"/><span class="toggle-track"></span></label>
+        </div>
+        <div class="webhook-url-row">
+          <input id="wh_url" type="url" placeholder="https://discord.com/api/webhooks/..."/>
+        </div>
+        <div class="cfg-row" style="margin-top:8px">
+          <div class="cfg-label">Mode<small>full / cookie / nftoken</small></div>
+          <select id="wh_mode">
+            <option value="full">Full</option>
+            <option value="cookie">Cookie Only</option>
+            <option value="nftoken">NFToken Only</option>
           </select>
         </div>
         <div class="cfg-row">
-          <div class="cfg-label">NFToken for Free<small>Generate token for free accounts</small></div>
-          <label class="toggle"><input type="checkbox" id="cfg_nftoken_for_free"/><span class="toggle-track"></span></label>
-        </div>
-        <div class="cfg-row">
-          <div class="cfg-label">NFToken Attempts<small>Retry count (1–5)</small></div>
-          <select id="cfg_nftoken_attempts">
-            <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
-          </select>
-        </div>
-        <div class="cfg-row" style="margin-top:10px">
-          <div class="cfg-label">Add Emojis<small>Where to show emojis</small></div>
-          <select id="cfg_add_emojis">
-            <option value="webhook">Webhook only</option>
-            <option value="txt">TXT only</option>
-            <option value="both">Both</option>
-            <option value="false">Off</option>
-          </select>
+          <div class="cfg-label">Plans<small>all or comma-separated</small></div>
+          <input id="wh_plans" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;padding:4px 8px;width:130px;outline:none" value="all"/>
         </div>
       </div>
     </div>
+
+    <div class="controls">
+      <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
+      <button class="btn-clear" onclick="clearAll()">Xoá</button>
+    </div>
+    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-label" id="progressLabel"></div>
   </div>
 
-  <!-- Webhook tab -->
-  <div id="tab-webhook" class="tab-panel">
-    <div class="cfg-group" style="margin-bottom:12px">
-      <div class="cfg-group-title">Discord Webhook</div>
-      <div class="cfg-row">
-        <div class="cfg-label">Enabled</div>
-        <label class="toggle"><input type="checkbox" id="wh_enabled"/><span class="toggle-track"></span></label>
-      </div>
-      <div class="webhook-url-row">
-        <input id="wh_url" type="url" placeholder="https://discord.com/api/webhooks/..."/>
-      </div>
-      <div class="cfg-row" style="margin-top:8px">
-        <div class="cfg-label">Mode<small>full / cookie / nftoken</small></div>
-        <select id="wh_mode">
-          <option value="full">Full</option>
-          <option value="cookie">Cookie Only</option>
-          <option value="nftoken">NFToken Only</option>
-        </select>
-      </div>
-      <div class="cfg-row">
-        <div class="cfg-label">Plans<small>all or comma-separated</small></div>
-        <input id="wh_plans" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;padding:4px 8px;width:130px;outline:none" value="all"/>
+  <div class="stats" id="statsRow">
+    <div class="stat hit"> <div class="stat-num" id="sHit">0</div> <div class="stat-label">HIT</div></div>
+    <div class="stat free"><div class="stat-num" id="sFree">0</div><div class="stat-label">FREE</div></div>
+    <div class="stat hold"><div class="stat-num" id="sHold">0</div><div class="stat-label">ON HOLD</div></div>
+    <div class="stat dead"><div class="stat-num" id="sDead">0</div><div class="stat-label">EXPIRED</div></div>
+    <div class="stat err"> <div class="stat-num" id="sErr">0</div> <div class="stat-label">ERROR</div></div>
+  </div>
+
+  <div class="export-bar" id="exportBar">
+    <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs</button>
+    <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs</button>
+    <button class="btn-export" onclick="exportTxt('all')">⬇ ALL Valid</button>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="card">
+    <div class="card-title">📖 Hướng dẫn deploy Cloudflare Worker</div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:6px;font-size:12px;line-height:1.8;color:var(--muted)">
+      <div><b style="color:var(--text)">1.</b> Đăng ký tại <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a></div>
+      <div><b style="color:var(--text)">2.</b> Workers &amp; Pages → Create → <b style="color:var(--text)">Start with Hello World!</b> → Deploy</div>
+      <div><b style="color:var(--text)">3.</b> Click <b style="color:var(--text)">Edit code</b> → Ctrl+A → paste nội dung <code style="color:var(--green)">worker.js</code> → Save &amp; Deploy</div>
+      <div><b style="color:var(--text)">4.</b> Tạo KV Namespace tên <code style="color:var(--green)">AUTH_KV</code> và Bind vào Worker. Tạo Secret Environment <code style="color:var(--green)">JWT_SECRET</code>.</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px;font-size:10px">
+        ⚡ Miễn phí <b style="color:var(--text)">100,000 req/ngày</b> · NFToken tự động · Webhook Discord tích hợp · Bảo mật Whitelist ẩn danh
       </div>
     </div>
   </div>
+  </main>
 
-  <div class="controls">
-    <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
-    <button class="btn-clear" onclick="clearAll()">Xoá</button>
-  </div>
-  <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-  <div class="progress-label" id="progressLabel"></div>
+  <footer>
+    Netflix Cookie Checker Web —
+    <a href="https://github.com/harshitkamboj/Netflix-Cookie-Checker" target="_blank">github.com/harshitkamboj</a>
+    &nbsp;·&nbsp;
+    <a href="https://discord.gg/DYJFE9nu5X" target="_blank">Discord</a>
+  </footer>
 </div>
-
-<!-- Stats -->
-<div class="stats" id="statsRow">
-  <div class="stat hit"> <div class="stat-num" id="sHit">0</div> <div class="stat-label">HIT</div></div>
-  <div class="stat free"><div class="stat-num" id="sFree">0</div><div class="stat-label">FREE</div></div>
-  <div class="stat hold"><div class="stat-num" id="sHold">0</div><div class="stat-label">ON HOLD</div></div>
-  <div class="stat dead"><div class="stat-num" id="sDead">0</div><div class="stat-label">EXPIRED</div></div>
-  <div class="stat err"> <div class="stat-num" id="sErr">0</div> <div class="stat-label">ERROR</div></div>
-</div>
-
-<!-- Export -->
-<div class="export-bar" id="exportBar">
-  <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs</button>
-  <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs</button>
-  <button class="btn-export" onclick="exportTxt('all')">⬇ ALL Valid</button>
-</div>
-
-<!-- Results -->
-<div id="results"></div>
-
-<!-- Guide -->
-<div class="card">
-  <div class="card-title">📖 Hướng dẫn deploy Cloudflare Worker</div>
-  <div style="display:flex;flex-direction:column;gap:14px;margin-top:6px;font-size:12px;line-height:1.8;color:var(--muted)">
-    <div><b style="color:var(--text)">1.</b> Đăng ký tại <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a></div>
-    <div><b style="color:var(--text)">2.</b> Workers &amp; Pages → Create → <b style="color:var(--text)">Start with Hello World!</b> → Deploy</div>
-    <div><b style="color:var(--text)">3.</b> Click <b style="color:var(--text)">Edit code</b> → Ctrl+A → paste nội dung <code style="color:var(--green)">worker.js</code> → Save &amp; Deploy</div>
-    <div><b style="color:var(--text)">4.</b> Copy URL → paste vào Bước 1 → check!</div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px;font-size:10px">
-      ⚡ Miễn phí <b style="color:var(--text)">100,000 req/ngày</b> · NFToken tự động · Webhook Discord tích hợp
-    </div>
-  </div>
-</div>
-
-</main>
-<footer>
-  Netflix Cookie Checker Web —
-  <a href="https://github.com/harshitkamboj/Netflix-Cookie-Checker" target="_blank">github.com/harshitkamboj</a>
-  &nbsp;·&nbsp;
-  <a href="https://discord.gg/DYJFE9nu5X" target="_blank">Discord</a>
-</footer>
 
 <script>
 // ═══════════════════════════════════════════════════════
-// STATE
+// LOGIC XÁC THỰC & BẢO MẬT (AUTH CONTROLLER)
+// ═══════════════════════════════════════════════════════
+const loginSec = document.getElementById('loginSection');
+const appCont  = document.getElementById('appContent');
+
+// Tự động load cấu hình Worker URL cũ nếu có
+const initialUrl = localStorage.getItem('nf_worker_url');
+if(initialUrl) {
+  document.getElementById('loginWorkerUrl').value = initialUrl;
+  document.getElementById('workerUrl').value = initialUrl;
+}
+
+// Hàm chạy kiểm tra Token ngầm khi mở Web
+async function checkGlobalAuth() {
+  const token = localStorage.getItem('nf_app_token');
+  const wUrl  = localStorage.getItem('nf_worker_url');
+  
+  if(!token || !wUrl) {
+    showLoginView();
+    return;
+  }
+  try {
+    const res = await fetch(`${wUrl}/auth/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    const data = await res.json();
+    if(data.ok) {
+      showAppView();
+    } else {
+      handleLogout();
+    }
+  } catch(e) {
+    // Nếu rớt mạng tạm thời vẫn cho giữ UI nhưng chặn thao tác gửi API check cookie sau
+    showAppView();
+  }
+}
+
+function showLoginView() {
+  loginSec.style.display = 'flex';
+  appCont.style.display = 'none';
+}
+function showAppView() {
+  loginSec.style.display = 'none';
+  appCont.style.display = 'block';
+}
+
+async function handleLogin() {
+  const wUrl = document.getElementById('loginWorkerUrl').value.trim();
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errorDiv = document.getElementById('loginError');
+  
+  if(!wUrl || !user || !pass) {
+    errorDiv.textContent = "Vui lòng nhập đầy đủ các trường dữ liệu!";
+    return;
+  }
+  errorDiv.textContent = "Đang xác thực với hệ thống Cloudflare...";
+  
+  try {
+    const res = await fetch(`${wUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass })
+    });
+    const data = await res.json();
+    if(data.ok && data.token) {
+      localStorage.setItem('nf_app_token', data.token);
+      localStorage.setItem('nf_worker_url', wUrl);
+      document.getElementById('workerUrl').value = wUrl;
+      showAppView();
+      toast('Đăng nhập thành công ✓');
+    } else {
+      errorDiv.textContent = data.error || "Tài khoản hoặc mật khẩu không chính xác.";
+    }
+  } catch(e) {
+    errorDiv.textContent = "Lỗi: Không kết nối được tới Worker URL của bạn.";
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem('nf_app_token');
+  showLoginView();
+}
+
+// Kích hoạt tiến trình kiểm tra bảo mật ban đầu
+checkGlobalAuth();
+
+// ═══════════════════════════════════════════════════════
+// STATE ỨNG DỤNG CŨ
 // ═══════════════════════════════════════════════════════
 let results   = [];
 let counts    = {hit:0,free:0,hold:0,dead:0,err:0};
@@ -348,7 +503,6 @@ function switchTab(name) {
 // WORKER URL
 // ═══════════════════════════════════════════════════════
 const urlInput = document.getElementById('workerUrl');
-(()=>{ const s=localStorage.getItem('nf_worker_url'); if(s) urlInput.value=s; })();
 function saveUrl(){ const v=urlInput.value.trim(); if(v){ localStorage.setItem('nf_worker_url',v); toast('URL đã lưu ✓'); }}
 urlInput.addEventListener('change',()=>{ if(urlInput.value.trim()) localStorage.setItem('nf_worker_url',urlInput.value.trim()); });
 
@@ -454,7 +608,7 @@ function splitCookies(text){
 }
 
 // ═══════════════════════════════════════════════════════
-// CHECK
+// CHECK WITH AUTHORIZATION HEADERS
 // ═══════════════════════════════════════════════════════
 async function startCheck(){
   const workerUrl=(urlInput.value||localStorage.getItem('nf_worker_url')||'').trim();
@@ -506,10 +660,24 @@ async function startCheck(){
 
 async function checkOne(wUrl,i,raw,cfg){
   try{
+    const token = localStorage.getItem('nf_app_token'); // Lấy mã token phiên đăng nhập hiện tại
     const res=await fetch(wUrl,{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${token}` // <--- GỬI KÈM TOKEN ĐỂ WORKER XÁC THỰC
+      },
       body:JSON.stringify({cookie:raw,config:cfg}),
     });
+    
+    if (res.status === 401) {
+      results[i].status='err';
+      results[i].error='Phiên làm việc hết hạn. Vui lòng F5 đăng nhập lại.';
+      counts[results[i].status]=(counts[results[i].status]||0)+1;
+      updateStats();refreshCard(i);
+      return;
+    }
+
     const data=await res.json();
     if(!data.ok){
       results[i].status=data.result==='EXPIRED'?'dead':'err';
@@ -532,7 +700,7 @@ async function checkOne(wUrl,i,raw,cfg){
 }
 
 // ═══════════════════════════════════════════════════════
-// UI HELPERS
+// UI RENDER HELPERS CŨ (GIỮ NGUYÊN)
 // ═══════════════════════════════════════════════════════
 function updateProgress(done,total){
   document.getElementById('progressBar').style.width=Math.round(done/total*100)+'%';
@@ -629,7 +797,6 @@ function buildDetail(id){
     return `<div class="info-key">${l}</div><div class="info-val">${esc(v)}</div>`;
   }).join('');
 
-  // NFToken section
   let nftHtml='';
   const nft=r.nftoken;
   if(nft&&nft.token){
@@ -662,9 +829,6 @@ function buildDetail(id){
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════
-// FALLBACK TXT (if worker didn't return txt_file)
-// ═══════════════════════════════════════════════════════
 function buildFallbackTxt(r){
   const info=r.info||{};
   const sub=['hit','hold'].includes(r.status);
@@ -689,9 +853,6 @@ function buildFallbackTxt(r){
   return lines.join('\n');
 }
 
-// ═══════════════════════════════════════════════════════
-// EXPORT
-// ═══════════════════════════════════════════════════════
 function exportTxt(type){
   const f=type==='all'
     ?results.filter(r=>['hit','free','hold'].includes(r.status))
@@ -706,9 +867,6 @@ function dlFile(name,content){
   a.download=name;a.click();
 }
 
-// ═══════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════
 function countryFlag(code){
   if(!code||code.length!==2) return '';
   return[...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join('');
@@ -735,7 +893,7 @@ function toast(msg){
   const t=document.createElement('div');
   Object.assign(t.style,{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',
     background:'#222',border:'1px solid #444',color:'#eee',padding:'8px 18px',
-    borderRadius:'4px',fontSize:'12px',zIndex:'999',transition:'opacity .3s'});
+    borderRadius:'4px',fontSize:'12px',zIndex:'99999',transition:'opacity .3s'});
   t.textContent=msg;document.body.appendChild(t);
   setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},2000);
 }
