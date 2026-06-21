@@ -24,8 +24,8 @@ header{width:100%;padding:16px 28px;display:flex;align-items:center;gap:10px;bor
 .logo span{color:var(--text);font-weight:300}
 .badge{font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 
-/* Main App Wrapper */
-main{width:100%;max-width:900px;padding:32px 16px 80px;display:flex;flex-direction:column;gap:20px}
+/* Main App Wrapper - Đã thêm margin: 0 auto để luôn căn giữa mọi thiết bị */
+main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:flex;flex-direction:column;gap:20px}
 
 /* Card */
 .card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
@@ -180,7 +180,7 @@ footer a{color:var(--red);text-decoration:none}
 @media(max-width:600px){.info-grid{grid-template-columns:1fr}}
 
 /* ═══════════════════════════════════════════════════════
-   GIAO DIỆN LOGIN OVERLAY ĐỒNG BỘ MÀU CHỦ ĐẠO
+   GIAO DIỆN LOGIN OVERLAY
    ═══════════════════════════════════════════════════════ */
 #loginSection {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -232,7 +232,7 @@ footer a{color:var(--red);text-decoration:none}
   </div>
 </div>
 
-<div id="appContent" style="display: none; width: 100%; display: flex; flex-direction: column; align-items: center;">
+<div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
   <header>
     <div class="logo">Netflix<span>Check</span></div>
     <div class="badge">Web v4.5</div>
@@ -432,13 +432,17 @@ function showLoginView() {
   loginSec.style.display = 'flex';
   appCont.style.display = 'none';
 }
+
 function showAppView() {
   loginSec.style.display = 'none';
-  appCont.style.display = 'block';
+  appCont.style.display = 'flex'; // Fix lỗi hiển thị lệch trái trên màn hình lớn
 }
 
 async function handleLogin() {
-  const wUrl = document.getElementById('loginWorkerUrl').value.trim();
+  // Sửa lỗi dư dấu gạch chéo ở cuối đường dẫn
+  const rawUrl = document.getElementById('loginWorkerUrl').value.trim();
+  const wUrl = rawUrl.replace(/\/+$/, ''); 
+  
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
   const errorDiv = document.getElementById('loginError');
@@ -503,8 +507,8 @@ function switchTab(name) {
 // WORKER URL
 // ═══════════════════════════════════════════════════════
 const urlInput = document.getElementById('workerUrl');
-function saveUrl(){ const v=urlInput.value.trim(); if(v){ localStorage.setItem('nf_worker_url',v); toast('URL đã lưu ✓'); }}
-urlInput.addEventListener('change',()=>{ if(urlInput.value.trim()) localStorage.setItem('nf_worker_url',urlInput.value.trim()); });
+function saveUrl(){ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v){ localStorage.setItem('nf_worker_url',v); urlInput.value=v; toast('URL đã lưu ✓'); }}
+urlInput.addEventListener('change',()=>{ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v) { localStorage.setItem('nf_worker_url',v); urlInput.value=v; }});
 
 // ═══════════════════════════════════════════════════════
 // TXT FIELDS CHECKBOXES
@@ -611,7 +615,7 @@ function splitCookies(text){
 // CHECK WITH AUTHORIZATION HEADERS
 // ═══════════════════════════════════════════════════════
 async function startCheck(){
-  const workerUrl=(urlInput.value||localStorage.getItem('nf_worker_url')||'').trim();
+  const workerUrl=(urlInput.value||localStorage.getItem('nf_worker_url')||'').trim().replace(/\/+$/, '');
   if(!workerUrl){alert('Vui lòng nhập Worker URL (Bước 1).');return;}
 
   const chunks=[];
