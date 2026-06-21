@@ -377,16 +377,15 @@ async function checkGlobalAuth() {
   } catch(e) { showAppView(); }
 }
 function showLoginView() { loginSec.style.display = 'flex'; appCont.style.display = 'none'; }
-function showAppView() { 
-  loginSec.style.display = 'none'; 
-  appCont.style.display = 'flex'; 
-  
+function showAppView() {
+  loginSec.style.display = 'none';
+  appCont.style.display = 'flex';
+
+  // Luôn đọc role mới nhất từ localStorage — tránh cache cũ sau logout/login
   const role = localStorage.getItem('nf_user_role');
   const tabAdmin = document.getElementById('tabKeyAdmin');
-  if (role === 'admin') {
-    if (tabAdmin) tabAdmin.style.display = 'block';
-  } else {
-    if (tabAdmin) tabAdmin.style.display = 'none';
+  if (tabAdmin) {
+    tabAdmin.style.display = (role === 'admin') ? 'block' : 'none';
   }
 }
 async function handleLogin() {
@@ -424,7 +423,46 @@ async function handleLogin() {
     else document.getElementById('loginError').textContent = data.error || "Sai thông tin đăng nhập.";
   } catch(e) { document.getElementById('loginError').textContent = "Lỗi kết nối URL Worker."; }
 }
-function handleLogout() { localStorage.removeItem('nf_app_token'); localStorage.removeItem('nf_user_role'); showLoginView(); }
+async function handleLogout() {
+  const token = localStorage.getItem('nf_app_token');
+  const wUrl  = localStorage.getItem('nf_worker_url');
+
+  // Xóa session trên server để token cũ không thể dùng lại
+  if (token && wUrl) {
+    try {
+      await fetch(`${wUrl}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+    } catch(_) {}
+  }
+
+  // Xóa toàn bộ trạng thái local
+  localStorage.removeItem('nf_app_token');
+  localStorage.removeItem('nf_user_role');
+
+  // Reset UI: ẩn tab admin ngay lập tức
+  const tabAdmin = document.getElementById('tabKeyAdmin');
+  if (tabAdmin) tabAdmin.style.display = 'none';
+
+  // Quay về tab cookie mặc định
+  switchTab('input');
+
+  // Xóa sạch dữ liệu runtime trong bộ nhớ
+  results = [];
+  cloudCookies = [];
+  generatedKeysList = [];
+  counts = { hit:0, free:0, hold:0, dead:0, err:0 };
+
+  // Reset form đăng nhập
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginKey').value = '';
+  document.getElementById('loginError').textContent = '';
+
+  showLoginView();
+}
 checkGlobalAuth();
 
 // TAB SWITCHER
