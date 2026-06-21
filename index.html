@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Netflix Cookie Checker</title>
+<title>Netflix Cookie Checker (Cloud Save Version)</title>
 <style>
 :root{
   --bg:#0a0a0a;--surface:#111;--card:#181818;--border:#2a2a2a;
@@ -24,7 +24,7 @@ header{width:100%;padding:16px 28px;display:flex;align-items:center;gap:10px;bor
 .logo span{color:var(--text);font-weight:300}
 .badge{font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 
-/* Main App Wrapper - Đã thêm margin: 0 auto để luôn căn giữa mọi thiết bị */
+/* Main App Wrapper */
 main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:flex;flex-direction:column;gap:20px}
 
 /* Card */
@@ -179,9 +179,7 @@ footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align
 footer a{color:var(--red);text-decoration:none}
 @media(max-width:600px){.info-grid{grid-template-columns:1fr}}
 
-/* ═══════════════════════════════════════════════════════
-   GIAO DIỆN LOGIN OVERLAY
-   ═══════════════════════════════════════════════════════ */
+/* LOGIN OVERLAY */
 #loginSection {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 20px;
@@ -235,7 +233,7 @@ footer a{color:var(--red);text-decoration:none}
 <div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
   <header>
     <div class="logo">Netflix<span>Check</span></div>
-    <div class="badge">Web v4.5</div>
+    <div class="badge">Web v4.5 + Cloud</div>
     <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
   </header>
 
@@ -252,6 +250,7 @@ footer a{color:var(--red);text-decoration:none}
   <div class="card">
     <div class="tabs">
       <button class="tab active" onclick="switchTab('input')">🍪 Cookie</button>
+      <button class="tab" onclick="switchTab('cloud')">☁️ Cloud Storage</button>
       <button class="tab" onclick="switchTab('config')">⚙ Config</button>
       <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
     </div>
@@ -273,6 +272,17 @@ footer a{color:var(--red);text-decoration:none}
         <span class="fmt">✓ Multi-file</span>
         <span class="fmt">✓ NFToken</span>
         <span class="fmt">✓ Webhook</span>
+      </div>
+    </div>
+
+    <!-- TÍNH NĂNG MỚI: QUẢN LÝ KHO COOKIE CLOUD -->
+    <div id="tab-cloud" class="tab-panel">
+      <div class="controls" style="margin-top: 0; margin-bottom: 14px; gap: 8px;">
+        <button class="btn-check" onclick="loadCloudCookies()" style="background: var(--blue); padding: 10px;">🔄 Tải Danh Sách</button>
+        <button class="btn-check" onclick="recheckAllCloud()" style="background: var(--hold); padding: 10px;">▶ Recheck Toàn Bộ Kho</button>
+      </div>
+      <div id="cloudResults" style="display:flex;flex-direction:column;gap:8px">
+        <div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Nhấn "Tải Danh Sách" để đồng bộ dữ liệu từ Cloudflare KV.</div>
       </div>
     </div>
 
@@ -366,42 +376,39 @@ footer a{color:var(--red);text-decoration:none}
   <div id="results"></div>
 
   <div class="card">
-    <div class="card-title">📖 Hướng dẫn deploy Cloudflare Worker</div>
+    <div class="card-title">📖 Hướng dẫn nâng cấp Cloudflare Worker & KV</div>
     <div style="display:flex;flex-direction:column;gap:14px;margin-top:6px;font-size:12px;line-height:1.8;color:var(--muted)">
-      <div><b style="color:var(--text)">1.</b> Đăng ký tại <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a></div>
-      <div><b style="color:var(--text)">2.</b> Workers &amp; Pages → Create → <b style="color:var(--text)">Start with Hello World!</b> → Deploy</div>
-      <div><b style="color:var(--text)">3.</b> Click <b style="color:var(--text)">Edit code</b> → Ctrl+A → paste nội dung <code style="color:var(--green)">worker.js</code> → Save &amp; Deploy</div>
-      <div><b style="color:var(--text)">4.</b> Tạo KV Namespace tên <code style="color:var(--green)">AUTH_KV</code> và Bind vào Worker. Tạo Secret Environment <code style="color:var(--green)">JWT_SECRET</code>.</div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px;font-size:10px">
-        ⚡ Miễn phí <b style="color:var(--text)">100,000 req/ngày</b> · NFToken tự động · Webhook Discord tích hợp · Bảo mật Whitelist ẩn danh
-      </div>
+      <div><b style="color:var(--text)">1.</b> Truy cập Cloudflare Dashboard → Workers &amp; Pages → <b style="color:var(--text)">KV</b>.</div>
+      <div><b style="color:var(--text)">2.</b> Bấm <b style="color:var(--text)">Create Namespace</b> → Đặt tên chính xác là <code style="color:var(--green)">COOKIE_KV</code> → Save.</div>
+      <div><b style="color:var(--text)">3.</b> Vào Worker của bạn → tab <b style="color:var(--text)">Settings</b> → <b style="color:var(--text)">Variables</b> → Kéo xuống mục <b style="color:var(--text)">KV Namespace Bindings</b>.</div>
+      <div><b style="color:var(--text)">4.</b> Bấm <b style="color:var(--text)">Add Binding</b> → Điền Variable Name là <code style="color:var(--green)">COOKIE_KV</code> và chọn tài nguyên KV tương ứng vừa tạo → Save & Deploy lại Worker Code.</div>
     </div>
   </div>
   </main>
 
   <footer>
-    Netflix Cookie Checker Web —
-    <a href="https://github.com/harshitkamboj/Netflix-Cookie-Checker" target="_blank">github.com/harshitkamboj</a>
-    &nbsp;·&nbsp;
-    <a href="https://discord.gg/DYJFE9nu5X" target="_blank">Discord</a>
+    Netflix Cookie Checker Cloud Edition — Mã nguồn tối ưu hóa bảo mật
   </footer>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// LOGIC XÁC THỰC & BẢO MẬT (AUTH CONTROLLER)
-// ═══════════════════════════════════════════════════════
+// STATE ỨNG DỤNG
+let results   = [];
+let counts    = {hit:0,free:0,hold:0,dead:0,err:0};
+let running   = false;
+let loadedFiles = [];
+let cloudCookies = [];
+
 const loginSec = document.getElementById('loginSection');
 const appCont  = document.getElementById('appContent');
 
-// Tự động load cấu hình Worker URL cũ nếu có
 const initialUrl = localStorage.getItem('nf_worker_url');
 if(initialUrl) {
   document.getElementById('loginWorkerUrl').value = initialUrl;
   document.getElementById('workerUrl').value = initialUrl;
 }
 
-// Hàm chạy kiểm tra Token ngầm khi mở Web
+// Kiểm tra phiên đăng nhập ban đầu
 async function checkGlobalAuth() {
   const token = localStorage.getItem('nf_app_token');
   const wUrl  = localStorage.getItem('nf_worker_url');
@@ -423,7 +430,6 @@ async function checkGlobalAuth() {
       handleLogout();
     }
   } catch(e) {
-    // Nếu rớt mạng tạm thời vẫn cho giữ UI nhưng chặn thao tác gửi API check cookie sau
     showAppView();
   }
 }
@@ -435,14 +441,12 @@ function showLoginView() {
 
 function showAppView() {
   loginSec.style.display = 'none';
-  appCont.style.display = 'flex'; // Fix lỗi hiển thị lệch trái trên màn hình lớn
+  appCont.style.display = 'flex';
 }
 
 async function handleLogin() {
-  // Sửa lỗi dư dấu gạch chéo ở cuối đường dẫn
   const rawUrl = document.getElementById('loginWorkerUrl').value.trim();
   const wUrl = rawUrl.replace(/\/+$/, ''); 
-  
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
   const errorDiv = document.getElementById('loginError');
@@ -451,7 +455,7 @@ async function handleLogin() {
     errorDiv.textContent = "Vui lòng nhập đầy đủ các trường dữ liệu!";
     return;
   }
-  errorDiv.textContent = "Đang xác thực với hệ thống Cloudflare...";
+  errorDiv.textContent = "Đang kết nối tới Cloudflare KV...";
   
   try {
     const res = await fetch(`${wUrl}/auth/login`, {
@@ -467,10 +471,10 @@ async function handleLogin() {
       showAppView();
       toast('Đăng nhập thành công ✓');
     } else {
-      errorDiv.textContent = data.error || "Tài khoản hoặc mật khẩu không chính xác.";
+      errorDiv.textContent = data.error || "Tài khoản hoặc mật khẩu whitelist sai.";
     }
   } catch(e) {
-    errorDiv.textContent = "Lỗi: Không kết nối được tới Worker URL của bạn.";
+    errorDiv.textContent = "Lỗi: Không kết nối được tới Worker URL.";
   }
 }
 
@@ -479,40 +483,26 @@ function handleLogout() {
   showLoginView();
 }
 
-// Kích hoạt tiến trình kiểm tra bảo mật ban đầu
 checkGlobalAuth();
 
-// ═══════════════════════════════════════════════════════
-// STATE ỨNG DỤNG CŨ
-// ═══════════════════════════════════════════════════════
-let results   = [];
-let counts    = {hit:0,free:0,hold:0,dead:0,err:0};
-let running   = false;
-let loadedFiles = [];
-
-// ═══════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════
+// TABS CONTROLLER (Bản sửa lỗi hỗ trợ 4 Tabs)
 function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    const panels=['input','config','webhook'];
-    t.classList.toggle('active', panels[i]===name);
+  const panels = ['input', 'cloud', 'config', 'webhook'];
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', panels[i] === name);
   });
-  document.querySelectorAll('.tab-panel').forEach(p=>{
-    p.classList.toggle('active', p.id===`tab-${name}`);
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.toggle('active', p.id === `tab-${name}`);
   });
+  if(name === 'cloud') loadCloudCookies();
 }
 
-// ═══════════════════════════════════════════════════════
-// WORKER URL
-// ═══════════════════════════════════════════════════════
+// WORKER URL UTILS
 const urlInput = document.getElementById('workerUrl');
 function saveUrl(){ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v){ localStorage.setItem('nf_worker_url',v); urlInput.value=v; toast('URL đã lưu ✓'); }}
 urlInput.addEventListener('change',()=>{ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v) { localStorage.setItem('nf_worker_url',v); urlInput.value=v; }});
 
-// ═══════════════════════════════════════════════════════
-// TXT FIELDS CHECKBOXES
-// ═══════════════════════════════════════════════════════
+// CONFIG SETUP
 const TXT_FIELD_DEFS = [
   ['name','Name'],['email','Email'],['country','Country'],['plan','Plan'],
   ['member_since','Member Since'],['next_billing','Next Billing'],
@@ -564,9 +554,7 @@ function getConfig(){
   };
 }
 
-// ═══════════════════════════════════════════════════════
-// FILE DROP
-// ═══════════════════════════════════════════════════════
+// FILE DRAG AND DROP
 const dropZone=document.getElementById('dropZone');
 const fileInput=document.getElementById('fileInput');
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
@@ -591,9 +579,6 @@ function renderFileTags(){
 }
 function removeFile(i){ loadedFiles.splice(i,1); renderFileTags(); }
 
-// ═══════════════════════════════════════════════════════
-// COOKIE SPLITTING
-// ═══════════════════════════════════════════════════════
 function splitCookies(text){
   text=(text||'').trim();
   if(!text) return[];
@@ -606,17 +591,17 @@ function splitCookies(text){
       }
     }catch(_){}
   }
-  const blocks=text.split(/\n\s*\n+/).map(b=>b.trim()).filter(Boolean);
+  const blocks=text.split(/
+\s*
++/).map(b=>b.trim()).filter(Boolean);
   const valid=blocks.filter(b=>b.includes('NetflixId')||b.startsWith('[')||b.startsWith('{'));
   return valid.length?valid:[text];
 }
 
-// ═══════════════════════════════════════════════════════
-// CHECK WITH AUTHORIZATION HEADERS
-// ═══════════════════════════════════════════════════════
+// TIẾN TRÌNH CHECK COOKIE
 async function startCheck(){
   const workerUrl=(urlInput.value||localStorage.getItem('nf_worker_url')||'').trim().replace(/\/+$/, '');
-  if(!workerUrl){alert('Vui lòng nhập Worker URL (Bước 1).');return;}
+  if(!workerUrl){alert('Vui lòng nhập Worker URL.');return;}
 
   const chunks=[];
   for(const f of loadedFiles){
@@ -627,7 +612,7 @@ async function startCheck(){
     const parts=splitCookies(manual);
     parts.forEach((p,i)=>chunks.push({raw:p,label:parts.length>1?`#${i+1}`:'manual'}));
   }
-  if(!chunks.length){alert('Chưa có cookie! Kéo file hoặc paste vào.');return;}
+  if(!chunks.length){alert('Chưa có dữ liệu cookie.');return;}
 
   results=[];counts={hit:0,free:0,hold:0,dead:0,err:0};
   document.getElementById('results').innerHTML='';
@@ -657,26 +642,23 @@ async function startCheck(){
   await Promise.all(Array.from({length:Math.min(5,chunks.length)},runNext));
 
   btn.disabled=false;btn.textContent='▶ Check Cookie';running=false;
-  document.getElementById('progressLabel').textContent=`Hoàn tất — ${chunks.length} cookie đã check.`;
+  document.getElementById('progressLabel').textContent=`Hoàn tất — ${chunks.length} cookie.`;
   if(results.some(r=>['hit','free','hold'].includes(r.status)))
     document.getElementById('exportBar').style.display='flex';
 }
 
 async function checkOne(wUrl,i,raw,cfg){
   try{
-    const token = localStorage.getItem('nf_app_token'); // Lấy mã token phiên đăng nhập hiện tại
+    const token = localStorage.getItem('nf_app_token');
     const res=await fetch(wUrl,{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization': `Bearer ${token}` // <--- GỬI KÈM TOKEN ĐỂ WORKER XÁC THỰC
-      },
+      headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
       body:JSON.stringify({cookie:raw,config:cfg}),
     });
     
     if (res.status === 401) {
       results[i].status='err';
-      results[i].error='Phiên làm việc hết hạn. Vui lòng F5 đăng nhập lại.';
+      results[i].error='Hết hạn phiên. Vui lòng F5.';
       counts[results[i].status]=(counts[results[i].status]||0)+1;
       updateStats();refreshCard(i);
       return;
@@ -685,7 +667,7 @@ async function checkOne(wUrl,i,raw,cfg){
     const data=await res.json();
     if(!data.ok){
       results[i].status=data.result==='EXPIRED'?'dead':'err';
-      results[i].error=data.error||data.reason||'Unknown error';
+      results[i].error=data.error||data.reason||'Error';
     } else {
       const r=data.result;
       const onHold=data.is_on_hold||false;
@@ -703,9 +685,6 @@ async function checkOne(wUrl,i,raw,cfg){
   updateStats();refreshCard(i);
 }
 
-// ═══════════════════════════════════════════════════════
-// UI RENDER HELPERS CŨ (GIỮ NGUYÊN)
-// ═══════════════════════════════════════════════════════
 function updateProgress(done,total){
   document.getElementById('progressBar').style.width=Math.round(done/total*100)+'%';
   document.getElementById('progressLabel').textContent=`Đang check ${done}/${total}…`;
@@ -724,7 +703,7 @@ function renderCard(r){
   el.innerHTML=`
     <div class="result-header" onclick="toggleDetail(${r.id})">
       <span class="status-badge"><span class="spinner"></span></span>
-      <span class="result-summary"><span class="dim">${esc(r.label)} — Đang kiểm tra…</span></span>
+      <span class="result-summary"><span class="dim">${esc(r.label)} — Đang quét…</span></span>
       <button class="toggle-btn">▾</button>
     </div>
     <div class="result-detail" id="detail-${r.id}"></div>`;
@@ -817,19 +796,20 @@ function buildDetail(id){
         <div class="nft-title">🔑 NFToken</div>
         <div class="nft-links">${links.join('')}</div>
         <div class="nft-expiry">Valid Till (UTC): ${esc(exp)}</div>
-        <div class="nft-expiry" style="margin-top:3px;font-size:9px;opacity:.4;word-break:break-all">${esc(t)}</div>
       </div>`;
   }
 
   const dlName=`netflix_${country||'xx'}_${Date.now()}.txt`;
   const dlContent=r.txt||buildFallbackTxt(r);
 
+  // ĐÃ SỬA: Tích hợp nút lưu Cloud an toàn bằng ID tham chiếu mảng, tránh crash layout attributes
   d.innerHTML=`
     <div class="info-grid">${grid}</div>
     ${nftHtml}
     <div class="action-row">
       <button class="btn-action btn-copy" onclick="copyText(this,${JSON.stringify(r.netscape||'')})">📋 Copy Cookie</button>
       <button class="btn-action btn-dl"   onclick="dlFile(${JSON.stringify(dlName)},${JSON.stringify(dlContent)})">⬇ Save .txt</button>
+      <button class="btn-action" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue)" onclick="saveCookieToCloud(${r.id})">☁️ Lưu Cloud</button>
     </div>`;
 }
 
@@ -842,27 +822,20 @@ function buildFallbackTxt(r){
     `Country: ${info.country||'UNKNOWN'}`,`Plan: ${info.plan||'UNKNOWN'}`,
     `Quality: ${info.quality||'UNKNOWN'}`,`Streams: ${info.max_streams||'UNKNOWN'}`,
     `Price: ${info.plan_price||'N/A'}`,`Email: ${info.email||'UNKNOWN'}`,
-    `Next Billing: ${info.next_billing||'UNKNOWN'}`,`Status: ${info.membership_status||'UNKNOWN'}`,
-    `Profiles: ${info.profiles||'UNKNOWN'}`,`User GUID: ${info.user_guid||'UNKNOWN'}`,
   ];
-  if(sub&&nft?.token){
-    lines.push('',D,'','NFToken DETAILS :👇','');
-    lines.push(`NFToken: ${nft.token}`);
-    lines.push(`🖥️ PC Login: https://netflix.com/?nftoken=${nft.token}`);
-    lines.push(`📱 Phone Login: https://netflix.com/unsupported?nftoken=${nft.token}`);
-    if(nft.expires_at_utc) lines.push(`Valid Till (UTC): ${nft.expires_at_utc}`);
-  }
-  lines.push('',D,'','Checker By: github.com/harshitkamboj | Website: harshitkamboj.in');
-  lines.push('Netflix COOKIE :👇','',(r.netscape||'').trim(),'');
-  return lines.join('\n');
+  lines.push('',D,'','Netflix COOKIE :👇','',(r.netscape||'').trim(),'');
+  return lines.join('
+');
 }
 
 function exportTxt(type){
-  const f=type==='all'
-    ?results.filter(r=>['hit','free','hold'].includes(r.status))
-    :results.filter(r=>r.status===type);
-  if(!f.length){toast('Không có kết quả để xuất.');return;}
-  const sep='\n\n'+'='.repeat(98)+'\n\n';
+  const f=type==='all'?results.filter(r=>['hit','free','hold'].includes(r.status)):results.filter(r=>r.status===type);
+  if(!f.length){toast('Không có kết quả.');return;}
+  const sep='
+
+'+'='.repeat(98)+'
+
+';
   dlFile(`netflix_${type}_${Date.now()}.txt`,f.map(r=>r.txt||buildFallbackTxt(r)).join(sep));
 }
 function dlFile(name,content){
@@ -896,14 +869,139 @@ function clearAll(){
 function toast(msg){
   const t=document.createElement('div');
   Object.assign(t.style,{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',
-    background:'#222',border:'1px solid #444',color:'#eee',padding:'8px 18px',
-    borderRadius:'4px',fontSize:'12px',zIndex:'99999',transition:'opacity .3s'});
+    background:'#222',border:'1px solid #444',color:'#eee',padding:'8px 18px',borderRadius:'4px',fontSize:'12px',zIndex:'99999'});
   t.textContent=msg;document.body.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},2000);
+  setTimeout(()=>{t.remove();},2000);
 }
-document.getElementById('cookieInput').addEventListener('keydown',e=>{
-  if(e.ctrlKey&&e.key==='Enter') startCheck();
-});
+
+// ═══════════════════════════════════════════════════════
+// LOGIC XỬ LÝ KHO LƯU TRỮ CLOUD TRÊN CLOUDFLARE KV
+// ═══════════════════════════════════════════════════════
+async function apiFetch(endpoint, method = 'GET', body = null) {
+  const wUrl = localStorage.getItem('nf_worker_url');
+  const token = localStorage.getItem('nf_app_token');
+  if(!wUrl || !token) return null;
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(`${wUrl}${endpoint}`, opts);
+    return await r.json();
+  } catch(e) { return { ok: false, error: e.message }; }
+}
+
+async function saveCookieToCloud(id) {
+  const r = results[id];
+  if(!r) return;
+  toast('Đang đẩy dữ liệu lên Cloud...');
+  const label = r.info?.email || r.label || 'Saved Cookie';
+  const res = await apiFetch('/api/cloud/cookies', 'POST', {
+    netscape: r.netscape,
+    label: label,
+    status: r.status,
+    info: r.info
+  });
+  if(res && res.ok) {
+    toast('Đã lưu thành công vào Cloudflare KV ✓');
+  } else {
+    toast(`Thất bại: ${res?.error || 'Trùng lặp hoặc lỗi cấu hình'}`);
+  }
+}
+
+async function loadCloudCookies() {
+  const cont = document.getElementById('cloudResults');
+  cont.innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> Đang đồng bộ hóa...</div>';
+  const res = await apiFetch('/api/cloud/cookies');
+  if(res && res.ok) {
+    cloudCookies = res.data;
+    renderCloudList();
+  } else {
+    cont.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Không thể tải dữ liệu từ Cloud KV.</div>`;
+  }
+}
+
+function renderCloudList() {
+  const cont = document.getElementById('cloudResults');
+  if(!cloudCookies.length) {
+    cont.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Kho lưu trữ trống.</div>';
+    return;
+  }
+  cont.innerHTML = cloudCookies.map((c) => {
+    const badge = c.status === 'hit' ? '<span style="color:var(--green)">✅ HIT</span>' :
+                  c.status === 'free' ? '<span style="color:var(--gold)">🟡 FREE</span>' :
+                  c.status === 'hold' ? '<span style="color:var(--hold)">⏸ HOLD</span>' :
+                  '<span style="color:var(--red)">❌ DEAD</span>';
+    const checkDate = c.lastCheck ? new Date(c.lastCheck).toLocaleString() : new Date(c.savedAt).toLocaleString();
+    
+    return `
+      <div class="result-card ${c.status}" style="border-left-width:3px;" id="cloud-card-${c.id}">
+        <div class="result-header" style="justify-content:space-between; cursor:default;">
+          <div style="display:flex;gap:10px;align-items:center;overflow:hidden;">
+             <span class="status-badge" style="background:#1a1a1a">${badge}</span>
+             <span class="result-summary">${esc(c.info?.plan || 'Free Account')} <span class="dim">· ${esc(c.info?.email || c.label)}</span></span>
+          </div>
+          <div style="display:flex;gap:5px;flex-shrink:0;">
+             <button class="btn-action btn-copy" onclick="copyText(this, ${JSON.stringify(c.netscape)})" style="padding:5px 9px">📋 Copy</button>
+             <button class="btn-action" style="color:var(--red);border-color:var(--red);padding:5px 9px;" onclick="deleteCloudCookie('${c.id}')">✕ Xoá</button>
+          </div>
+        </div>
+        <div style="padding:0 16px 12px 16px;font-size:10px;color:var(--muted)">Đồng bộ cuối: ${checkDate}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function deleteCloudCookie(id) {
+  if(!confirm("Bạn có chắc chắn muốn xóa cookie này khỏi hệ thống Cloud?")) return;
+  const res = await apiFetch(`/api/cloud/cookies/${id}`, 'DELETE');
+  if(res && res.ok) {
+    toast('Đã xoá dữ liệu trên KV ✓');
+    loadCloudCookies();
+  }
+}
+
+async function recheckAllCloud() {
+  if(!cloudCookies.length) return toast("Không có cookie trong kho");
+  const wUrl = localStorage.getItem('nf_worker_url');
+  const token = localStorage.getItem('nf_app_token');
+  const cfg = getConfig();
+  
+  toast('Bắt đầu Recheck tự động toàn kho...');
+  for(let i=0; i<cloudCookies.length; i++) {
+    const c = cloudCookies[i];
+    const card = document.getElementById(`cloud-card-${c.id}`);
+    if(card) card.querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
+    
+    try {
+      const res = await fetch(wUrl, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
+        body:JSON.stringify({cookie:c.netscape, config:cfg}),
+      });
+      const data = await res.json();
+      
+      let newStatus = 'dead';
+      let newInfo = c.info;
+      
+      if(data.ok) {
+        newStatus = data.is_on_hold ? 'hold' : data.result === 'HIT' ? 'hit' : data.result === 'FREE' ? 'free' : 'dead';
+        if(data.info) newInfo = data.info;
+      }
+      
+      cloudCookies[i].status = newStatus;
+      cloudCookies[i].info = newInfo;
+      cloudCookies[i].lastCheck = Date.now();
+      
+      await apiFetch('/api/cloud/cookies/update', 'POST', { id: c.id, status: newStatus, info: newInfo });
+      renderCloudList();
+    } catch(e) {
+      if(card) card.querySelector('.status-badge').innerHTML = '⚠ ERR';
+    }
+  }
+  toast("Recheck và đồng bộ đám mây hoàn tất!");
+}
 </script>
 </body>
 </html>
