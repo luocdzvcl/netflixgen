@@ -342,6 +342,7 @@ select:focus{border-color:var(--red)}
         <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs</button>
         <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs</button>
         <button class="btn-export" onclick="exportTxt('all')">⬇ ALL</button>
+        <button class="btn-export" onclick="saveAllHitsToCloud()" style="color: var(--blue); border-color: var(--blue);">☁️ LƯU ALL HIT LÊN CLOUD</button>
       </div>
       <div id="results"></div>
     </div>
@@ -381,7 +382,6 @@ function showAppView() {
   loginSec.style.display = 'none';
   appCont.style.display = 'flex';
 
-  // Luôn đọc role mới nhất từ localStorage — tránh cache cũ sau logout/login
   const role = localStorage.getItem('nf_user_role');
   const tabAdmin = document.getElementById('tabKeyAdmin');
   if (tabAdmin) {
@@ -427,7 +427,6 @@ async function handleLogout() {
   const token = localStorage.getItem('nf_app_token');
   const wUrl  = localStorage.getItem('nf_worker_url');
 
-  // Xóa session trên server để token cũ không thể dùng lại
   if (token && wUrl) {
     try {
       await fetch(`${wUrl}/auth/logout`, {
@@ -438,24 +437,19 @@ async function handleLogout() {
     } catch(_) {}
   }
 
-  // Xóa toàn bộ trạng thái local
   localStorage.removeItem('nf_app_token');
   localStorage.removeItem('nf_user_role');
 
-  // Reset UI: ẩn tab admin ngay lập tức
   const tabAdmin = document.getElementById('tabKeyAdmin');
   if (tabAdmin) tabAdmin.style.display = 'none';
 
-  // Quay về tab cookie mặc định
   switchTab('input');
 
-  // Xóa sạch dữ liệu runtime trong bộ nhớ
   results = [];
   cloudCookies = [];
   generatedKeysList = [];
   counts = { hit:0, free:0, hold:0, dead:0, err:0 };
 
-  // Reset form đăng nhập
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginKey').value = '';
@@ -548,7 +542,7 @@ async function checkOne(wUrl,i,raw,cfg){
     if (res.status === 401) { results[i].status='err'; results[i].error='Hết hạn phiên. Vui lòng F5.'; counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i); return; }
     const data=await res.json();
     if(!data.ok){ results[i].status=data.result==='EXPIRED'?'dead':'err'; results[i].error=data.error||data.reason||'Error'; }
-    else { const r=data.result; results[i].status = data.is_on_hold?'hold': r==='HIT'?'hit': r==='FREE'?'free':'dead'; results[i].info = data.info; results[i].nftoken= data.nftoken||null; results[i].txt = data.txt_file||null; results[i].netscape=data.netscape||null; }
+    else { const r=data.result; results[i].status = data.is_on_hold?'hold': r==='HIT_EXTRA'||r==='HIT'?'hit': r==='FREE'?'free':'dead'; results[i].info = data.info; results[i].nftoken= data.nftoken||null; results[i].txt = data.txt_file||null; results[i].netscape=data.netscape||null; }
   }catch(e){ results[i].status='err'; results[i].error=e.message||'Network error'; }
   counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i);
 }
@@ -658,6 +652,43 @@ async function saveCookieToCloud(id) {
   const label = r.info?.email || r.label || 'Saved Cookie';
   const res = await apiFetch('/api/cloud/cookies', 'POST', { netscape: r.netscape, label: label, status: r.status, info: r.info, nftoken: r.nftoken });
   if(res && res.ok) toast('Đã lưu thành công vào Cloudflare KV ✓'); else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
+}
+
+// ════ LƯU TẤT CẢ HIT LÊN CLOUD ════
+async function saveAllHitsToCloud() {
+  const hits = results.filter(r => r.status === 'hit' || r.status === 'hold');
+  
+  if (!hits.length) {
+    return toast('Không có tài khoản HIT hoặc HOLD nào để lưu!');
+  }
+
+  const btn = document.querySelector('button[onclick="saveAllHitsToCloud()"]');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner" style="border-top-color:var(--blue)"></span> Đang lưu...';
+  btn.disabled = true;
+
+  let success = 0;
+  let failed = 0;
+  
+  for (const r of hits) {
+    const label = r.info?.email || r.label || 'Saved Cookie';
+    const res = await apiFetch('/api/cloud/cookies', 'POST', { 
+      netscape: r.netscape, 
+      label: label, 
+      status: r.status, 
+      info: r.info, 
+      nftoken: r.nftoken 
+    });
+    
+    if (res && res.ok) success++;
+    else failed++;
+  }
+
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+  toast(`Hoàn tất! Lưu mới: ${success} | Bỏ qua (Trùng/Lỗi): ${failed}`);
+  
+  loadCloudCookies();
 }
 
 async function loadCloudCookies() {
