@@ -27,7 +27,7 @@ main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:fle
 .card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
 .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 
-.tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px;flex-wrap:wrap;}
+.tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px}
 .tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s}
 .tab.active{background:var(--card);color:var(--text)}
 .tab-panel{display:none}.tab-panel.active{display:block}
@@ -58,11 +58,11 @@ textarea:focus{border-color:var(--red)}
 .formats{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .fmt{font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 8px;letter-spacing:.5px}
 
-.controls{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+.controls{display:flex;gap:10px;align-items:center;margin-top:14px}
 .btn-check{flex:1;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
 .btn-check:hover:not(:disabled){background:#c1070f}
 .btn-check:disabled{background:var(--red-dim);cursor:not-allowed;opacity:.7}
-.btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s; font-weight: bold;}
+.btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s}
 .btn-clear:hover{border-color:var(--text);color:var(--text)}
 
 .progress-wrap{display:none;margin-top:14px;background:var(--surface);border-radius:4px;height:3px;overflow:hidden}
@@ -183,7 +183,9 @@ select:focus{border-color:var(--red)}
 </head>
 <body>
 
-<noscript><div style="color: white; text-align: center; padding: 50px;">Vui lòng bật JavaScript!</div></noscript>
+<noscript>
+  <div style="color: white; text-align: center; padding: 50px;">Vui lòng bật JavaScript!</div>
+</noscript>
 <div id="jsErrorFallback" style="color: var(--red); text-align: center; padding: 20px; display: none; font-weight: bold; position: relative; z-index: 10000;"></div>
 
 <script>
@@ -210,7 +212,7 @@ select:focus{border-color:var(--red)}
 <div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
   <header>
     <div class="logo">Netflix<span>Check</span></div>
-    <div class="badge">Web v4.7 + Proxy</div>
+    <div class="badge">Web v4.6 + Cloud</div>
     <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
   </header>
 
@@ -226,7 +228,6 @@ select:focus{border-color:var(--red)}
   <div class="card">
     <div class="tabs">
       <button class="tab active" onclick="switchTab('input')">🍪 Cookie</button>
-      <button class="tab" onclick="switchTab('proxy')">🌐 Proxy</button>
       <button class="tab" onclick="switchTab('cloud')">☁️ Cloud Storage</button>
       <button class="tab" onclick="switchTab('config')">⚙ Config</button>
       <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
@@ -243,20 +244,6 @@ select:focus{border-color:var(--red)}
       <div class="or-div">hoặc paste</div>
       <textarea id="cookieInput" placeholder="Paste cookie..."></textarea>
       <div class="formats"><span class="fmt">✓ Netscape</span><span class="fmt">✓ JSON array</span></div>
-    </div>
-
-    <div id="tab-proxy" class="tab-panel">
-      <div class="cfg-group">
-        <div class="cfg-group-title">Danh sách Proxy (Mỗi dòng 1 Proxy)</div>
-        <textarea id="proxyInput" placeholder="ip:port&#10;user:pass@ip:port&#10;socks5://user:pass@ip:port" style="min-height: 180px;"></textarea>
-        <div style="font-size: 10px; color: var(--muted); margin-top: 8px; line-height: 1.5;">
-          Hệ thống tự nhận diện thông minh các dạng Proxy: <br>
-          • <code>ip:port</code> | <code>user:pass@ip:port</code> | <code>ip:port@user:pass</code> <br>
-          • <code>ip:port:user:pass</code> | <code>user:pass:ip:port</code> <br>
-          • <code>http://...</code> | <code>socks4://...</code> | <code>socks5://...</code> <br>
-          • Chấp nhận dải phân cách bằng các dấu: khoảng trắng, <code>|</code>, <code>;</code>, <code>,</code>
-        </div>
-      </div>
     </div>
 
     <div id="tab-cloud" class="tab-panel">
@@ -339,7 +326,6 @@ select:focus{border-color:var(--red)}
     <div id="mainControlsSection">
       <div class="controls">
         <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
-        <button class="btn-clear" id="recheckErrorBtn" onclick="recheckErrors()" style="border-color: var(--hold); color: var(--hold);">🔄 Recheck Lỗi</button>
         <button class="btn-clear" onclick="clearAll()">Xoá</button>
       </div>
       <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
@@ -375,12 +361,6 @@ let generatedKeysList = [];
 const loginSec = document.getElementById('loginSection');
 const appCont  = document.getElementById('appContent');
 
-// Khôi phục proxy đã lưu
-window.addEventListener('DOMContentLoaded', () => {
-    const savedProxies = localStorage.getItem('nf_proxies');
-    if(savedProxies) document.getElementById('proxyInput').value = savedProxies;
-});
-
 const initialUrl = localStorage.getItem('nf_worker_url');
 if(initialUrl) { document.getElementById('loginWorkerUrl').value = initialUrl; document.getElementById('workerUrl').value = initialUrl; }
 
@@ -399,56 +379,92 @@ async function checkGlobalAuth() {
 }
 function showLoginView() { loginSec.style.display = 'flex'; appCont.style.display = 'none'; }
 function showAppView() {
-  loginSec.style.display = 'none'; appCont.style.display = 'flex';
+  loginSec.style.display = 'none';
+  appCont.style.display = 'flex';
+
   const role = localStorage.getItem('nf_user_role');
   const tabAdmin = document.getElementById('tabKeyAdmin');
-  if (tabAdmin) tabAdmin.style.display = (role === 'admin') ? 'block' : 'none';
+  if (tabAdmin) {
+    tabAdmin.style.display = (role === 'admin') ? 'block' : 'none';
+  }
 }
-
 async function handleLogin() {
   const wUrl = document.getElementById('loginWorkerUrl').value.trim().replace(/\/+$/, ''); 
   if(!wUrl) return document.getElementById('loginError').textContent = "Nhập Worker URL!";
+  
   const key = document.getElementById('loginKey').value.trim();
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
   
-  let payload = {}; let endpoint = '/auth/login';
+  let payload = {};
+  let endpoint = '/auth/login';
+  
   if (key) {
     if(!key.startsWith('NFNTOC29-')) return document.getElementById('loginError').textContent = "Định dạng Key không hợp lệ!";
-    payload = { key: key }; endpoint = '/auth/login-key';
+    payload = { key: key };
+    endpoint = '/auth/login-key';
   } else {
     if(!user || !pass) return document.getElementById('loginError').textContent = "Nhập đủ thông tin tài khoản!";
     payload = { username: user, password: pass };
   }
+  
   document.getElementById('loginError').textContent = "Đang kết nối...";
   try {
     const res = await fetch(`${wUrl}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const data = await res.json();
     if(data.ok) { 
-      localStorage.setItem('nf_app_token', data.token); localStorage.setItem('nf_worker_url', wUrl); localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
-      document.getElementById('workerUrl').value = wUrl; showAppView(); toast('Đăng nhập thành công ✓'); 
-    } else document.getElementById('loginError').textContent = data.error || "Sai thông tin đăng nhập.";
+      localStorage.setItem('nf_app_token', data.token); 
+      localStorage.setItem('nf_worker_url', wUrl); 
+      localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
+      document.getElementById('workerUrl').value = wUrl; 
+      showAppView(); 
+      toast('Đăng nhập thành công ✓'); 
+    }
+    else document.getElementById('loginError').textContent = data.error || "Sai thông tin đăng nhập.";
   } catch(e) { document.getElementById('loginError').textContent = "Lỗi kết nối URL Worker."; }
 }
-
 async function handleLogout() {
-  const token = localStorage.getItem('nf_app_token'); const wUrl  = localStorage.getItem('nf_worker_url');
-  if (token && wUrl) { try { await fetch(`${wUrl}/auth/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) }); } catch(_) {} }
-  localStorage.removeItem('nf_app_token'); localStorage.removeItem('nf_user_role');
-  if (document.getElementById('tabKeyAdmin')) document.getElementById('tabKeyAdmin').style.display = 'none';
+  const token = localStorage.getItem('nf_app_token');
+  const wUrl  = localStorage.getItem('nf_worker_url');
+
+  if (token && wUrl) {
+    try {
+      await fetch(`${wUrl}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+    } catch(_) {}
+  }
+
+  localStorage.removeItem('nf_app_token');
+  localStorage.removeItem('nf_user_role');
+
+  const tabAdmin = document.getElementById('tabKeyAdmin');
+  if (tabAdmin) tabAdmin.style.display = 'none';
+
   switchTab('input');
-  results = []; cloudCookies = []; generatedKeysList = []; counts = { hit:0, free:0, hold:0, dead:0, err:0 };
-  document.getElementById('loginUser').value = ''; document.getElementById('loginPass').value = ''; document.getElementById('loginKey').value = ''; document.getElementById('loginError').textContent = '';
+
+  results = [];
+  cloudCookies = [];
+  generatedKeysList = [];
+  counts = { hit:0, free:0, hold:0, dead:0, err:0 };
+
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginKey').value = '';
+  document.getElementById('loginError').textContent = '';
+
   showLoginView();
 }
 checkGlobalAuth();
 
 // TAB SWITCHER
 function switchTab(name) {
-  const panels = ['input', 'proxy', 'cloud', 'config', 'webhook', 'keys'];
+  const panels = ['input', 'cloud', 'config', 'webhook', 'keys'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', panels[i] === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
-  document.getElementById('mainControlsSection').style.display = (name === 'input' || name === 'proxy') ? 'block' : 'none';
+  document.getElementById('mainControlsSection').style.display = name === 'input' ? 'block' : 'none';
   if(name === 'cloud') loadCloudCookies();
   if(name === 'keys') loadAdminKeys();
 }
@@ -474,37 +490,6 @@ function getConfig(){
     performance: { nftoken_for_free: document.getElementById('cfg_nftoken_for_free') ? document.getElementById('cfg_nftoken_for_free').checked : false },
     retries: { nftoken_attempts: document.getElementById('cfg_nftoken_attempts') ? parseInt(document.getElementById('cfg_nftoken_attempts').value)||3 : 3 },
   };
-}
-
-// HÀM PHÂN TÍCH PROXY CỰC KỲ MẠNH MẼ
-function getParsedProxies() {
-  const raw = document.getElementById('proxyInput').value.trim();
-  if(!raw) return [];
-  localStorage.setItem('nf_proxies', raw);
-  
-  return raw.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
-      let proto = 'http';
-      let clean = line.replace(/\s+/g, ':'); // thay khoảng trắng bằng : để xử lý
-      const protoMatch = clean.match(/^(https?|socks4a?|socks5h?):\/\/(.*)/i);
-      if (protoMatch) { proto = protoMatch[1].toLowerCase(); clean = protoMatch[2]; }
-      clean = clean.replace(/[|;,]/g, ':'); 
-
-      let ip, port, user, pass;
-      if (clean.includes('@')) {
-          const parts = clean.split('@');
-          if (parts[1].includes('.')) { [user, pass] = parts[0].split(':'); [ip, port] = parts[1].split(':'); } 
-          else { [ip, port] = parts[0].split(':'); [user, pass] = parts[1].split(':'); }
-      } else {
-          const parts = clean.split(':').map(s=>s.trim());
-          if (parts.length === 2) [ip, port] = parts;
-          else if (parts.length === 4) {
-              if (parts[0].includes('.')) [ip, port, user, pass] = parts;
-              else [user, pass, ip, port] = parts;
-          } else if (parts.length === 3) [ip, port, user] = parts; // edge case
-      }
-      if(ip && port) return { proto, ip, port, user, pass };
-      return null;
-  }).filter(Boolean);
 }
 
 const dropZone=document.getElementById('dropZone'); const fileInput=document.getElementById('fileInput');
@@ -534,8 +519,6 @@ async function startCheck(){
   if(manual){ const parts=splitCookies(manual); parts.forEach((p,i)=>chunks.push({raw:p,label:parts.length>1?`#${i+1}`:'manual'})); }
   if(!chunks.length){alert('Chưa có dữ liệu cookie.');return;}
 
-  const proxyList = getParsedProxies();
-
   results=[]; counts={hit:0,free:0,hold:0,dead:0,err:0}; document.getElementById('results').innerHTML=''; updateStats();
   document.getElementById('statsRow').style.display='flex'; document.getElementById('exportBar').style.display='none';
   document.getElementById('progressWrap').style.display='block'; document.getElementById('progressLabel').style.display='block';
@@ -545,72 +528,23 @@ async function startCheck(){
   chunks.forEach((c,i)=>{ results.push({id:i,raw:c.raw,label:c.label,status:'checking',info:null,nftoken:null,txt:null,netscape:null,error:null}); renderCard(results[i]); });
 
   let idx=0;
-  async function runNext(){ 
-    while(idx<chunks.length){ 
-      const i=idx++; 
-      const proxy = proxyList.length > 0 ? proxyList[i % proxyList.length] : null;
-      await checkOne(workerUrl, i, chunks[i].raw, cfg, proxy); 
-      updateProgress(i+1,chunks.length); 
-    } 
-  }
+  async function runNext(){ while(idx<chunks.length){ const i=idx++; await checkOne(workerUrl,i,chunks[i].raw,cfg); updateProgress(i+1,chunks.length); } }
   await Promise.all(Array.from({length:Math.min(5,chunks.length)},runNext));
 
   btn.disabled=false; btn.textContent='▶ Check Cookie'; running=false; document.getElementById('progressLabel').textContent=`Hoàn tất — ${chunks.length} cookie.`;
   if(results.some(r=>['hit','free','hold'].includes(r.status))) document.getElementById('exportBar').style.display='flex';
 }
 
-async function checkOne(wUrl, i, raw, cfg, proxyData = null){
+async function checkOne(wUrl,i,raw,cfg){
   try{
     const token = localStorage.getItem('nf_app_token');
-    const payload = { cookie: raw, config: cfg };
-    if (proxyData) payload.proxy = proxyData;
-
-    const res=await fetch(wUrl,{ method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body:JSON.stringify(payload) });
+    const res=await fetch(wUrl,{ method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body:JSON.stringify({cookie:raw,config:cfg}), });
     if (res.status === 401) { results[i].status='err'; results[i].error='Hết hạn phiên. Vui lòng F5.'; counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i); return; }
     const data=await res.json();
     if(!data.ok){ results[i].status=data.result==='EXPIRED'?'dead':'err'; results[i].error=data.error||data.reason||'Error'; }
     else { const r=data.result; results[i].status = data.is_on_hold?'hold': r==='HIT_EXTRA'||r==='HIT'?'hit': r==='FREE'?'free':'dead'; results[i].info = data.info; results[i].nftoken= data.nftoken||null; results[i].txt = data.txt_file||null; results[i].netscape=data.netscape||null; }
   }catch(e){ results[i].status='err'; results[i].error=e.message||'Network error'; }
   counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i);
-}
-
-// LOGIC RECHECK CÁC COOKIE BỊ ERROR
-async function recheckErrors() {
-  const errorResults = results.filter(r => r.status === 'err');
-  if (errorResults.length === 0) return toast('Không có lỗi nào để recheck.');
-  
-  running = true;
-  document.getElementById('checkBtn').disabled = true;
-  const btnRecheck = document.getElementById('recheckErrorBtn');
-  btnRecheck.disabled = true;
-  btnRecheck.textContent = 'Đang Recheck...';
-  
-  const wUrl = urlInput.value || localStorage.getItem('nf_worker_url');
-  const cfg = getConfig();
-  const proxyList = getParsedProxies();
-  
-  let idx = 0;
-  async function runNext() {
-      while(idx < errorResults.length) {
-          const r = errorResults[idx++];
-          // Trừ lại số đếm thống kê cũ trước khi recheck
-          counts['err'] = Math.max(0, counts['err'] - 1);
-          
-          document.getElementById(`card-${r.id}`).classList.replace('err', 'checking');
-          document.getElementById(`card-${r.id}`).querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
-          
-          const proxy = proxyList.length > 0 ? proxyList[idx % proxyList.length] : null;
-          await checkOne(wUrl, r.id, r.raw, cfg, proxy);
-      }
-  }
-  
-  await Promise.all(Array.from({length: Math.min(5, errorResults.length)}, runNext));
-  
-  running = false;
-  document.getElementById('checkBtn').disabled = false;
-  btnRecheck.disabled = false;
-  btnRecheck.textContent = '🔄 Recheck Lỗi';
-  toast('Recheck lỗi hoàn tất!');
 }
 
 function updateProgress(d,t){ document.getElementById('progressBar').style.width=Math.round(d/t*100)+'%'; document.getElementById('progressLabel').textContent=`Đang check ${d}/${t}…`; }
@@ -720,19 +654,40 @@ async function saveCookieToCloud(id) {
   if(res && res.ok) toast('Đã lưu thành công vào Cloudflare KV ✓'); else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
 }
 
+// ════ LƯU TẤT CẢ HIT LÊN CLOUD ════
 async function saveAllHitsToCloud() {
   const hits = results.filter(r => r.status === 'hit' || r.status === 'hold');
-  if (!hits.length) return toast('Không có tài khoản HIT hoặc HOLD nào để lưu!');
+  
+  if (!hits.length) {
+    return toast('Không có tài khoản HIT hoặc HOLD nào để lưu!');
+  }
+
   const btn = document.querySelector('button[onclick="saveAllHitsToCloud()"]');
-  const originalText = btn.innerHTML; btn.innerHTML = '<span class="spinner" style="border-top-color:var(--blue)"></span> Đang lưu...'; btn.disabled = true;
-  let success = 0; let failed = 0;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner" style="border-top-color:var(--blue)"></span> Đang lưu...';
+  btn.disabled = true;
+
+  let success = 0;
+  let failed = 0;
+  
   for (const r of hits) {
     const label = r.info?.email || r.label || 'Saved Cookie';
-    const res = await apiFetch('/api/cloud/cookies', 'POST', { netscape: r.netscape, label: label, status: r.status, info: r.info, nftoken: r.nftoken });
-    if (res && res.ok) success++; else failed++;
+    const res = await apiFetch('/api/cloud/cookies', 'POST', { 
+      netscape: r.netscape, 
+      label: label, 
+      status: r.status, 
+      info: r.info, 
+      nftoken: r.nftoken 
+    });
+    
+    if (res && res.ok) success++;
+    else failed++;
   }
-  btn.innerHTML = originalText; btn.disabled = false;
+
+  btn.innerHTML = originalText;
+  btn.disabled = false;
   toast(`Hoàn tất! Lưu mới: ${success} | Bỏ qua (Trùng/Lỗi): ${failed}`);
+  
   loadCloudCookies();
 }
 
@@ -810,19 +765,32 @@ async function generateNewKey() {
   const duration = document.getElementById('keyDurationSelect').value;
   toast('Đang khởi tạo Key...');
   const res = await apiFetch('/api/keys', 'POST', { duration });
-  if (res && res.ok) { toast('Tạo Key thành công ✓'); loadAdminKeys(); } else { toast(`Lỗi: ${res?.error || 'Không thể tạo key'}`); }
+  if (res && res.ok) {
+    toast('Tạo Key thành công ✓');
+    loadAdminKeys();
+  } else {
+    toast(`Lỗi: ${res?.error || 'Không thể tạo key'}`);
+  }
 }
 
 async function loadAdminKeys() {
   const container = document.getElementById('keysListContainer');
   container.innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> Đang tải...</div>';
   const res = await apiFetch('/api/keys');
-  if (res && res.ok) { generatedKeysList = res.data || []; renderKeysList(); } else { container.innerHTML = `<div style="color:var(--red);text-align:center;padding:12px;font-size:12px;">Không khả dụng hoặc Bạn không có quyền Admin.</div>`; }
+  if (res && res.ok) {
+    generatedKeysList = res.data || [];
+    renderKeysList();
+  } else {
+    container.innerHTML = `<div style="color:var(--red);text-align:center;padding:12px;font-size:12px;">Không khả dụng hoặc Bạn không có quyền Admin.</div>`;
+  }
 }
 
 function renderKeysList() {
   const container = document.getElementById('keysListContainer');
-  if (!generatedKeysList.length) { container.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Hệ thống chưa ghi nhận Key nào.</div>'; return; }
+  if (!generatedKeysList.length) {
+    container.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Hệ thống chưa ghi nhận Key nào.</div>';
+    return;
+  }
   container.innerHTML = generatedKeysList.map(k => {
     const isExpired = Date.now() > k.expiresAt;
     const badge = isExpired ? '<span style="color:var(--red);background:#2a1111;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">EXPIRED</span>' : '<span style="color:var(--green);background:var(--green-dim);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">ACTIVE</span>';
