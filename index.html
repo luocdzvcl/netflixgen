@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Netflix Cookie Checker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
   --bg:#0a0a0a;--surface:#111;--card:#181818;--border:#2a2a2a;
@@ -238,9 +239,9 @@ select:focus{border-color:var(--red)}
 
     <div id="tab-input" class="tab-panel active">
       <div class="drop-zone" id="dropZone">
-        <input type="file" id="fileInput" accept=".txt,.json" multiple/>
+        <input type="file" id="fileInput" accept=".txt,.json,.zip" multiple/>
         <div class="drop-icon">📂</div>
-        <div class="drop-label"><strong>Kéo thả file</strong> hoặc click</div>
+        <div class="drop-label"><strong>Kéo thả file</strong> hoặc click<br><span style="font-size:10px;color:var(--muted)">.txt · .json · .zip</span></div>
         <div class="drop-files" id="dropFiles"></div>
       </div>
       <div class="or-div">hoặc paste</div>
@@ -404,9 +405,11 @@ select:focus{border-color:var(--red)}
         <div class="stat err"> <div class="stat-num" id="sErr">0</div> <div class="stat-label">ERROR</div></div>
       </div>
       <div class="export-bar" id="exportBar">
-        <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs</button>
-        <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs</button>
-        <button class="btn-export" onclick="exportTxt('all')">⬇ ALL</button>
+        <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs .txt</button>
+        <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs .txt</button>
+        <button class="btn-export" onclick="exportTxt('all')">⬇ ALL .txt</button>
+        <button class="btn-export" style="color:var(--gold);border-color:var(--gold)" onclick="exportZip('hit')">📦 HITs .zip</button>
+        <button class="btn-export" style="color:var(--gold);border-color:var(--gold)" onclick="exportZip('all')">📦 ALL .zip</button>
         <button class="btn-export" onclick="saveAllHitsToCloud()" style="color: var(--blue); border-color: var(--blue);">☁️ LƯU ALL HIT LÊN CLOUD</button>
       </div>
       <div id="results"></div>
@@ -454,6 +457,9 @@ function showAppView() {
   if (tabUserAdmin) tabUserAdmin.style.display = (role === 'admin') ? 'block' : 'none';
   const tabKvAdmin = document.getElementById('tabKvAdmin');
   if (tabKvAdmin) tabKvAdmin.style.display = (role === 'admin') ? 'block' : 'none';
+  
+  startHeartbeat();
+  setTimeout(_restorePendingResults, 300);
 }
 async function handleLogin() {
   const wUrl = document.getElementById('loginWorkerUrl').value.trim().replace(/\/+$/, ''); 
@@ -493,6 +499,8 @@ async function handleLogin() {
 async function handleLogout() {
   const token = localStorage.getItem('nf_app_token');
   const wUrl  = localStorage.getItem('nf_worker_url');
+
+  stopHeartbeat();
 
   if (token && wUrl) {
     try {
@@ -571,8 +579,72 @@ dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over')
 dropZone.addEventListener('drop',e=>{ e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles([...e.dataTransfer.files]); });
 fileInput.addEventListener('change',()=>{ handleFiles([...fileInput.files]); fileInput.value=''; });
 async function handleFiles(files){
-  for(const f of files){ if(!f.name.match(/\.(txt|json)$/i)) continue; const content=await f.text(); if(!loadedFiles.find(x=>x.name===f.name&&x.content===content)) loadedFiles.push({name:f.name,content}); }
+  for(const f of files){
+    if(f.name.match(/\.zip$/i)){
+      if(typeof JSZip === 'undefined'){ toast('JSZip chưa sẵn sàng, thử lại!'); continue; }
+      try {
+        const zip = await JSZip.loadAsync(f);
+        for(const [name, entry] of Object.entries(zip.files)){
+          if(entry.dir || !name.match(/\.(txt|json)$/i)) continue;
+          const content = await entry.async('string');
+          if(!loadedFiles.find(x=>x.name===name&&x.content===content)) loadedFiles.push({name,content});
+        }
+        toast(`Đã giải nén ${f.name} ✓`);
+      } catch(e){ toast(`Lỗi đọc ZIP: ${e.message}`); }
+      continue;
+    }
+    if(!f.name.match(/\.(txt|json)$/i)) continue;
+    const content=await f.text();
+    if(!loadedFiles.find(x=>x.name===f.name&&x.content===content)) loadedFiles.push({name:f.name,content});
+  }
   renderFileTags();
+}
+
+// ─── Heartbeat: tự động gia hạn phiên mỗi 4 phút để tránh mất session ───
+let _hbTimer = null;
+function startHeartbeat(){
+  stopHeartbeat();
+  _hbTimer = setInterval(async ()=>{
+    const token = localStorage.getItem('nf_app_token');
+    const wUrl  = localStorage.getItem('nf_worker_url');
+    if(!token || !wUrl) return;
+    try {
+      const res = await fetch(`${wUrl}/auth/verify`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({token}) });
+      const data = await res.json();
+      if(!data.ok){
+        stopHeartbeat();
+        // Lưu dữ liệu hiện tại trước khi bị đăng xuất
+        _savePendingResults();
+        toast('⚠ Phiên hết hạn — đã lưu cookie vào bộ nhớ tạm. Đăng nhập lại để tiếp tục.');
+        showLoginView();
+      }
+    } catch(_){}
+  }, 4 * 60 * 1000); // 4 phút
+}
+function stopHeartbeat(){ if(_hbTimer){ clearInterval(_hbTimer); _hbTimer=null; } }
+
+// Lưu results vào sessionStorage khi phiên hết hạn, phục hồi khi login lại
+function _savePendingResults(){
+  const good = results.filter(r=>['hit','free','hold'].includes(r.status));
+  if(good.length){ try{ sessionStorage.setItem('nf_pending_results', JSON.stringify(good)); }catch(_){} }
+}
+function _restorePendingResults(){
+  try{
+    const raw = sessionStorage.getItem('nf_pending_results');
+    if(!raw) return;
+    const pending = JSON.parse(raw);
+    if(!pending.length) return;
+    sessionStorage.removeItem('nf_pending_results');
+    results = pending;
+    counts = {hit:0,free:0,hold:0,dead:0,err:0};
+    pending.forEach(r=>{ counts[r.status]=(counts[r.status]||0)+1; });
+    document.getElementById('results').innerHTML='';
+    document.getElementById('statsRow').style.display='flex';
+    document.getElementById('exportBar').style.display='flex';
+    pending.forEach(r=>{ renderCard(r); refreshCard(results.findIndex(x=>x.id===r.id)); });
+    updateStats();
+    toast(`✅ Đã phục hồi ${pending.length} cookie từ phiên trước!`);
+  }catch(_){}
 }
 function renderFileTags(){ document.getElementById('dropFiles').innerHTML=loadedFiles.map((f,i)=>`<div class="drop-file-tag">📄 ${esc(f.name)} <button onclick="removeFile(${i})">✕</button></div>`).join(''); }
 function removeFile(i){ loadedFiles.splice(i,1); renderFileTags(); }
@@ -676,7 +748,13 @@ function getDetailHTML(r, isCloud = false) {
   const dlName=`netflix_${country||'xx'}_${Date.now()}.txt`;
   const dlContent=r.txt||buildFallbackTxt(r);
   
-  let btns = `<button class="btn-action btn-copy" onclick="copyText(this,${JSON.stringify(r.netscape||'')})">📋 Copy Cookie</button><button class="btn-action btn-dl" onclick="dlFile(${JSON.stringify(dlName)},${JSON.stringify(dlContent)})">⬇ Save .txt</button>`;
+  // Store data safely via storeActionData to avoid esc() corrupting binary cookie content
+  const dataKey = `_adat_${r.id}_${Date.now()}`;
+  window[dataKey] = { netscape: r.netscape||'', dlName, dlContent };
+  
+  let btns = `<button class="btn-action btn-copy" onclick="copyTextByKey(this,'${dataKey}','netscape')">📋 Copy Cookie</button>`
+    + `<button class="btn-action btn-dl" onclick="dlFileByKey('${dataKey}')">⬇ Save .txt</button>`
+    + `<button class="btn-action btn-dl" style="border-color:var(--gold);color:var(--gold)" onclick="dlZipByKey('${dataKey}')">📦 Save .zip</button>`;
   if(!isCloud) btns += `<button class="btn-action" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue)" onclick="saveCookieToCloud(${r.id})">☁️ Lưu Cloud</button>`;
   return `<div class="info-grid">${grid}</div>${nftHtml}<div class="action-row">${btns}</div>`;
 }
@@ -697,18 +775,67 @@ function exportTxt(type){
   const f=type==='all'?results.filter(r=>['hit','free','hold'].includes(r.status)):results.filter(r=>r.status===type);
   if(!f.length){toast('Không có kết quả.');return;} const sep='\n\n'+'='.repeat(98)+'\n\n'; dlFile(`netflix_${type}_${Date.now()}.txt`,f.map(r=>r.txt||buildFallbackTxt(r)).join(sep));
 }
-function dlFile(name,content){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'})); a.download=name; a.click(); }
+function dlFile(name,content){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000); }
 function countryFlag(code){ if(!code||code.length!==2) return ''; return[...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join(''); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function copyText(btn,text){
-  if(!text){toast('Không có dữ liệu để copy!');return;}
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='📋 Copy Cookie'; btn.classList.remove('copied'); },1800); }).catch(()=>{ fallbackCopy(text); });
-  } else { fallbackCopy(text); }
+
+// Safe key-based copy/download (tranh esc() lam hong noi dung cookie)
+function copyTextByKey(btn, key, field) {
+  const data = window[key]; if(!data){ toast('Khong co du lieu!'); return; }
+  const text = data[field]||''; if(!text){ toast('Khong co du lieu de copy!'); return; }
+  copyTextRaw(btn, text);
 }
+function dlFileByKey(key) {
+  const data = window[key]; if(!data){ toast('Khong co du lieu!'); return; }
+  dlFile(data.dlName, data.dlContent);
+}
+async function dlZipByKey(key) {
+  const data = window[key]; if(!data){ toast('Khong co du lieu!'); return; }
+  if(typeof JSZip === 'undefined'){ toast('JSZip chua san sang, thu lai!'); return; }
+  const zip = new JSZip();
+  zip.file(data.dlName, data.dlContent);
+  if(data.netscape) zip.file(data.dlName.replace('.txt','_netscape.txt'), data.netscape);
+  const blob = await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = data.dlName.replace('.txt','.zip');
+  document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000);
+}
+
+function copyTextRaw(btn, text){
+  const doFallback = () => {
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0;';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){}
+    document.body.removeChild(ta);
+    if(ok){ markCopied(btn); } else { toast('Copy that bai - thu chon thu cong!'); }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>markCopied(btn)).catch(doFallback);
+  } else { doFallback(); }
+}
+function markCopied(btn){ const orig=btn.textContent; btn.textContent='\u2713 Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent=orig; btn.classList.remove('copied'); },1800); }
+function copyText(btn,text){ copyTextRaw(btn, text); }
 function fallbackCopy(text){
-  const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
-  document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast('Đã copy ✓');
+  const ta=document.createElement('textarea'); ta.value=text; ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  if(ok) toast('Da copy \u2713'); else toast('Copy that bai!');
+}
+
+// Export ZIP toan bo
+async function exportZip(type){
+  if(typeof JSZip === 'undefined'){ toast('JSZip chua san sang!'); return; }
+  const f = type==='all' ? results.filter(r=>['hit','free','hold'].includes(r.status)) : results.filter(r=>r.status===type);
+  if(!f.length){ toast('Khong co ket qua.'); return; }
+  const zip = new JSZip();
+  f.forEach((r,i)=>{
+    const content = r.txt||buildFallbackTxt(r);
+    const email = (r.info?.email||'cookie').replace(/[^a-zA-Z0-9@._-]/g,'_');
+    zip.file(`${i+1}_${email}.txt`, content);
+    if(r.netscape) zip.file(`${i+1}_${email}_netscape.txt`, r.netscape);
+  });
+  const blob = await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `netflix_${type}_${Date.now()}.zip`;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000);
+  toast(`Da xuat ${f.length} cookie dang ZIP \u2713`);
 }
 function clearAll(){
   if(running) return; document.getElementById('cookieInput').value=''; document.getElementById('results').innerHTML='';
