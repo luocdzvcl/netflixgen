@@ -232,6 +232,7 @@ select:focus{border-color:var(--red)}
       <button class="tab" onclick="switchTab('config')">⚙ Config</button>
       <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
       <button class="tab" id="tabKeyAdmin" style="display:none;" onclick="switchTab('keys')">🔑 Quản lý Key</button>
+      <button class="tab" id="tabUserAdmin" style="display:none;" onclick="switchTab('users')">👤 Quản lý User</button>
     </div>
 
     <div id="tab-input" class="tab-panel active">
@@ -323,6 +324,46 @@ select:focus{border-color:var(--red)}
       </div>
     </div>
 
+    <div id="tab-users" class="tab-panel">
+      <div class="cfg-group" style="margin-bottom: 15px;">
+        <div class="cfg-group-title">👤 Tạo Tài Khoản User Mới</div>
+        <div class="cfg-row" style="gap: 10px; align-items: flex-start; margin-top: 10px; flex-wrap: wrap;">
+          <div style="flex:1; min-width:120px;">
+            <div class="cfg-group-title" style="margin-bottom:4px;">Username</div>
+            <input type="text" id="newUsername" placeholder="tên tài khoản" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:7px 10px;outline:none;" spellcheck="false" autocomplete="off"/>
+          </div>
+          <div style="flex:1; min-width:120px;">
+            <div class="cfg-group-title" style="margin-bottom:4px;">Password</div>
+            <input type="text" id="newPassword" placeholder="mật khẩu" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:7px 10px;outline:none;"/>
+          </div>
+          <div style="flex:1; min-width:120px;">
+            <div class="cfg-group-title" style="margin-bottom:4px;">Thời hạn</div>
+            <select id="userDurationSelect" style="width:100%;padding: 8px 10px; font-size: 11px; background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);">
+              <option value="10m">10 Phút</option>
+              <option value="30m">30 Phút</option>
+              <option value="1h">1 Tiếng</option>
+              <option value="6h">6 Tiếng</option>
+              <option value="24h">24 Tiếng</option>
+              <option value="48h">48 Tiếng</option>
+              <option value="30d" selected>30 Ngày</option>
+              <option value="1y">1 Năm</option>
+              <option value="forever">Vĩnh viễn</option>
+            </select>
+          </div>
+          <button class="btn-check" style="flex: none; padding: 8px 16px; margin: 0; font-size: 11px; align-self:flex-end;" onclick="createAdminUser()">⚡ Tạo User</button>
+        </div>
+      </div>
+      <div class="cfg-group">
+        <div class="cfg-group-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Danh Sách User</span>
+          <button class="btn-sm" style="padding: 2px 8px; font-size: 9px;" onclick="loadAdminUsers()">🔄 Làm mới</button>
+        </div>
+        <div id="usersListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:400px; overflow-y:auto;">
+          <div style="text-align:center; font-size:11px; color:var(--muted); padding:20px;">Đang tải...</div>
+        </div>
+      </div>
+    </div>
+
     <div id="mainControlsSection">
       <div class="controls">
         <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
@@ -384,9 +425,9 @@ function showAppView() {
 
   const role = localStorage.getItem('nf_user_role');
   const tabAdmin = document.getElementById('tabKeyAdmin');
-  if (tabAdmin) {
-    tabAdmin.style.display = (role === 'admin') ? 'block' : 'none';
-  }
+  if (tabAdmin) tabAdmin.style.display = (role === 'admin') ? 'block' : 'none';
+  const tabUserAdmin = document.getElementById('tabUserAdmin');
+  if (tabUserAdmin) tabUserAdmin.style.display = (role === 'admin') ? 'block' : 'none';
 }
 async function handleLogin() {
   const wUrl = document.getElementById('loginWorkerUrl').value.trim().replace(/\/+$/, ''); 
@@ -442,6 +483,8 @@ async function handleLogout() {
 
   const tabAdmin = document.getElementById('tabKeyAdmin');
   if (tabAdmin) tabAdmin.style.display = 'none';
+  const tabUserAdminEl = document.getElementById('tabUserAdmin');
+  if (tabUserAdminEl) tabUserAdminEl.style.display = 'none';
 
   switchTab('input');
 
@@ -461,12 +504,13 @@ checkGlobalAuth();
 
 // TAB SWITCHER
 function switchTab(name) {
-  const panels = ['input', 'cloud', 'config', 'webhook', 'keys'];
+  const panels = ['input', 'cloud', 'config', 'webhook', 'keys', 'users'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', panels[i] === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
   document.getElementById('mainControlsSection').style.display = name === 'input' ? 'block' : 'none';
   if(name === 'cloud') loadCloudCookies();
   if(name === 'keys') loadAdminKeys();
+  if(name === 'users') loadAdminUsers();
 }
 
 const urlInput = document.getElementById('workerUrl');
@@ -627,7 +671,16 @@ function exportTxt(type){
 function dlFile(name,content){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'})); a.download=name; a.click(); }
 function countryFlag(code){ if(!code||code.length!==2) return ''; return[...code.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join(''); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function copyText(btn,text){ navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='📋 Copy Cookie'; btn.classList.remove('copied'); },1800); }); }
+function copyText(btn,text){
+  if(!text){toast('Không có dữ liệu để copy!');return;}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{ btn.textContent='✓ Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='📋 Copy Cookie'; btn.classList.remove('copied'); },1800); }).catch(()=>{ fallbackCopy(text); });
+  } else { fallbackCopy(text); }
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast('Đã copy ✓');
+}
 function clearAll(){
   if(running) return; document.getElementById('cookieInput').value=''; document.getElementById('results').innerHTML='';
   document.getElementById('statsRow').style.display='none'; document.getElementById('exportBar').style.display='none';
@@ -758,6 +811,72 @@ async function recheckAllCloud() {
     } catch(e) { if(card) card.querySelector('.status-badge').innerHTML = '⚠ ERR'; }
   }
   toast("Recheck hoàn tất!");
+}
+
+// ════ USER MANAGEMENT LOGIC (ADMIN ONLY) ════
+let adminUsersList = [];
+
+async function createAdminUser() {
+  const username = document.getElementById('newUsername').value.trim();
+  const password = document.getElementById('newPassword').value.trim();
+  const duration = document.getElementById('userDurationSelect').value;
+  if(!username) return toast('Nhập Username!');
+  if(!password) return toast('Nhập Password!');
+  toast('Đang tạo tài khoản...');
+  const res = await apiFetch('/api/users', 'POST', { username, password, duration });
+  if(res && res.ok) {
+    toast('Tạo tài khoản thành công ✓');
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPassword').value = '';
+    loadAdminUsers();
+  } else toast(`Lỗi: ${res?.error || 'Không thể tạo'}`);
+}
+
+async function loadAdminUsers() {
+  const container = document.getElementById('usersListContainer');
+  container.innerHTML = '<div style="text-align:center;padding:20px;"><span class="spinner"></span> Đang tải...</div>';
+  const res = await apiFetch('/api/users');
+  if(res && res.ok) {
+    adminUsersList = res.data || [];
+    renderUsersList();
+  } else {
+    container.innerHTML = '<div style="color:var(--red);text-align:center;padding:12px;font-size:12px;">Không khả dụng hoặc Bạn không có quyền Admin.</div>';
+  }
+}
+
+function renderUsersList() {
+  const container = document.getElementById('usersListContainer');
+  if(!adminUsersList.length) {
+    container.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Chưa có tài khoản nào.</div>';
+    return;
+  }
+  container.innerHTML = adminUsersList.map(u => {
+    const isExpired = u.expiresAt !== -1 && Date.now() > u.expiresAt;
+    const badge = isExpired
+      ? '<span style="color:var(--red);background:#2a1111;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">EXPIRED</span>'
+      : '<span style="color:var(--green);background:var(--green-dim);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">ACTIVE</span>';
+    const expText = u.expiresAt === -1 ? 'Vĩnh viễn' : new Date(u.expiresAt).toLocaleString();
+    return `
+    <div class="cfg-group" style="background:var(--card); border:1px solid var(--border); padding:10px; display:flex; flex-direction:column; gap:6px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-family:var(--mono); font-size:12px; color:var(--text); font-weight:bold;">👤 ${esc(u.username)}</span>
+        ${badge}
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--muted)">
+        <span>Hết hạn: ${expText}</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-sm" style="padding:3px 8px; font-size:10px; color:var(--red); border-color:var(--red-dim);" onclick="deleteAdminUser('${esc(u.username)}')">✕ Xoá</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteAdminUser(username) {
+  if(!confirm(`Xác nhận xóa tài khoản "${username}"?`)) return;
+  const res = await apiFetch(`/api/users/${encodeURIComponent(username)}`, 'DELETE');
+  if(res && res.ok) { toast('Đã xoá tài khoản ✓'); loadAdminUsers(); }
+  else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
 }
 
 // ════ KEY MANAGEMENT LOGIC (ADMIN ONLY) ════
