@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Netflix Cookie Checker</title>
+<title>NOTOC29FLIX Checker</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
@@ -22,14 +22,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 header{width:100%;padding:16px 28px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
 .logo{font-size:20px;font-weight:900;letter-spacing:-.5px;color:var(--red);text-transform:uppercase}
 .logo span{color:var(--text);font-weight:300}
-.badge{font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 
 main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:flex;flex-direction:column;gap:20px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
 .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 
 .tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px}
-.tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s}
+.tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s; white-space:nowrap;}
 .tab.active{background:var(--card);color:var(--text)}
 .tab-panel{display:none}.tab-panel.active{display:block}
 
@@ -71,7 +70,6 @@ textarea:focus{border-color:var(--red)}
 .progress-label{font-size:10px;color:var(--muted);margin-top:5px;display:none}
 
 .cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:600px){.cfg-grid{grid-template-columns:1fr}}
 .cfg-group{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px}
 .cfg-group-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .cfg-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
@@ -178,8 +176,22 @@ select:focus{border-color:var(--red)}
 }
 .btn-login:hover { background: #c1070f; }
 #loginError { color: var(--red); font-size: 11px; margin-top: 15px; min-height: 16px; }
-.logout-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; font-size: 10px; border-radius: 3px; cursor: pointer; margin-left: auto; transition: color 0.2s, border-color 0.2s;}
+.logout-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; font-size: 10px; border-radius: 3px; cursor: pointer; transition: color 0.2s, border-color 0.2s;}
 .logout-btn:hover { color: var(--text); border-color: var(--text); }
+
+/* MOBILE RESPONSIVE FIXES */
+@media (max-width: 600px) {
+  header { padding: 12px 16px; flex-wrap: wrap; }
+  .logo { font-size: 18px; }
+  .tabs { flex-wrap: wrap; }
+  .tab { font-size: 10px; padding: 6px; }
+  .cfg-grid { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 100px 1fr; gap: 4px 8px; }
+  .stat { min-width: 70px; padding: 10px; }
+  .stat-num { font-size: 20px; }
+  .btn-export { flex: 1 1 45%; display: flex; justify-content: center; text-align: center; }
+  .result-summary { font-size: 11px; }
+}
 </style>
 </head>
 <body>
@@ -199,7 +211,7 @@ select:focus{border-color:var(--red)}
 
 <div id="loginSection">
   <div class="login-card">
-    <h2>Netflix<span>Check</span></h2>
+    <h2>NOTOC29FLIX</h2>
     <div class="login-group"><label>Worker URL</label><input type="url" id="loginWorkerUrl" placeholder="https://..." spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Username</label><input type="text" id="loginUser" placeholder="Nhập tài khoản" spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Password</label><input type="password" id="loginPass" placeholder="Nhập mật khẩu" /></div>
@@ -212,9 +224,11 @@ select:focus{border-color:var(--red)}
 
 <div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
   <header>
-    <div class="logo">Netflix<span>Check</span></div>
-    <div class="badge">Web v4.6 + Cloud</div>
-    <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
+    <div class="logo">NOTOC29FLIX</div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+      <span id="displayUsername" style="font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;"></span>
+      <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
+    </div>
   </header>
 
   <main>
@@ -441,6 +455,7 @@ async function checkGlobalAuth() {
     const data = await res.json();
     if(data.ok) {
       localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
+      if (data.username) localStorage.setItem('nf_username', data.username);
       showAppView(); 
     } else handleLogout();
   } catch(e) { showAppView(); }
@@ -451,6 +466,9 @@ function showAppView() {
   appCont.style.display = 'flex';
 
   const role = localStorage.getItem('nf_user_role');
+  const username = localStorage.getItem('nf_username') || 'USER';
+  document.getElementById('displayUsername').innerText = `👤 ${username}`;
+
   const tabAdmin = document.getElementById('tabKeyAdmin');
   if (tabAdmin) tabAdmin.style.display = (role === 'admin') ? 'block' : 'none';
   const tabUserAdmin = document.getElementById('tabUserAdmin');
@@ -489,6 +507,7 @@ async function handleLogin() {
       localStorage.setItem('nf_app_token', data.token); 
       localStorage.setItem('nf_worker_url', wUrl); 
       localStorage.setItem('nf_user_role', data.username === 'admin' || data.isAdmin ? 'admin' : 'user');
+      localStorage.setItem('nf_username', data.username || user || (key ? 'KEY_USER' : 'USER'));
       document.getElementById('workerUrl').value = wUrl; 
       showAppView(); 
       toast('Đăng nhập thành công ✓'); 
@@ -514,6 +533,7 @@ async function handleLogout() {
 
   localStorage.removeItem('nf_app_token');
   localStorage.removeItem('nf_user_role');
+  localStorage.removeItem('nf_username');
 
   const tabAdmin = document.getElementById('tabKeyAdmin');
   if (tabAdmin) tabAdmin.style.display = 'none';
