@@ -27,8 +27,8 @@ main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:fle
 .card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
 .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 
-.tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px}
-.tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s}
+.tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px; flex-wrap: wrap;}
+.tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s; white-space: nowrap;}
 .tab.active{background:var(--card);color:var(--text)}
 .tab-panel{display:none}.tab-panel.active{display:block}
 
@@ -58,8 +58,8 @@ textarea:focus{border-color:var(--red)}
 .formats{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .fmt{font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 8px;letter-spacing:.5px}
 
-.controls{display:flex;gap:10px;align-items:center;margin-top:14px}
-.btn-check{flex:1;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.controls{display:flex;gap:10px;align-items:center;margin-top:14px; flex-wrap: wrap;}
+.btn-check{flex:1;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s; min-width: 120px;}
 .btn-check:hover:not(:disabled){background:#c1070f}
 .btn-check:disabled{background:var(--red-dim);cursor:not-allowed;opacity:.7}
 .btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s}
@@ -212,7 +212,7 @@ select:focus{border-color:var(--red)}
 <div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
   <header>
     <div class="logo">Netflix<span>Check</span></div>
-    <div class="badge">Web v4.6 + Cloud</div>
+    <div class="badge">Web v6.2 + Cloud</div>
     <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
   </header>
 
@@ -228,6 +228,7 @@ select:focus{border-color:var(--red)}
   <div class="card">
     <div class="tabs">
       <button class="tab active" onclick="switchTab('input')">🍪 Cookie</button>
+      <button class="tab" onclick="switchTab('proxy')">🌐 Proxy</button>
       <button class="tab" onclick="switchTab('cloud')">☁️ Cloud Storage</button>
       <button class="tab" onclick="switchTab('config')">⚙ Config</button>
       <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
@@ -244,6 +245,18 @@ select:focus{border-color:var(--red)}
       <div class="or-div">hoặc paste</div>
       <textarea id="cookieInput" placeholder="Paste cookie..."></textarea>
       <div class="formats"><span class="fmt">✓ Netscape</span><span class="fmt">✓ JSON array</span></div>
+    </div>
+
+    <div id="tab-proxy" class="tab-panel">
+      <div class="cfg-group">
+        <div class="cfg-group-title">Danh Sách Proxy</div>
+        <div class="cfg-row" style="margin-bottom: 10px;">
+          <div class="cfg-label">Sử dụng Proxy cho phiên quét này</div>
+          <label class="toggle"><input type="checkbox" id="cfg_use_proxy"/><span class="toggle-track"></span></label>
+        </div>
+        <textarea id="proxyInput" placeholder="Hỗ trợ tự nhận diện các định dạng:&#10;ip:port&#10;user:pass@ip:port&#10;ip:port@user:pass&#10;http://... socks5://...&#10;ip:port:user:pass&#10;user:pass:ip:port&#10;..."></textarea>
+        <div style="font-size: 10px; color: var(--muted); margin-top: 8px;">Mỗi dòng 1 proxy. Hệ thống sẽ chọn ngẫu nhiên 1 proxy cho mỗi request.</div>
+      </div>
     </div>
 
     <div id="tab-cloud" class="tab-panel">
@@ -326,6 +339,7 @@ select:focus{border-color:var(--red)}
     <div id="mainControlsSection">
       <div class="controls">
         <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
+        <button class="btn-check" id="recheckErrBtn" onclick="recheckErrors()" style="background: var(--muted); display: none;">🔄 Recheck Lỗi</button>
         <button class="btn-clear" onclick="clearAll()">Xoá</button>
       </div>
       <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
@@ -461,7 +475,7 @@ checkGlobalAuth();
 
 // TAB SWITCHER
 function switchTab(name) {
-  const panels = ['input', 'cloud', 'config', 'webhook', 'keys'];
+  const panels = ['input', 'proxy', 'cloud', 'config', 'webhook', 'keys'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', panels[i] === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
   document.getElementById('mainControlsSection').style.display = name === 'input' ? 'block' : 'none';
@@ -480,12 +494,51 @@ function buildTxtFieldsGrid(){
 }
 buildTxtFieldsGrid();
 
+// MULTI-FORMAT PROXY PARSER
+function parseProxies() {
+  const raw = document.getElementById('proxyInput').value.trim();
+  if(!raw) return [];
+  return raw.split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+    let protocol = 'http';
+    const protoMatch = line.match(/^(https?|socks[45]h?):\/\//i);
+    if(protoMatch) {
+        protocol = protoMatch[1].toLowerCase();
+        line = line.replace(protoMatch[0], '');
+    }
+    line = line.replace(/[\s|;,]+/g, ':'); 
+    
+    let ip, port, user, pass;
+    if(line.includes('@')) {
+       const [auth, host] = line.split('@');
+       if(auth.includes(':') && host.includes(':')) {
+          [user, pass] = auth.split(':');
+          [ip, port] = host.split(':');
+       } else {
+          [ip, port] = auth.split(':');
+          [user, pass] = host.split(':');
+       }
+    } else {
+       const parts = line.split(':');
+       if(parts.length === 2) [ip, port] = parts;
+       else if(parts.length === 4) {
+          if(parts[0].includes('.')) [ip, port, user, pass] = parts; 
+          else [user, pass, ip, port] = parts;
+       }
+    }
+    return { protocol, ip, port, user, pass };
+  }).filter(p => p.ip && p.port);
+}
+
 function getConfig(){
   const tf={}; TXT_FIELD_DEFS.forEach(([k])=>{ tf[k]=document.getElementById(`tf_${k}`)?.checked!==false; });
   const plansRaw=(document.getElementById('wh_plans').value||'all').trim();
   const plans = plansRaw.toLowerCase()==='all'?'all':plansRaw.split(',').map(x=>x.trim()).filter(Boolean);
+  
+  const proxyList = document.getElementById('cfg_use_proxy')?.checked ? parseProxies() : [];
+  const randomProxy = proxyList.length ? proxyList[Math.floor(Math.random() * proxyList.length)] : null;
+
   return {
-    txt_fields: tf, nftoken: document.getElementById('cfg_nftoken').value, add_emojis: document.getElementById('cfg_add_emojis').value,
+    txt_fields: tf, nftoken: document.getElementById('cfg_nftoken').value, add_emojis: document.getElementById('cfg_add_emojis').value, proxy: randomProxy,
     notifications: { webhook: { enabled: document.getElementById('wh_enabled').checked, url: document.getElementById('wh_url').value.trim(), mode: document.getElementById('wh_mode') ? document.getElementById('wh_mode').value : 'full', plans } },
     performance: { nftoken_for_free: document.getElementById('cfg_nftoken_for_free') ? document.getElementById('cfg_nftoken_for_free').checked : false },
     retries: { nftoken_attempts: document.getElementById('cfg_nftoken_attempts') ? parseInt(document.getElementById('cfg_nftoken_attempts').value)||3 : 3 },
@@ -548,7 +601,16 @@ async function checkOne(wUrl,i,raw,cfg){
 }
 
 function updateProgress(d,t){ document.getElementById('progressBar').style.width=Math.round(d/t*100)+'%'; document.getElementById('progressLabel').textContent=`Đang check ${d}/${t}…`; }
-function updateStats(){ document.getElementById('sHit').textContent=counts.hit; document.getElementById('sFree').textContent=counts.free; document.getElementById('sHold').textContent=counts.hold; document.getElementById('sDead').textContent=counts.dead; document.getElementById('sErr').textContent=counts.err; }
+
+function updateStats(){ 
+  document.getElementById('sHit').textContent=counts.hit; 
+  document.getElementById('sFree').textContent=counts.free; 
+  document.getElementById('sHold').textContent=counts.hold; 
+  document.getElementById('sDead').textContent=counts.dead; 
+  document.getElementById('sErr').textContent=counts.err; 
+  const recheckBtn = document.getElementById('recheckErrBtn');
+  if (recheckBtn) recheckBtn.style.display = counts.err > 0 ? 'block' : 'none';
+}
 
 function renderCard(r){
   const el=document.createElement('div'); el.className='result-card checking'; el.id=`card-${r.id}`;
@@ -639,6 +701,32 @@ function toast(msg){
   t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.remove();},2000);
 }
 
+// ════ LOGIC RECHECK ERROR ════
+async function recheckErrors() {
+  if (running) return;
+  const errIndices = results.map((r, i) => r.status === 'err' ? i : -1).filter(i => i !== -1);
+  if (!errIndices.length) return toast("Không có lỗi nào để recheck!");
+  
+  running = true;
+  document.getElementById('recheckErrBtn').disabled = true;
+  toast(`Đang recheck ${errIndices.length} tài khoản lỗi...`);
+  
+  const workerUrl = document.getElementById('workerUrl').value.trim().replace(/\/+$/, '');
+  const cfg = getConfig();
+
+  for (let i of errIndices) {
+      results[i].status = 'checking';
+      counts.err--; 
+      updateStats();
+      refreshCard(i);
+      await checkOne(workerUrl, i, results[i].raw, cfg);
+  }
+  
+  running = false;
+  document.getElementById('recheckErrBtn').disabled = false;
+  toast("Recheck hoàn tất!");
+}
+
 // ════ CLOUD STORAGE LOGIC ════
 async function apiFetch(endpoint, method = 'GET', body = null) {
   const wUrl = localStorage.getItem('nf_worker_url'); const token = localStorage.getItem('nf_app_token');
@@ -654,7 +742,6 @@ async function saveCookieToCloud(id) {
   if(res && res.ok) toast('Đã lưu thành công vào Cloudflare KV ✓'); else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
 }
 
-// ════ LƯU TẤT CẢ HIT LÊN CLOUD ════
 async function saveAllHitsToCloud() {
   const hits = results.filter(r => r.status === 'hit' || r.status === 'hold');
   
