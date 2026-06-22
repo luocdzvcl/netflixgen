@@ -527,9 +527,18 @@ async function startCheck(){
   const cfg=getConfig();
   chunks.forEach((c,i)=>{ results.push({id:i,raw:c.raw,label:c.label,status:'checking',info:null,nftoken:null,txt:null,netscape:null,error:null}); renderCard(results[i]); });
 
+  const CHECK_DELAY_MS = 500;
+  const CONCURRENCY    = 2;
   let idx=0;
-  async function runNext(){ while(idx<chunks.length){ const i=idx++; await checkOne(workerUrl,i,chunks[i].raw,cfg); updateProgress(i+1,chunks.length); } }
-  await Promise.all(Array.from({length:Math.min(5,chunks.length)},runNext));
+  async function runNext(){
+    while(idx<chunks.length){
+      const i=idx++;
+      await checkOne(workerUrl,i,chunks[i].raw,cfg);
+      updateProgress(i+1,chunks.length);
+      if(idx<chunks.length) await sleep(CHECK_DELAY_MS);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(CONCURRENCY,chunks.length)},runNext));
 
   btn.disabled=false; btn.textContent='▶ Check Cookie'; running=false; document.getElementById('progressLabel').textContent=`Hoàn tất — ${chunks.length} cookie.`;
   if(results.some(r=>['hit','free','hold'].includes(r.status))) document.getElementById('exportBar').style.display='flex';
@@ -670,18 +679,19 @@ async function saveAllHitsToCloud() {
   let success = 0;
   let failed = 0;
   
-  for (const r of hits) {
+  for (let hi = 0; hi < hits.length; hi++) {
+    const r = hits[hi];
     const label = r.info?.email || r.label || 'Saved Cookie';
-    const res = await apiFetch('/api/cloud/cookies', 'POST', { 
-      netscape: r.netscape, 
-      label: label, 
-      status: r.status, 
-      info: r.info, 
-      nftoken: r.nftoken 
+    const res = await apiFetch('/api/cloud/cookies', 'POST', {
+      netscape: r.netscape,
+      label: label,
+      status: r.status,
+      info: r.info,
+      nftoken: r.nftoken
     });
-    
     if (res && res.ok) success++;
     else failed++;
+    if (hi < hits.length - 1) await sleep(300);
   }
 
   btn.innerHTML = originalText;
