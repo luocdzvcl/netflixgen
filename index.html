@@ -540,7 +540,7 @@ checkGlobalAuth();
 
 // TAB SWITCHER
 function switchTab(name) {
-  const panels = ['input', 'cloud', 'config', 'webhook', 'keys', 'users'];
+  const panels = ['input', 'cloud', 'config', 'webhook', 'keys', 'users', 'kv'];
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', panels[i] === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
   document.getElementById('mainControlsSection').style.display = name === 'input' ? 'block' : 'none';
@@ -1052,18 +1052,19 @@ async function loadKvData() {
   
   stats.textContent = `Tổng: ${res.count} entries`;
   
-  if (!res.data.length) {
+  if (!res.data || !res.data.length) {
     container.innerHTML = '<div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Không có dữ liệu.</div>';
     return;
   }
   
+  // CF KV trả key dạng string "session:abc", không phải JSON array
   container.innerHTML = res.data.map((entry, idx) => {
-    const keyParsed = JSON.parse(entry.key);
-    const keyLabel = keyParsed.join(' → ');
+    const keyStr = typeof entry.key === 'string' ? entry.key : JSON.stringify(entry.key);
+    const keyLabel = keyStr.replace(/:/g, ' → ');
     const valueStr = JSON.stringify(entry.value, null, 2);
-    const isSession = keyParsed[0] === 'session';
-    const isCookie = keyParsed[0] === 'cookies';
-    // truncate large values
+    const prefix0 = keyStr.split(':')[0];
+    const isSession = prefix0 === 'session';
+    const isCookie = prefix0 === 'cookies';
     const displayVal = valueStr.length > 300 ? valueStr.substring(0, 300) + '...' : valueStr;
     const keyColor = isSession ? 'var(--blue)' : isCookie ? 'var(--green)' : 'var(--gold)';
     return `
@@ -1076,16 +1077,16 @@ async function loadKvData() {
     </div>`;
   }).join('');
   
-  // Store for delete
   window._kvData = res.data;
 }
 
 async function deleteKvEntry(idx) {
   if (!window._kvData || !window._kvData[idx]) return;
   const entry = window._kvData[idx];
-  const keyParsed = JSON.parse(entry.key);
-  if (!confirm(`Xoá key: ${keyParsed.join(' → ')}?`)) return;
-  const res = await apiFetch('/api/admin/kv/delete', 'POST', { key: keyParsed });
+  const keyStr = typeof entry.key === 'string' ? entry.key : JSON.stringify(entry.key);
+  if (!confirm(`Xoá key: ${keyStr.replace(/:/g, ' → ')}?`)) return;
+  // Gửi key dạng string thẳng cho backend CF KV
+  const res = await apiFetch('/api/admin/kv/delete', 'POST', { key: keyStr });
   if (res && res.ok) { toast('Đã xoá ✓'); loadKvData(); }
   else toast(`Lỗi: ${res?.error}`);
 }
