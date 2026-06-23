@@ -774,7 +774,7 @@ async function handleFiles(files){
   renderFileTags();
 }
 
-// ─── Heartbeat: tự động gia hạn phiên mỗi 4 phút để tránh mất session ───
+// ─── Heartbeat: kiểm tra phiên mỗi 2 phút, tự văng login nếu key hết hạn/bị xóa ───
 let _hbTimer = null;
 function startHeartbeat(){
   stopHeartbeat();
@@ -787,13 +787,13 @@ function startHeartbeat(){
       const data = await res.json();
       if(!data.ok){
         stopHeartbeat();
-        // Lưu dữ liệu hiện tại trước khi bị đăng xuất
         _savePendingResults();
-        toast('⚠ Phiên hết hạn — đã lưu cookie vào bộ nhớ tạm. Đăng nhập lại để tiếp tục.');
-        showLoginView();
+        const msg = data.error || 'Phiên hết hạn';
+        toast(`⚠ ${msg} — Đang chuyển về trang đăng nhập...`);
+        setTimeout(() => handleLogout(), 1500);
       }
     } catch(_){}
-  }, 4 * 60 * 1000); // 4 phút
+  }, 2 * 60 * 1000); // 2 phút
 }
 function stopHeartbeat(){ if(_hbTimer){ clearInterval(_hbTimer); _hbTimer=null; } }
 
@@ -1025,9 +1025,27 @@ function toast(msg){
 // ════ CLOUD STORAGE LOGIC ════
 async function apiFetch(endpoint, method = 'GET', body = null) {
   const wUrl = localStorage.getItem('nf_worker_url'); const token = localStorage.getItem('nf_app_token');
-  if(!wUrl || !token) return null; const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } };
+  if(!wUrl || !token) return null;
+  const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } };
   if(body) opts.body = JSON.stringify(body);
-  try { const r = await fetch(`${wUrl}${endpoint}`, opts); return await r.json(); } catch(e) { return { ok: false, error: e.message }; }
+  try {
+    const r = await fetch(`${wUrl}${endpoint}`, opts);
+    // Key hết hạn / bị xóa / session không hợp lệ → tự văng ra login
+    if (r.status === 401 || r.status === 403) {
+      const data = await r.json().catch(() => ({}));
+      // Chỉ logout nếu là lỗi auth thực sự (không phải lỗi phân quyền tính năng)
+      const authErrors = ['Chưa đăng nhập hệ thống!', 'Token không hợp lệ', 'Token hết hạn', 'Key đã hết hạn', 'Key không tồn tại hoặc đã bị vô hiệu hóa'];
+      if (r.status === 401 && authErrors.some(e => (data.error || '').includes(e.split('!')[0]))) {
+        stopHeartbeat();
+        _savePendingResults();
+        toast('⚠ Phiên đăng nhập không còn hợp lệ — vui lòng đăng nhập lại.');
+        setTimeout(() => handleLogout(), 1500);
+        return data;
+      }
+      return data;
+    }
+    return await r.json();
+  } catch(e) { return { ok: false, error: e.message }; }
 }
 
 async function saveCookieToCloud(id) {
