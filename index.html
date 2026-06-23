@@ -251,6 +251,28 @@ select:focus{border-color:var(--red)}
   </div>
 </div>
 
+<!-- Modal thông báo mật khẩu key lần đầu đăng nhập -->
+<div id="firstLoginKeyPassModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box" style="max-width:400px;">
+    <h3 style="color:var(--gold);">🔑 MẬT KHẨU KEY CỦA BẠN</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+      Đây là mật khẩu key được cấp tự động. Bạn có thể <strong style="color:var(--text);">giữ nguyên</strong> để dùng hoặc <strong style="color:var(--text);">đổi ngay</strong> thành mật khẩu khác.
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--gold);border-radius:4px;padding:14px;text-align:center;margin-bottom:16px;">
+      <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">MẬT KHẨU KEY</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+        <code id="firstLoginKeyPassValue" style="font-family:var(--mono);font-size:20px;color:var(--gold);letter-spacing:3px;font-weight:bold;"></code>
+        <button class="btn-sm" style="padding:4px 10px;font-size:10px;" onclick="copyText(this, document.getElementById('firstLoginKeyPassValue').textContent)">📋</button>
+      </div>
+    </div>
+    <div style="font-size:9px;color:var(--muted);margin-bottom:16px;">⚠ Lưu lại mật khẩu này! Bạn cần nhập mật khẩu này mỗi lần đăng nhập.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('firstLoginKeyPassModal')" style="border-color:var(--gold);color:var(--gold);">Giữ nguyên &amp; Đóng</button>
+      <button class="btn-modal-ok" onclick="closeModal('firstLoginKeyPassModal'); openChangePassModal();" style="background:var(--gold);color:#000;">Đổi Mật Khẩu Ngay</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal đặt mật khẩu cho Key (admin reset) -->
 <div id="keyPassModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
@@ -374,7 +396,28 @@ select:focus{border-color:var(--red)}
     <div id="tab-keys" class="tab-panel">
       <div class="cfg-group" style="margin-bottom: 15px;">
         <div class="cfg-group-title">🔑 Tạo Key Đăng Nhập Mới</div>
-        <div class="cfg-row" style="gap: 12px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
+        
+        <!-- Custom key input -->
+        <div style="margin-top:10px; margin-bottom:10px;">
+          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">Key Custom (tuỳ chọn)</div>
+          <input type="text" id="customKeyInput" placeholder="NFNTOC29-CUSTOM... (để trống để tự sinh)" spellcheck="false" autocomplete="off"
+            style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 10px;outline:none;transition:border-color .2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+          <div style="font-size:9px;color:var(--muted);margin-top:3px;">Nếu không nhập, hệ thống sẽ tự tạo key ngẫu nhiên.</div>
+        </div>
+
+        <!-- Optional password -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">Mật khẩu Key (tuỳ chọn)</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="keyPasswordInput" placeholder="Để trống = tự sinh MK tạm, user thấy sau khi đăng nhập" spellcheck="false" autocomplete="off"
+              style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 10px;outline:none;transition:border-color .2s;"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <div style="font-size:9px;color:var(--muted);margin-top:3px;">Nếu để trống, hệ thống tự sinh MK. User sẽ thấy MK ngay sau khi đăng nhập lần đầu và có thể tự đổi.</div>
+        </div>
+
+        <div class="cfg-row" style="gap: 12px; align-items: center; flex-wrap: wrap;">
           <div class="cfg-label" style="white-space:nowrap;">Thời hạn:</div>
           <select id="keyDurationSelect" style="padding: 8px 12px; font-size: 11px; flex: 1; min-width:100px;">
             <option value="10m">10 Phút</option>
@@ -401,8 +444,9 @@ select:focus{border-color:var(--red)}
               <code id="newKeyPass" style="font-family:var(--mono);font-size:12px;color:var(--green);flex:1;"></code>
               <button class="btn-sm" style="padding:3px 8px;font-size:9px;" onclick="copyText(this, document.getElementById('newKeyPass').textContent)">📋</button>
             </div>
+            <div id="newKeyNoPassNote" style="display:none;font-size:9px;color:var(--hold);margin-top:2px;">ℹ️ Key này không có mật khẩu cố định — user sẽ thấy MK tạm sau khi đăng nhập lần đầu.</div>
           </div>
-          <div style="font-size:9px;color:var(--red);margin-top:8px;">⚠ Lưu lại mật khẩu này ngay! Admin có thể reset mật khẩu sau nếu cần.</div>
+          <div style="font-size:9px;color:var(--red);margin-top:8px;">⚠ Lưu lại thông tin này! Admin có thể reset mật khẩu sau nếu cần.</div>
         </div>
       </div>
       
@@ -593,7 +637,14 @@ async function handleLogin() {
       localStorage.setItem('nf_username', data.username || user || (key ? 'KEY_USER' : 'USER'));
       document.getElementById('workerUrl').value = wUrl; 
       showAppView(); 
-      toast('Đăng nhập thành công ✓'); 
+      toast('Đăng nhập thành công ✓');
+      // Hiện popup mật khẩu key nếu đây là lần đầu (mật khẩu tự sinh)
+      if (data.noPasswordSet && data.currentPassword) {
+        setTimeout(() => {
+          document.getElementById('firstLoginKeyPassValue').textContent = data.currentPassword;
+          document.getElementById('firstLoginKeyPassModal').style.display = 'flex';
+        }, 600);
+      }
     }
     else document.getElementById('loginError').textContent = data.error || "Sai thông tin đăng nhập.";
   } catch(e) { document.getElementById('loginError').textContent = "Lỗi kết nối URL Worker."; }
@@ -1200,13 +1251,25 @@ async function deleteKvEntry(idx) {
 // ════ KEY MANAGEMENT LOGIC (ADMIN ONLY) ════
 async function generateNewKey() {
   const duration = document.getElementById('keyDurationSelect').value;
+  const customKey = (document.getElementById('customKeyInput').value || '').trim();
+  const keyPassword = (document.getElementById('keyPasswordInput').value || '').trim();
+  
+  const payload = { duration };
+  if (customKey) payload.customKey = customKey;
+  if (keyPassword) payload.password = keyPassword;
+
   toast('Đang khởi tạo Key...');
   document.getElementById('newKeyResult').style.display = 'none';
-  const res = await apiFetch('/api/keys', 'POST', { duration });
+  const res = await apiFetch('/api/keys', 'POST', payload);
   if (res && res.ok) {
     document.getElementById('newKeyValue').textContent = res.key;
     document.getElementById('newKeyPass').textContent = res.password;
+    const noPassNote = document.getElementById('newKeyNoPassNote');
+    if (noPassNote) noPassNote.style.display = res.noPasswordSet ? 'block' : 'none';
     document.getElementById('newKeyResult').style.display = 'block';
+    // Reset inputs
+    document.getElementById('customKeyInput').value = '';
+    document.getElementById('keyPasswordInput').value = '';
     toast('Tạo Key thành công ✓');
     loadAdminKeys();
   } else {
@@ -1235,7 +1298,8 @@ function renderKeysList() {
   container.innerHTML = generatedKeysList.map(k => {
     const isExpired = Date.now() > k.expiresAt;
     const badge = isExpired ? '<span style="color:var(--red);background:#2a1111;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">EXPIRED</span>' : '<span style="color:var(--green);background:var(--green-dim);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700">ACTIVE</span>';
-    const passDisplay = k.password ? `<span style="font-family:var(--mono);font-size:10px;color:var(--muted);">MK: <span id="kpass-${k.id}" style="letter-spacing:2px;">••••••••</span> <button class="btn-sm" style="padding:1px 5px;font-size:9px;" onclick="toggleShowKeyPass('${esc(k.id)}','${esc(k.password)}')">👁</button></span>` : '<span style="font-size:9px;color:var(--red);">⚠ Chưa có MK</span>';
+    const mkLabel = k.noPasswordSet ? `<span style="font-size:9px;background:rgba(0,207,255,.15);color:var(--hold);border:1px solid var(--hold);border-radius:3px;padding:1px 5px;margin-left:4px;">MK Tạm</span>` : '';
+    const passDisplay = k.password ? `<span style="font-family:var(--mono);font-size:10px;color:var(--muted);">MK: <span id="kpass-${k.id}" style="letter-spacing:2px;">••••••••</span> <button class="btn-sm" style="padding:1px 5px;font-size:9px;" onclick="toggleShowKeyPass('${esc(k.id)}','${esc(k.password)}')">👁</button>${mkLabel}</span>` : '<span style="font-size:9px;color:var(--red);">⚠ Chưa có MK</span>';
     return `
     <div class="cfg-group" style="background:var(--card); border:1px solid var(--border); padding:10px; display:flex; flex-direction:column; gap:6px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
