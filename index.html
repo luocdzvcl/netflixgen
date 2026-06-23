@@ -877,13 +877,18 @@ async function apiFetch(endpoint, method = 'GET', body = null) {
 }
 
 async function saveCookieToCloud(id) {
-  const r = results[id]; if(!r) return; toast('Đang đẩy dữ liệu lên Cloud...');
+  const r = results[id]; if(!r) return;
   const label = r.info?.email || r.label || 'Saved Cookie';
-  const res = await apiFetch('/api/cloud/cookies', 'POST', { netscape: r.netscape, label: label, status: r.status, info: r.info, nftoken: r.nftoken });
-  if(res && res.ok) toast('Đã lưu thành công vào Cloudflare KV ✓'); else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
+  // Fire and show feedback nhanh, không chặn UI
+  toast('☁️ Đang lưu...');
+  apiFetch('/api/cloud/cookies', 'POST', { netscape: r.netscape, label: label, status: r.status, info: r.info, nftoken: r.nftoken })
+    .then(res => {
+      if(res && res.ok) toast('✅ Đã lưu vào Cloudflare KV');
+      else toast(`Thất bại: ${res?.error || 'Lỗi'}`);
+    });
 }
 
-// ════ LƯU TẤT CẢ HIT LÊN CLOUD ════
+// ════ LƯU TẤT CẢ HIT LÊN CLOUD (SONG SONG - TỐC ĐỘ CAO) ════
 async function saveAllHitsToCloud() {
   const hits = results.filter(r => r.status === 'hit' || r.status === 'hold');
   
@@ -896,21 +901,24 @@ async function saveAllHitsToCloud() {
   btn.innerHTML = '<span class="spinner" style="border-top-color:var(--blue)"></span> Đang lưu...';
   btn.disabled = true;
 
-  let success = 0;
-  let failed = 0;
-  
-  for (const r of hits) {
-    const label = r.info?.email || r.label || 'Saved Cookie';
-    const res = await apiFetch('/api/cloud/cookies', 'POST', { 
-      netscape: r.netscape, 
-      label: label, 
-      status: r.status, 
-      info: r.info, 
-      nftoken: r.nftoken 
-    });
-    
-    if (res && res.ok) success++;
-    else failed++;
+  // Gửi song song, nhóm 5 request mỗi đợt để không quá tải KV
+  const BATCH = 5;
+  let success = 0, failed = 0;
+
+  for (let i = 0; i < hits.length; i += BATCH) {
+    const batch = hits.slice(i, i + BATCH);
+    const batchResults = await Promise.all(batch.map(r => {
+      const label = r.info?.email || r.label || 'Saved Cookie';
+      return apiFetch('/api/cloud/cookies', 'POST', {
+        netscape: r.netscape,
+        label: label,
+        status: r.status,
+        info: r.info,
+        nftoken: r.nftoken
+      });
+    }));
+    batchResults.forEach(res => { if (res && res.ok) success++; else failed++; });
+    btn.innerHTML = `<span class="spinner" style="border-top-color:var(--blue)"></span> Đã lưu ${success}/${hits.length}...`;
   }
 
   btn.innerHTML = originalText;
@@ -941,6 +949,7 @@ function renderCloudList() {
           <span class="result-summary">${esc(c.info?.plan || 'Free Account')} <span class="dim">· ${esc(c.info?.email || c.label)}</span></span>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0;">
+          <button class="btn-action" style="color:var(--blue);border-color:var(--blue-dim);padding:5px 9px;" onclick="event.stopPropagation(); regenNFToken('${c.id}', ${idx}, this)" title="Gen NFToken mới">🔗 NFToken</button>
           <button class="btn-action" style="color:var(--red);border-color:var(--red);padding:5px 9px;" onclick="event.stopPropagation(); deleteCloudCookie('${c.id}')">✕ Xoá</button>
           <button class="toggle-btn" onclick="event.stopPropagation(); toggleCloudDetail(${idx})">▾</button>
         </div>
@@ -966,27 +975,87 @@ async function deleteCloudCookie(id) {
   if(res && res.ok) { toast('Đã xoá ✓'); loadCloudCookies(); }
 }
 
+// Gen NFToken mới cho một cookie cloud cụ thể (không cần recheck toàn bộ)
+async function regenNFToken(id, idx, btn) {
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner" style="border-top-color:var(--blue)"></span>';
+  btn.disabled = true;
+  try {
+    const res = await apiFetch('/api/cloud/cookies/regen-nftoken', 'POST', { id, attempts: 3 });
+    if (res && res.ok && res.nftoken) {
+      cloudCookies[idx].nftoken = res.nftoken;
+      cloudCookies[idx].lastCheck = Date.now();
+      toast(`✅ Gen NFToken mới thành công! Hết hạn: ${res.nftoken.expires_at_utc || 'N/A'}`);
+      // Refresh detail nếu đang mở
+      const d = document.getElementById(`cloud-detail-${id}`);
+      if(d && d.classList.contains('open')) { d.innerHTML = getDetailHTML(cloudCookies[idx], true); }
+    } else {
+      toast(`❌ Thất bại: ${res?.error || 'Cookie đã hết hạn'}`);
+    }
+  } catch(e) { toast(`Lỗi: ${e.message}`); }
+  btn.innerHTML = orig;
+  btn.disabled = false;
+}
+
 async function recheckAllCloud() {
   if(!cloudCookies.length) return toast("Không có cookie trong kho");
-  const wUrl = localStorage.getItem('nf_worker_url'); const token = localStorage.getItem('nf_app_token'); const cfg = getConfig();
-  toast('Bắt đầu Recheck tự động...');
-  for(let i=0; i<cloudCookies.length; i++) {
-    const c = cloudCookies[i]; const card = document.getElementById(`cloud-card-${c.id}`);
+  const wUrl = localStorage.getItem('nf_worker_url');
+  const token = localStorage.getItem('nf_app_token');
+  // Force nftoken=true khi recheck để luôn gen link mới cho HIT
+  const cfg = Object.assign({}, getConfig(), { nftoken: 'true', performance: { nftoken_for_free: false } });
+  toast('Bắt đầu Recheck tự động (song song)...');
+
+  // Hiển thị spinner cho tất cả card ngay
+  cloudCookies.forEach(c => {
+    const card = document.getElementById(`cloud-card-${c.id}`);
     if(card) card.querySelector('.status-badge').innerHTML = '<span class="spinner"></span>';
-    try {
-      const res = await fetch(wUrl, { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body:JSON.stringify({cookie:c.netscape, config:cfg}) });
-      const data = await res.json();
-      let newStatus = 'dead'; let newInfo = c.info; let newNftoken = c.nftoken;
-      if(data.ok) {
-        newStatus = data.is_on_hold ? 'hold' : data.result === 'HIT' ? 'hit' : data.result === 'FREE' ? 'free' : 'dead';
-        if(data.info) newInfo = data.info; if(data.nftoken) newNftoken = data.nftoken;
+  });
+
+  const BATCH = 5;
+  let done = 0;
+
+  for(let i = 0; i < cloudCookies.length; i += BATCH) {
+    const batchSlice = cloudCookies.slice(i, i + BATCH).map((c, bi) => ({ c, gi: i + bi }));
+
+    await Promise.all(batchSlice.map(async ({ c, gi }) => {
+      const card = document.getElementById(`cloud-card-${c.id}`);
+      try {
+        const res = await fetch(wUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ cookie: c.netscape, config: cfg })
+        });
+        const data = await res.json();
+        let newStatus = 'dead', newInfo = c.info, newNftoken = c.nftoken;
+        if(data.ok) {
+          newStatus = data.is_on_hold ? 'hold'
+            : (data.result === 'HIT' || data.result === 'HIT_EXTRA') ? 'hit'
+            : data.result === 'FREE' ? 'free' : 'dead';
+          if(data.info) newInfo = data.info;
+          // Luôn cập nhật nftoken mới nếu server trả về (gen link mới)
+          if(data.nftoken && data.nftoken.token) newNftoken = data.nftoken;
+        }
+        cloudCookies[gi].status = newStatus;
+        cloudCookies[gi].info = newInfo;
+        cloudCookies[gi].nftoken = newNftoken;
+        cloudCookies[gi].lastCheck = Date.now();
+        // Lưu lên KV luôn bao gồm nftoken mới
+        await apiFetch('/api/cloud/cookies/update', 'POST', {
+          id: c.id, status: newStatus, info: newInfo, nftoken: newNftoken
+        });
+      } catch(e) {
+        if(card) card.querySelector('.status-badge').innerHTML = '⚠ ERR';
       }
-      cloudCookies[i].status = newStatus; cloudCookies[i].info = newInfo; cloudCookies[i].nftoken = newNftoken; cloudCookies[i].lastCheck = Date.now();
-      await apiFetch('/api/cloud/cookies/update', 'POST', { id: c.id, status: newStatus, info: newInfo, nftoken: newNftoken });
-      renderCloudList();
-    } catch(e) { if(card) card.querySelector('.status-badge').innerHTML = '⚠ ERR'; }
+      done++;
+    }));
+
+    // Cập nhật UI sau mỗi batch
+    renderCloudList();
+    toast(`Recheck: ${done}/${cloudCookies.length} cookie...`);
   }
-  toast("Recheck hoàn tất!");
+
+  renderCloudList();
+  toast(`✅ Recheck hoàn tất! ${done} cookie đã được cập nhật + gen NFToken mới.`);
 }
 
 // ════ USER MANAGEMENT LOGIC (ADMIN ONLY) ════
