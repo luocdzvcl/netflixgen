@@ -603,9 +603,9 @@ function showAppView() {
   if (tabUserAdmin) tabUserAdmin.style.display = (role === 'admin') ? 'block' : 'none';
   const tabKvAdmin = document.getElementById('tabKvAdmin');
   if (tabKvAdmin) tabKvAdmin.style.display = (role === 'admin') ? 'block' : 'none';
-  // Hiện nút đổi mật khẩu: user thường VÀ key user đều có thể đổi
+  // Hiện nút đổi mật khẩu cho tất cả trừ admin
   const btnCP = document.getElementById('btnChangePass');
-  if (btnCP) btnCP.style.display = (role === 'user') ? 'inline-block' : 'none';
+  if (btnCP) btnCP.style.display = (role !== 'admin') ? 'inline-block' : 'none';
   
   startHeartbeat();
   setTimeout(_restorePendingResults, 300);
