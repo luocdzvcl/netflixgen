@@ -353,6 +353,7 @@ select:focus{border-color:var(--red)}
     <div id="tab-cloud" class="tab-panel">
       <div class="controls" style="margin-top: 0; margin-bottom: 14px; gap: 8px;">
         <button class="btn-check" onclick="loadCloudCookies()" style="background: var(--blue); padding: 10px;">🔄 Tải Danh Sách</button>
+        <button class="btn-check" onclick="deleteAllDeadCloud()" style="background: var(--red-dim); border:1px solid var(--red); padding: 10px;">🗑️ Xoá Toàn Bộ Dead</button>
         <button class="btn-check" onclick="recheckAllCloud()" style="background: var(--hold); padding: 10px;">▶ Recheck Toàn Kho</button>
       </div>
       <div id="cloudResults" style="display:flex;flex-direction:column;gap:8px">
@@ -1138,6 +1139,23 @@ async function deleteCloudCookie(id) {
   if(!confirm("Xóa cookie khỏi Cloud?")) return;
   const res = await apiFetch(`/api/cloud/cookies/${id}`, 'DELETE');
   if(res && res.ok) { toast('Đã xoá ✓'); loadCloudCookies(); }
+}
+
+async function deleteAllDeadCloud() {
+  const dead = cloudCookies.filter(c => c.status === 'dead' || c.status === 'err');
+  if(!dead.length) return toast('Không có tài khoản DEAD/ERR nào trong kho!');
+  if(!confirm(`Xác nhận xoá toàn bộ ${dead.length} tài khoản DEAD/ERR khỏi Cloud?`)) return;
+  const btn = document.querySelector('button[onclick="deleteAllDeadCloud()"]');
+  if(btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-top-color:var(--red)"></span> Đang xoá...'; }
+  const ids = dead.map(c => c.id);
+  const res = await apiFetch('/api/cloud/cookies/bulk-delete', 'POST', { ids });
+  if(btn) { btn.disabled = false; btn.innerHTML = '🗑️ Xoá Toàn Bộ Dead'; }
+  if(res && res.ok) {
+    toast(`Đã xoá ${res.deleted} tài khoản Dead ✓`);
+    loadCloudCookies();
+  } else {
+    toast(`Thất bại: ${res?.error || 'Lỗi không xác định'}`);
+  }
 }
 
 async function recheckAllCloud() {
