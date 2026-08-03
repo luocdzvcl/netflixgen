@@ -1821,4 +1821,15 @@ async function submitKeyPass() {
   if (newPass.length < 4) return errEl.textContent = 'Mật khẩu phải có ít nhất 4 ký tự!';
   errEl.textContent = 'Đang xử lý...';
   // Admin reset: gửi theo keyId, không cần MK cũ
-  const res = await apiFetc
+  const res = await apiFetch(`/api/keys/${_keyPassId}/password`, 'POST', { password: newPass });
+  if(res && res.ok) {
+    closeModal('keyPassModal');
+    toast('Đã reset mật khẩu Key ✓');
+    loadAdminKeys();
+  } else {
+    errEl.textContent = res?.error || 'Lỗi không xác định';
+  }
+}
+</script>
+</body>
+</html>
