@@ -2,217 +2,376 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>NOTOC29FLIX Checker</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>NOTOC29FLIX Checker UI</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a0a0a;--surface:#111;--card:#181818;--border:#2a2a2a;
-  --red:#e50914;--red-dim:#7f050b;
-  --green:#46d369;--green-dim:#1a4a27;
-  --gold:#f5c518;--gold-dim:#3d3107;
-  --blue:#4fa3e0;--blue-dim:#0e2a40;
-  --hold:#00cfff;--hold-dim:#003344;
-  --text:#e5e5e5;--muted:#808080;
-  --mono:'Courier New',monospace;--sans:'Helvetica Neue',Arial,sans-serif;
+:root {
+  --bg: #050505;
+  --bg-gradient: radial-gradient(circle at top right, rgba(229, 9, 20, 0.15), transparent 40%),
+                 radial-gradient(circle at bottom left, rgba(79, 163, 224, 0.05), transparent 40%);
+  --surface: rgba(20, 20, 20, 0.7);
+  --surface-hover: rgba(30, 30, 30, 0.9);
+  --card: rgba(28, 28, 28, 0.5);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(255, 255, 255, 0.2);
+  --red: #e50914; --red-hover: #f40612; --red-dim: rgba(229, 9, 20, 0.15);
+  --green: #46d369; --green-dim: rgba(70, 211, 105, 0.15);
+  --gold: #f5c518; --gold-dim: rgba(245, 197, 24, 0.15);
+  --blue: #4fa3e0; --blue-dim: rgba(79, 163, 224, 0.15);
+  --hold: #00cfff; --hold-dim: rgba(0, 207, 255, 0.15);
+  --text: #ffffff; --text-muted: #999999;
+  --mono: 'Courier New', monospace;
+  --sans: 'Inter', sans-serif;
+  --glass-blur: blur(20px);
+  --sidebar-width: 260px;
+  --header-height: 70px;
+  --radius: 12px;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center}
 
-header{width:100%;padding:16px 28px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
-.logo{font-size:20px;font-weight:900;letter-spacing:-.5px;color:var(--red);text-transform:uppercase}
-.logo span{color:var(--text);font-weight:300}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background-color: var(--bg);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
-main{width:100%;max-width:900px;margin:0 auto;padding:32px 16px 80px;display:flex;flex-direction:column;gap:20px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
-.card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
-.tabs{display:flex;gap:2px;background:var(--surface);border-radius:5px;padding:3px;margin-bottom:16px}
-.tab{flex:1;padding:8px;background:none;border:none;border-radius:4px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,color .15s; white-space:nowrap;}
-.tab.active{background:var(--card);color:var(--text)}
-.tab-panel{display:none}.tab-panel.active{display:block}
+/* Inputs & Buttons Base */
+input, textarea, select, button { font-family: inherit; }
+input, textarea, select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  outline: none;
+  backdrop-filter: var(--glass-blur);
+}
+input:focus, textarea:focus, select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05); }
+button { cursor: pointer; transition: all 0.2s ease; }
 
-.url-row{display:flex;gap:8px;align-items:center}
-.url-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;outline:none;transition:border-color .2s}
-.url-row input:focus{border-color:var(--red)}
-.btn-sm{padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s}
-.btn-sm:hover{border-color:var(--red);color:var(--text)}
-
-.drop-zone{position:relative;border:2px dashed var(--border);border-radius:6px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
-.drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:rgba(229,9,20,.05)}
-.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.drop-icon{font-size:26px;margin-bottom:6px}
-.drop-label{font-size:12px;color:var(--muted)}
-.drop-label strong{color:var(--text)}
-.drop-files{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
-.drop-file-tag{font-size:10px;background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.drop-file-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;line-height:1;padding:0}
-.drop-file-tag button:hover{color:var(--red)}
-.or-div{text-align:center;font-size:10px;color:var(--muted);letter-spacing:2px;margin:4px 0 8px;position:relative}
-.or-div::before,.or-div::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:var(--border)}
-.or-div::before{left:0}.or-div::after{right:0}
-
-textarea{width:100%;min-height:130px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;line-height:1.7;padding:12px;resize:vertical;outline:none;transition:border-color .2s}
-textarea:focus{border-color:var(--red)}
-
-.formats{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.fmt{font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 8px;letter-spacing:.5px}
-
-.controls{display:flex;gap:10px;align-items:center;margin-top:14px}
-.btn-check{flex:1;padding:13px;background:var(--red);border:none;border-radius:4px;color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}
-.btn-check:hover:not(:disabled){background:#c1070f}
-.btn-check:disabled{background:var(--red-dim);cursor:not-allowed;opacity:.7}
-.btn-clear{padding:13px 18px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s}
-.btn-clear:hover{border-color:var(--text);color:var(--text)}
-
-.progress-wrap{display:none;margin-top:14px;background:var(--surface);border-radius:4px;height:3px;overflow:hidden}
-.progress-bar{height:100%;background:var(--red);width:0%;transition:width .3s ease}
-.progress-label{font-size:10px;color:var(--muted);margin-top:5px;display:none}
-
-.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cfg-group{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px}
-.cfg-group-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.cfg-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-.cfg-row:last-child{margin-bottom:0}
-.cfg-label{font-size:11px;color:var(--text)}
-.cfg-label small{color:var(--muted);font-size:9px;display:block;line-height:1.3}
-
-.toggle{position:relative;width:34px;height:18px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0;position:absolute}
-.toggle-track{position:absolute;inset:0;background:#333;border-radius:18px;transition:background .2s;cursor:pointer}
-.toggle input:checked+.toggle-track{background:var(--red)}
-.toggle-track::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s}
-.toggle input:checked+.toggle-track::after{left:18px}
-
-select{background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:4px 8px;outline:none;cursor:pointer}
-select:focus{border-color:var(--red)}
-.webhook-url-row{margin-top:8px}
-.webhook-url-row input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:10px;padding:7px 10px;outline:none}
-.webhook-url-row input:focus{border-color:var(--red)}
-
-.stats{display:none;gap:10px;flex-wrap:wrap;margin-top:14px}
-.stat{flex:1;min-width:90px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
-.stat-num{font-size:26px;font-weight:900;line-height:1;margin-bottom:3px}
-.stat-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
-.stat.hit .stat-num{color:var(--green)}
-.stat.free .stat-num{color:var(--gold)}
-.stat.hold .stat-num{color:var(--hold)}
-.stat.dead .stat-num{color:var(--red)}
-.stat.err  .stat-num{color:var(--muted)}
-
-#results{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-.result-card{background:var(--card);border-radius:6px;border-left:3px solid var(--border);overflow:hidden;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.result-card.hit  {border-left-color:var(--green)}
-.result-card.free {border-left-color:var(--gold)}
-.result-card.hold {border-left-color:var(--hold)}
-.result-card.dead {border-left-color:var(--red)}
-.result-card.err  {border-left-color:var(--muted)}
-.result-card.checking{border-left-color:#333}
-
-.result-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none}
-.status-badge{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;white-space:nowrap}
-.hit  .status-badge{background:var(--green-dim);color:var(--green)}
-.free .status-badge{background:var(--gold-dim);color:var(--gold)}
-.hold .status-badge{background:var(--hold-dim);color:var(--hold)}
-.dead .status-badge{background:#2a1111;color:var(--red)}
-.err  .status-badge{background:#1a1a1a;color:var(--muted)}
-.checking .status-badge{background:#1a1a1a;color:#444}
-.result-summary{flex:1;font-size:12px;color:var(--text);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.result-summary .dim{color:var(--muted)}
-.toggle-btn{font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:3px 6px;border-radius:3px;transition:background .15s}
-.toggle-btn:hover{background:var(--border);color:var(--text)}
-.result-detail{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
-.result-detail.open{display:block}
-
-.info-grid{display:grid;grid-template-columns:140px 1fr;gap:5px 14px;margin-top:12px;font-size:12px}
-.info-key{color:var(--muted);font-size:10px;letter-spacing:.4px;display:flex;align-items:center}
-.info-val{color:var(--text);font-family:var(--mono);font-size:11px;word-break:break-all}
-
-.nft-section{margin-top:12px;padding:10px 12px;background:var(--blue-dim);border:1px solid var(--blue);border-radius:4px}
-.nft-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
-.nft-links{display:flex;flex-wrap:wrap;gap:6px}
-.nft-link{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;border-radius:4px;text-decoration:none;letter-spacing:.3px;transition:opacity .15s}
-.nft-link:hover{opacity:.85}
-.nft-expiry{margin-top:6px;font-size:10px;color:var(--blue);opacity:.7;font-family:var(--mono)}
-
-.action-row{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
-.btn-action{font-size:10px;padding:6px 12px;border-radius:3px;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;font-weight:600;transition:border-color .15s,color .15s}
-.btn-copy{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
-.btn-copy:hover{border-color:var(--text);color:var(--text)}
-.btn-copy.copied{border-color:var(--green);color:var(--green)}
-.btn-dl{background:transparent;border:1px solid var(--border);color:var(--muted)}
-.btn-dl:hover{border-color:var(--green);color:var(--green)}
-
-.export-bar{display:none;gap:8px;flex-wrap:wrap;margin-top:14px}
-.btn-export{padding:9px 16px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;font-weight:600;transition:border-color .2s,color .2s}
-.btn-export:hover{border-color:var(--green);color:var(--green)}
-
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{display:inline-block;width:11px;height:11px;border:2px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
-
-/* Login section */
+/* Login Section (Fullscreen Glass) */
 #loginSection {
+  position: fixed; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 20px;
+  background: var(--bg);
+  background-image: var(--bg-gradient);
+  z-index: 9999; padding: 20px;
 }
 .login-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 6px;
-  padding: 30px; width: 100%; max-width: 360px; text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px; width: 100%; max-width: 420px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.login-card h2 { color: var(--red); font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: -0.5px;}
+.login-card h2 {
+  color: var(--red); font-size: 28px; font-weight: 900;
+  text-transform: uppercase; margin-bottom: 30px; letter-spacing: -0.5px;
+  text-align: center; text-shadow: 0 2px 10px rgba(229,9,20,0.3);
+}
 .login-card h2 span { color: var(--text); font-weight: 300; }
-.login-group { text-align: left; margin-bottom: 15px; }
-.login-group label { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-.login-group input {
-  width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-  color: var(--text); padding: 11px 14px; outline: none; font-size: 13px; font-family: var(--sans); transition: border-color 0.2s;
+.login-group { margin-bottom: 20px; text-align: left; }
+.login-group label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+.login-group input { width: 100%; background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
+.login-group input:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(229,9,20,0.15); }
+.or-div {
+  text-align: center; font-size: 11px; color: var(--text-muted); letter-spacing: 2px;
+  margin: 10px 0 20px; position: relative; font-weight: 500;
 }
-.login-group input:focus { border-color: var(--red); }
+.or-div::before, .or-div::after { content: ''; position: absolute; top: 50%; width: 25%; height: 1px; background: var(--border); }
+.or-div::before { left: 0; } .or-div::after { right: 0; }
 .btn-login {
-  width: 100%; padding: 12px; background: var(--red); border: none; border-radius: 4px;
-  color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-top: 10px; transition: background 0.2s;
+  width: 100%; padding: 14px; background: var(--red); border: none; border-radius: 8px;
+  color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(229,9,20,0.3);
 }
-.btn-login:hover { background: #c1070f; }
-#loginError { color: var(--red); font-size: 11px; margin-top: 15px; min-height: 16px; }
-.logout-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; font-size: 10px; border-radius: 3px; cursor: pointer; transition: color 0.2s, border-color 0.2s;}
-.logout-btn:hover { color: var(--text); border-color: var(--text); }
+.btn-login:hover { background: var(--red-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(229,9,20,0.4); }
+#loginError { color: var(--red); font-size: 12px; margin-top: 15px; text-align: center; font-weight: 500; min-height: 18px; }
 
-/* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-box{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:24px;width:100%;max-width:360px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-.modal-box h3{color:var(--text);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px}
-.modal-box .login-group{margin-bottom:12px}
-.modal-actions{display:flex;gap:8px;margin-top:16px}
-.modal-actions button{flex:1;padding:10px;border-radius:4px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
-.btn-modal-ok{background:var(--red);border:none;color:#fff}
-.btn-modal-ok:hover{background:#c1070f}
-.btn-modal-cancel{background:transparent;border:1px solid var(--border);color:var(--muted)}
-.btn-modal-cancel:hover{border-color:var(--text);color:var(--text)}
-#modalError{color:var(--red);font-size:11px;min-height:14px;margin-top:8px}
+/* App Layout - PC First */
+#appContent { display: none; width: 100%; height: 100vh; overflow: hidden; }
+.app-container { display: flex; width: 100%; height: 100%; }
 
-/* MOBILE RESPONSIVE FIXES */
-@media (max-width: 600px) {
-  header { padding: 12px 16px; flex-wrap: wrap; }
-  .logo { font-size: 18px; }
-  .tabs { flex-wrap: wrap; }
-  .tab { font-size: 10px; padding: 6px; }
+/* Sidebar (Tabs) */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  flex-shrink: 0; z-index: 20;
+}
+.sidebar-header {
+  height: var(--header-height);
+  display: flex; align-items: center; padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--red); text-transform: uppercase; text-shadow: 0 2px 10px rgba(229,9,20,0.3); }
+.logo span { color: var(--text); font-weight: 300; }
+.tabs { display: flex; flex-direction: column; gap: 4px; padding: 20px 12px; flex: 1; overflow-y: auto; }
+.tab {
+  padding: 12px 16px; background: transparent; border: none; border-radius: 8px;
+  color: var(--text-muted); font-size: 13px; font-weight: 600; text-align: left;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px;
+}
+.tab:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.tab.active { background: rgba(229,9,20,0.1); color: var(--red); border-left: 3px solid var(--red); border-radius: 0 8px 8px 0; padding-left: 13px; }
+
+/* Main Area */
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+/* Top Header */
+header {
+  height: var(--header-height);
+  padding: 0 30px; display: flex; align-items: center; justify-content: flex-end; gap: 20px;
+  background: rgba(10, 10, 10, 0.4); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border); z-index: 10;
+}
+#displayUsername { font-size: 12px; color: var(--text); font-weight: 600; letter-spacing: 0.5px; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 20px; border: 1px solid var(--border); }
+.logout-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+  padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 20px; transition: all 0.2s;
+}
+.logout-btn:hover { color: var(--text); border-color: var(--text); background: rgba(255,255,255,0.05); }
+#btnChangePass { border-color: var(--blue-dim); color: var(--blue); background: rgba(79, 163, 224, 0.05); }
+#btnChangePass:hover { background: var(--blue-dim); border-color: var(--blue); color: #fff; }
+
+/* Main Content Scrollable */
+main { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
+.content-wrapper { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; padding-bottom: 60px; }
+
+/* Cards */
+.card {
+  background: var(--card); backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;
+}
+.card-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center; }
+
+/* Tab Panels */
+.tab-panel { display: none; animation: fadeIn 0.3s ease; }
+.tab-panel.active { display: block; }
+
+/* Input Tab Elements */
+.url-row { display: flex; gap: 12px; align-items: center; }
+.url-row input { flex: 1; font-family: var(--mono); background: rgba(0,0,0,0.3); }
+.btn-sm {
+  padding: 10px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 12px; font-weight: 600; transition: all 0.2s;
+}
+.btn-sm:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+.drop-zone {
+  position: relative; border: 2px dashed rgba(255,255,255,0.15); border-radius: var(--radius);
+  padding: 40px 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 20px;
+  background: rgba(0,0,0,0.2);
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--red); background: var(--red-dim); }
+.drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.drop-icon { font-size: 32px; margin-bottom: 12px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.drop-label { font-size: 14px; color: var(--text-muted); }
+.drop-label strong { color: var(--text); font-weight: 600; }
+.drop-files { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.drop-file-tag {
+  font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 12px; color: var(--text); display: flex; align-items: center; gap: 8px;
+}
+.drop-file-tag button { background: none; border: none; color: var(--text-muted); font-size: 14px; line-height: 1; padding:0; }
+.drop-file-tag button:hover { color: var(--red); }
+
+textarea { width: 100%; min-height: 160px; font-family: var(--mono); font-size: 12px; line-height: 1.6; background: rgba(0,0,0,0.3); resize: vertical; }
+.formats { display: flex; gap: 8px; margin-top: 12px; }
+.fmt { font-size: 10px; color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-weight: 500; background: rgba(255,255,255,0.02); }
+
+/* Config & Grid */
+.cfg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.cfg-group { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.cfg-group-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.cfg-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.cfg-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.cfg-label { font-size: 13px; color: var(--text); font-weight: 500; }
+.cfg-label small { color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px; font-weight: 400; }
+
+/* Toggles */
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 24px; transition: 0.3s; cursor: pointer; border: 1px solid var(--border); }
+.toggle input:checked + .toggle-track { background: var(--red); border-color: var(--red); }
+.toggle-track::after { content: ''; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.toggle input:checked + .toggle-track::after { left: 22px; }
+
+.webhook-url-row input { width: 100%; margin-top: 12px; font-family: var(--mono); font-size: 12px; }
+
+/* Controls & Buttons */
+.controls { display: flex; gap: 12px; align-items: center; margin: 24px 0 16px; flex-wrap: wrap; }
+.btn-check {
+  flex: 1; padding: 16px 24px; background: var(--red); border: none; border-radius: 8px;
+  color: #fff; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  box-shadow: 0 4px 15px rgba(229,9,20,0.3);
+}
+.btn-check:hover:not(:disabled) { background: var(--red-hover); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(229,9,20,0.4); }
+.btn-check:disabled { background: var(--red-dim); color: rgba(255,255,255,0.5); cursor: not-allowed; box-shadow: none; transform: none; }
+.btn-clear {
+  padding: 16px 24px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 14px; font-weight: 600; text-transform: uppercase;
+}
+.btn-clear:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+
+/* Progress */
+.progress-wrap { display: none; margin-top: 16px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden; border: 1px solid var(--border); }
+.progress-bar { height: 100%; background: linear-gradient(90deg, #e50914, #ff3b30); width: 0%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(229,9,20,0.5); }
+.progress-label { font-size: 11px; color: var(--text-muted); margin-top: 8px; display: none; text-align: right; font-weight: 500; font-family: var(--mono); }
+
+/* Stats Grid */
+.stats { display: none; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin-top: 24px; }
+.stat {
+  background: var(--card); backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center;
+  transition: transform 0.2s; position: relative; overflow: hidden;
+}
+.stat::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%); }
+.stat-num { font-size: 32px; font-weight: 900; line-height: 1; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.stat-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
+.stat.hit { border-bottom: 3px solid var(--green); } .stat.hit .stat-num { color: var(--green); }
+.stat.free { border-bottom: 3px solid var(--gold); } .stat.free .stat-num { color: var(--gold); }
+.stat.hold { border-bottom: 3px solid var(--hold); } .stat.hold .stat-num { color: var(--hold); }
+.stat.dead { border-bottom: 3px solid var(--red); } .stat.dead .stat-num { color: var(--red); }
+.stat.err { border-bottom: 3px solid var(--text-muted); } .stat.err .stat-num { color: var(--text-muted); }
+
+/* Export Bar */
+.export-bar { display: none; gap: 12px; flex-wrap: wrap; margin-top: 24px; background: rgba(0,0,0,0.2); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); }
+.btn-export {
+  flex: 1; min-width: 120px; padding: 12px 16px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
+}
+.btn-export:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
+
+/* Results */
+#results { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.result-card {
+  background: var(--card); backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border); border-radius: var(--radius); border-left: 4px solid var(--border);
+  overflow: hidden; animation: slideUp 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.result-card.hit { border-left-color: var(--green); }
+.result-card.free { border-left-color: var(--gold); }
+.result-card.hold { border-left-color: var(--hold); }
+.result-card.dead { border-left-color: var(--red); }
+.result-card.err { border-left-color: var(--text-muted); }
+.result-card.checking { border-left-color: #555; background: rgba(40,40,40,0.5); }
+
+.result-header { display: flex; align-items: center; gap: 16px; padding: 16px 20px; cursor: pointer; user-select: none; transition: background 0.2s; }
+.result-header:hover { background: rgba(255,255,255,0.02); }
+.status-badge { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+.hit .status-badge { background: var(--green-dim); color: var(--green); border: 1px solid rgba(70,211,105,0.2); }
+.free .status-badge { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(245,197,24,0.2); }
+.hold .status-badge { background: var(--hold-dim); color: var(--hold); border: 1px solid rgba(0,207,255,0.2); }
+.dead .status-badge { background: rgba(229,9,20,0.1); color: var(--red); border: 1px solid rgba(229,9,20,0.2); }
+.err .status-badge { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); }
+.checking .status-badge { background: rgba(255,255,255,0.05); color: #aaa; border: 1px solid rgba(255,255,255,0.1); }
+
+.result-summary { flex: 1; font-size: 13px; color: var(--text); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-summary .dim { color: var(--text-muted); font-family: var(--sans); margin-left: 8px; }
+.toggle-btn { font-size: 14px; color: var(--text-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.toggle-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+.result-detail { display: none; padding: 0 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); }
+.result-detail.open { display: block; animation: fadeIn 0.3s ease; }
+
+.info-grid { display: grid; grid-template-columns: 160px 1fr; gap: 8px 16px; margin-top: 20px; font-size: 13px; }
+.info-key { color: var(--text-muted); font-size: 11px; letter-spacing: 0.5px; display: flex; align-items: center; font-weight: 500; text-transform: uppercase; }
+.info-val { color: var(--text); font-family: var(--mono); font-size: 12px; word-break: break-all; background: rgba(255,255,255,0.02); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.03); }
+
+.nft-section { margin-top: 20px; padding: 16px; background: var(--blue-dim); border: 1px solid rgba(79,163,224,0.3); border-radius: 8px; }
+.nft-title { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.nft-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.nft-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 700; border-radius: 6px; text-decoration: none; letter-spacing: 0.5px; transition: all 0.2s; box-shadow: 0 4px 10px rgba(79,163,224,0.3); }
+.nft-link:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(79,163,224,0.4); }
+.nft-expiry { margin-top: 12px; font-size: 11px; color: var(--blue); opacity: 0.8; font-family: var(--mono); font-weight: 500; }
+
+.action-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); }
+.btn-action { font-size: 11px; padding: 8px 16px; border-radius: 6px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+.btn-action:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
+.btn-copy { color: var(--text); }
+.btn-copy.copied { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.btn-dl { color: var(--text); }
+
+/* Modals */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s; }
+.modal-box { background: var(--card); backdrop-filter: var(--glass-blur); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px; width: 100%; max-width: 400px; box-shadow: 0 24px 48px rgba(0,0,0,0.6); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.modal-box h3 { color: var(--text); font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; text-align: center; }
+.modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+.modal-actions button { flex: 1; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.btn-modal-ok { background: var(--red); border: none; color: #fff; box-shadow: 0 4px 15px rgba(229,9,20,0.3); }
+.btn-modal-ok:hover { background: var(--red-hover); transform: translateY(-1px); }
+.btn-modal-cancel { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+.btn-modal-cancel:hover { background: rgba(255,255,255,0.1); }
+#modalError { color: var(--red); font-size: 12px; min-height: 16px; margin-top: 12px; text-align: center; }
+
+/* Utilities */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Mobile Responsive */
+@media (max-width: 800px) {
+  .app-container { flex-direction: column; }
+  .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); height: auto; z-index: 30; background: rgba(15,15,15,0.95); backdrop-filter: blur(20px); }
+  .sidebar-header { padding: 0 20px; justify-content: space-between; height: 60px; }
+  
+  /* Mobile Tab Navigation - horizontally scrollable */
+  .tabs { flex-direction: row; overflow-x: auto; padding: 12px; gap: 8px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { white-space: nowrap; padding: 8px 16px; font-size: 12px; border-radius: 20px; background: rgba(255,255,255,0.05); }
+  .tab.active { border-left: none; border-radius: 20px; padding-left: 16px; background: var(--red); color: #fff; }
+  
+  header { height: 60px; padding: 0 20px; background: transparent; border-bottom: none; justify-content: space-between; }
+  main { padding: 16px; }
+  
   .cfg-grid { grid-template-columns: 1fr; }
-  .info-grid { grid-template-columns: 100px 1fr; gap: 4px 8px; }
-  .stat { min-width: 70px; padding: 10px; }
-  .stat-num { font-size: 20px; }
-  .btn-export { flex: 1 1 45%; display: flex; justify-content: center; text-align: center; }
-  .result-summary { font-size: 11px; }
+  .info-grid { grid-template-columns: 1fr; gap: 4px; }
+  .info-key { margin-top: 8px; }
+  
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat { padding: 16px 10px; }
+  .stat-num { font-size: 24px; }
+  
+  .btn-export { flex: 1 1 100%; }
+  .result-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px 16px; position: relative; }
+  .result-summary { width: 100%; white-space: normal; line-height: 1.4; padding-right: 40px; }
+  .toggle-btn { position: absolute; right: 16px; top: 16px; }
+  .result-card { position: relative; }
+  .action-row { justify-content: stretch; }
+  .btn-action { flex: 1; text-align: center; }
 }
 </style>
 </head>
 <body>
 
 <noscript>
-  <div style="color: white; text-align: center; padding: 50px;">Vui lòng bật JavaScript!</div>
+  <div style="position:fixed;inset:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:999999;font-family:sans-serif;font-weight:bold;">
+    Vui lòng bật JavaScript để sử dụng ứng dụng này!
+  </div>
 </noscript>
-<div id="jsErrorFallback" style="color: var(--red); text-align: center; padding: 20px; display: none; font-weight: bold; position: relative; z-index: 10000;"></div>
+<div id="jsErrorFallback" style="color: #e50914; background: rgba(229,9,20,0.1); border: 1px solid #e50914; padding: 16px; text-align: center; display: none; font-weight: bold; position: fixed; top: 0; left: 0; right: 0; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
 
 <script>
   window.onerror = function(msg, url, line) {
@@ -222,13 +381,13 @@ select:focus{border-color:var(--red)}
   };
 </script>
 
-<!-- Modal đổi mật khẩu user (tự đổi) -->
+<!-- Modals -->
 <div id="changePassModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <h3>🔒 Đổi Mật Khẩu</h3>
     <div class="login-group"><label>Mật khẩu hiện tại</label><input type="password" id="cpCurrentPass" placeholder="Nhập mật khẩu hiện tại" autocomplete="off"/></div>
-    <div class="login-group"><label>Mật khẩu mới</label><input type="password" id="cpNewPass" placeholder="Nhập mật khẩu mới (tối thiểu 4 ký tự)" autocomplete="off"/></div>
-    <div class="login-group"><label>Xác nhận mật khẩu mới</label><input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới" autocomplete="off"/></div>
+    <div class="login-group"><label>Mật khẩu mới</label><input type="password" id="cpNewPass" placeholder="Tối thiểu 4 ký tự" autocomplete="off"/></div>
+    <div class="login-group"><label>Xác nhận mật khẩu</label><input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới" autocomplete="off"/></div>
     <div id="modalError"></div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('changePassModal')">Hủy</button>
@@ -237,11 +396,10 @@ select:focus{border-color:var(--red)}
   </div>
 </div>
 
-<!-- Modal admin đổi mật khẩu user -->
 <div id="adminChangePassModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
     <h3>🔒 Đổi MK Cho User</h3>
-    <div id="adminChangePassTarget" style="font-size:11px;color:var(--muted);margin-bottom:14px;"></div>
+    <div id="adminChangePassTarget" style="font-size:12px;color:var(--text-muted);margin-bottom:20px;text-align:center;font-weight:600;"></div>
     <div class="login-group"><label>Mật khẩu mới</label><input type="password" id="adminNewPass" placeholder="Nhập mật khẩu mới" autocomplete="off"/></div>
     <div id="adminModalError"></div>
     <div class="modal-actions">
@@ -251,36 +409,34 @@ select:focus{border-color:var(--red)}
   </div>
 </div>
 
-<!-- Modal thông báo mật khẩu key lần đầu đăng nhập -->
 <div id="firstLoginKeyPassModal" class="modal-overlay" style="display:none;">
-  <div class="modal-box" style="max-width:400px;">
-    <h3 style="color:var(--gold);">🔑 MẬT KHẨU KEY CỦA BẠN</h3>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
-      Đây là mật khẩu key được cấp tự động. Bạn có thể <strong style="color:var(--text);">giữ nguyên</strong> để dùng hoặc <strong style="color:var(--text);">đổi ngay</strong> thành mật khẩu khác.
+  <div class="modal-box" style="max-width:440px;">
+    <h3 style="color:var(--gold);">🔑 Mật Khẩu Key Của Bạn</h3>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;text-align:center;">
+      Đây là mật khẩu được cấp tự động. <strong style="color:var(--text);">Giữ nguyên</strong> hoặc <strong style="color:var(--text);">đổi ngay</strong> thành mật khẩu khác.
     </div>
-    <div style="background:var(--bg);border:1px solid var(--gold);border-radius:4px;padding:14px;text-align:center;margin-bottom:16px;">
-      <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">MẬT KHẨU KEY</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
-        <code id="firstLoginKeyPassValue" style="font-family:var(--mono);font-size:20px;color:var(--gold);letter-spacing:3px;font-weight:bold;"></code>
-        <button class="btn-sm" style="padding:4px 10px;font-size:10px;" onclick="copyText(this, document.getElementById('firstLoginKeyPassValue').textContent)">📋</button>
+    <div style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.3);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;">
+      <div style="font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;font-weight:700;">MẬT KHẨU KEY</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
+        <code id="firstLoginKeyPassValue" style="font-family:var(--mono);font-size:24px;color:var(--gold);letter-spacing:4px;font-weight:900;"></code>
+        <button class="btn-sm" style="padding:8px 12px;font-size:14px;background:rgba(255,255,255,0.1);border-color:transparent;" onclick="copyText(this, document.getElementById('firstLoginKeyPassValue').textContent)">📋</button>
       </div>
     </div>
-    <div style="font-size:9px;color:var(--muted);margin-bottom:16px;">⚠ Lưu lại mật khẩu này! Bạn cần nhập mật khẩu này mỗi lần đăng nhập.</div>
-    <div class="modal-actions">
-      <button class="btn-modal-cancel" onclick="closeModal('firstLoginKeyPassModal')" style="border-color:var(--gold);color:var(--gold);">Giữ nguyên &amp; Đóng</button>
-      <button class="btn-modal-ok" onclick="closeModal('firstLoginKeyPassModal'); openChangePassModal();" style="background:var(--gold);color:#000;">Đổi Mật Khẩu Ngay</button>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:20px;text-align:center;">⚠ Lưu lại mật khẩu này! Cần thiết cho các lần đăng nhập sau.</div>
+    <div class="modal-actions" style="flex-direction:column;gap:10px;">
+      <button class="btn-modal-ok" onclick="closeModal('firstLoginKeyPassModal'); openChangePassModal();" style="background:var(--gold);color:#000;box-shadow:0 4px 15px rgba(245,197,24,0.3);">Đổi Mật Khẩu Ngay</button>
+      <button class="btn-modal-cancel" onclick="closeModal('firstLoginKeyPassModal')" style="border-color:rgba(255,255,255,0.1);">Giữ nguyên &amp; Đóng</button>
     </div>
   </div>
 </div>
 
-<!-- Modal đặt mật khẩu cho Key (admin reset) -->
 <div id="keyPassModal" class="modal-overlay" style="display:none;">
   <div class="modal-box">
-    <h3>🔑 Reset Mật Khẩu Key</h3>
-    <div id="keyPassTarget" style="font-size:10px;color:var(--muted);margin-bottom:14px;font-family:var(--mono);word-break:break-all;"></div>
+    <h3>🔑 Reset MK Key</h3>
+    <div id="keyPassTarget" style="font-size:11px;color:var(--text-muted);margin-bottom:20px;font-family:var(--mono);word-break:break-all;text-align:center;background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;"></div>
     <div class="login-group">
-      <label>Mật khẩu mới <small style="color:var(--muted)">(tối thiểu 4 ký tự)</small></label>
-      <input type="text" id="keyNewPass" placeholder="Nhập mật khẩu mới cho Key" autocomplete="off" spellcheck="false"/>
+      <label>Mật khẩu mới <small style="color:var(--text-muted);text-transform:none;">(tối thiểu 4 ký tự)</small></label>
+      <input type="text" id="keyNewPass" placeholder="Nhập mật khẩu mới" autocomplete="off" spellcheck="false"/>
     </div>
     <div id="keyModalError"></div>
     <div class="modal-actions">
@@ -290,273 +446,291 @@ select:focus{border-color:var(--red)}
   </div>
 </div>
 
+<!-- Login Section -->
 <div id="loginSection">
   <div class="login-card">
-    <h2>NOTOC29FLIX</h2>
+    <h2>NOTOC29<span>FLIX</span></h2>
     <div class="login-group"><label>Worker URL</label><input type="url" id="loginWorkerUrl" placeholder="https://..." spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Username</label><input type="text" id="loginUser" placeholder="Nhập tài khoản" spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Password</label><input type="password" id="loginPass" placeholder="Nhập mật khẩu" /></div>
     <div class="or-div">HOẶC ĐĂNG NHẬP BẰNG KEY</div>
-    <div class="login-group"><label>Access Key</label><input type="text" id="loginKey" placeholder="NFNTOC29-XXXXXXXXXXXXXXXX" spellcheck="false" autocomplete="off" oninput="onKeyInput(this.value)"/></div>
-    <div class="login-group" id="keyPasswordGroup">
+    <div class="login-group"><label>Access Key</label><input type="text" id="loginKey" placeholder="NFNTOC29-..." spellcheck="false" autocomplete="off" oninput="onKeyInput(this.value)"/></div>
+    <div class="login-group" id="keyPasswordGroup" style="display:none;">
       <label>Mật Khẩu Key</label>
       <input type="password" id="loginKeyPass" placeholder="Nhập mật khẩu Key" autocomplete="off"/>
-      <div id="keyPassHint" style="font-size:9px;color:var(--muted);margin-top:4px;display:none;">⚡ Lần đầu đăng nhập không cần nhập mật khẩu — hệ thống sẽ tự tạo cho bạn.</div>
+      <div id="keyPassHint" style="font-size:11px;color:var(--text-muted);margin-top:8px;display:none;font-weight:500;">⚡ Lần đầu đăng nhập không cần nhập mật khẩu.</div>
     </div>
-    <button class="btn-login" onclick="handleLogin()">Đăng nhập</button>
+    <button class="btn-login" onclick="handleLogin()">Đăng Nhập</button>
     <div id="loginError"></div>
   </div>
 </div>
 
-<div id="appContent" style="display: none; width: 100%; flex-direction: column; align-items: center; min-height: 100vh;">
-  <header>
-    <div class="logo">NOTOC29FLIX</div>
-    <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
-      <span id="displayUsername" style="font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;"></span>
-      <button id="btnChangePass" class="logout-btn" onclick="openChangePassModal()" style="display:none; color:var(--blue); border-color:var(--blue);">🔒 Đổi Mật Khẩu</button>
-      <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
+<!-- Main App -->
+<div id="appContent">
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">N29<span>FLIX</span></div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('input')"><span>🍪</span> Cookie Check</button>
+        <button class="tab" onclick="switchTab('cloud')"><span>☁️</span> Cloud Storage</button>
+        <button class="tab" onclick="switchTab('config')"><span>⚙️</span> Configuration</button>
+        <button class="tab" onclick="switchTab('webhook')"><span>🔔</span> Webhook</button>
+        <div style="height: 1px; background: var(--border); margin: 8px 16px;"></div>
+        <button class="tab" id="tabKeyAdmin" style="display:none;" onclick="switchTab('keys')"><span>🔑</span> Key Manager</button>
+        <button class="tab" id="tabUserAdmin" style="display:none;" onclick="switchTab('users')"><span>👤</span> User Manager</button>
+        <button class="tab" id="tabKvAdmin" style="display:none;" onclick="switchTab('kv')"><span>🗄️</span> KV Explorer</button>
+      </div>
     </div>
-  </header>
+    
+    <!-- Main Area -->
+    <div class="main-area">
+      <!-- Header -->
+      <header>
+        <span id="displayUsername">👤 USER</span>
+        <button id="btnChangePass" class="logout-btn" onclick="openChangePassModal()" style="display:none;">🔒 Đổi Mật Khẩu</button>
+        <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
+      </header>
+      
+      <!-- Content -->
+      <main>
+        <div class="content-wrapper">
+          <!-- Worker URL Setup -->
+          <div class="card" style="padding: 16px 24px;">
+            <div class="url-row">
+              <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Worker URL</span>
+              <input id="workerUrl" type="url" placeholder="https://..." spellcheck="false" autocomplete="off"/>
+              <button class="btn-sm" onclick="saveUrl()">Lưu</button>
+            </div>
+          </div>
 
-  <main>
-  <div class="card">
-    <div class="card-title">⚙ Bước 1 — Worker URL</div>
-    <div class="url-row">
-      <input id="workerUrl" type="url" placeholder="https://..." spellcheck="false" autocomplete="off"/>
-      <button class="btn-sm" onclick="saveUrl()">Lưu</button>
+          <!-- Tab Panels -->
+          <div id="tab-input" class="tab-panel active">
+            <div class="drop-zone" id="dropZone">
+              <input type="file" id="fileInput" accept=".txt,.json,.zip" multiple/>
+              <div class="drop-icon">📂</div>
+              <div class="drop-label"><strong>Kéo thả file</strong> hoặc Click để chọn<br><span style="font-size:12px;color:var(--text-muted);margin-top:6px;display:block;">Hỗ trợ .txt · .json · .zip</span></div>
+              <div class="drop-files" id="dropFiles"></div>
+            </div>
+            <div class="or-div">HOẶC DÁN TRỰC TIẾP</div>
+            <textarea id="cookieInput" placeholder="Dán nội dung cookie (Netscape hoặc JSON) vào đây..."></textarea>
+            <div class="formats"><span class="fmt">✓ Netscape format</span><span class="fmt">✓ JSON array format</span></div>
+            
+            <div id="mainControlsSection">
+              <div class="controls">
+                <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Bắt đầu Kiểm Tra</button>
+                <button class="btn-clear" onclick="clearAll()">Xoá Dữ Liệu</button>
+              </div>
+              <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+              <div class="progress-label" id="progressLabel"></div>
+              
+              <div class="stats" id="statsRow">
+                <div class="stat hit"><div class="stat-num" id="sHit">0</div><div class="stat-label">HIT</div></div>
+                <div class="stat free"><div class="stat-num" id="sFree">0</div><div class="stat-label">FREE</div></div>
+                <div class="stat hold"><div class="stat-num" id="sHold">0</div><div class="stat-label">ON HOLD</div></div>
+                <div class="stat dead"><div class="stat-num" id="sDead">0</div><div class="stat-label">EXPIRED</div></div>
+                <div class="stat err"><div class="stat-num" id="sErr">0</div><div class="stat-label">ERROR</div></div>
+              </div>
+              
+              <div class="export-bar" id="exportBar">
+                <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs .txt</button>
+                <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs .txt</button>
+                <button class="btn-export" onclick="exportTxt('all')">⬇ ALL .txt</button>
+                <button class="btn-export" style="color:var(--gold);border-color:rgba(245,197,24,0.3)" onclick="exportZip('hit')">📦 HITs .zip</button>
+                <button class="btn-export" style="color:var(--gold);border-color:rgba(245,197,24,0.3)" onclick="exportZip('all')">📦 ALL .zip</button>
+                <button class="btn-export" onclick="saveAllHitsToCloud()" style="color:var(--blue);border-color:rgba(79,163,224,0.3);width:100%;max-width:none;margin-top:8px;">☁️ LƯU TOÀN BỘ HIT LÊN CLOUD</button>
+              </div>
+              
+              <div id="results"></div>
+            </div>
+          </div>
+
+          <div id="tab-cloud" class="tab-panel">
+            <div class="card">
+              <div class="card-title">Quản Lý Cloud Storage</div>
+              <div class="controls" style="margin-top: 0; margin-bottom: 24px; gap: 12px;">
+                <button class="btn-check" onclick="loadCloudCookies()" style="background: var(--blue); padding: 12px 20px; font-size: 13px;">🔄 Tải Danh Sách</button>
+                <button class="btn-check" onclick="deleteAllDeadCloud()" style="background: transparent; border: 1px solid var(--red); color: var(--red); padding: 12px 20px; font-size: 13px; box-shadow: none;">🗑️ Xoá Toàn Bộ Dead</button>
+                <button class="btn-check" onclick="recheckAllCloud()" style="background: var(--hold); padding: 12px 20px; font-size: 13px; color: #000;">▶ Recheck Toàn Kho</button>
+              </div>
+              <div id="cloudResults" style="display:flex;flex-direction:column;gap:12px;">
+                <div style="text-align:center;font-size:13px;color:var(--text-muted);padding:40px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px dashed var(--border);">Nhấn "Tải Danh Sách" để đồng bộ dữ liệu từ Cloudflare KV.</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-config" class="tab-panel">
+            <div class="cfg-grid">
+              <div class="cfg-group">
+                <div class="cfg-group-title">Cấu hình File TXT Đầu Ra</div>
+                <div id="txtFieldsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;"></div>
+              </div>
+              <div class="cfg-group">
+                <div class="cfg-group-title">Tính năng Bổ sung</div>
+                <div class="cfg-row">
+                  <div class="cfg-label">NFToken Mode<small>Lấy link đăng nhập tự động</small></div>
+                  <select id="cfg_nftoken"><option value="both">Both (PC & Mobile)</option><option value="pc">PC Only</option><option value="mobile">Mobile Only</option><option value="false">Off</option></select>
+                </div>
+                <div class="cfg-row">
+                  <div class="cfg-label">NFToken For Free<small>Lấy token cho tài khoản Free</small></div>
+                  <label class="toggle"><input type="checkbox" id="cfg_nftoken_for_free"/><span class="toggle-track"></span></label>
+                </div>
+                <div class="cfg-row">
+                  <div class="cfg-label">NFToken Attempts<small>Số lần thử lấy token (Max 5)</small></div>
+                  <select id="cfg_nftoken_attempts"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+                </div>
+                <div class="cfg-row">
+                  <div class="cfg-label">Thêm Emojis<small>Giao diện hiển thị</small></div>
+                  <select id="cfg_add_emojis"><option value="webhook">Webhook only</option><option value="txt">TXT only</option><option value="both" selected>Both</option><option value="false">Off</option></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-webhook" class="tab-panel">
+            <div class="card">
+              <div class="cfg-group" style="border:none;background:transparent;padding:0;">
+                <div class="cfg-row">
+                  <div class="cfg-label">Kích hoạt Webhook<small>Gửi thông báo HIT qua Discord</small></div>
+                  <label class="toggle"><input type="checkbox" id="wh_enabled"/><span class="toggle-track"></span></label>
+                </div>
+                <div class="webhook-url-row">
+                  <input id="wh_url" type="url" placeholder="https://discord.com/api/webhooks/..."/>
+                </div>
+                <div class="cfg-grid" style="margin-top:24px;gap:20px;grid-template-columns:1fr 1fr;">
+                  <div class="cfg-row" style="margin-bottom:0;border-bottom:none;padding-bottom:0;">
+                    <div class="cfg-label">Chế độ hiển thị</div>
+                    <select id="wh_mode"><option value="full">Full Info</option><option value="cookie">Only Cookie</option><option value="nftoken">Only NFToken</option></select>
+                  </div>
+                  <div class="cfg-row" style="margin-bottom:0;border-bottom:none;padding-bottom:0;">
+                    <div class="cfg-label">Lọc theo Plan</div>
+                    <input id="wh_plans" style="width:140px;background:rgba(0,0,0,0.3);" value="all" placeholder="Premium, Standard..."/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-keys" class="tab-panel">
+            <div class="card" style="margin-bottom:24px;">
+              <div class="cfg-group-title">🔑 TẠO KEY ĐĂNG NHẬP MỚI</div>
+              <div style="margin-top:20px;display:flex;flex-direction:column;gap:16px;">
+                <div>
+                  <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;display:block;margin-bottom:8px;">Key Custom (Tuỳ chọn)</label>
+                  <input type="text" id="customKeyInput" placeholder="NFNTOC29-CUSTOM... (Để trống để tạo ngẫu nhiên)" spellcheck="false" autocomplete="off" style="width:100%;font-family:var(--mono);"/>
+                </div>
+                <div>
+                  <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;display:block;margin-bottom:8px;">Mật khẩu Key (Tuỳ chọn)</label>
+                  <input type="text" id="keyPasswordInput" placeholder="Để trống hệ thống sẽ tự sinh MK tạm thời cho User" spellcheck="false" autocomplete="off" style="width:100%;font-family:var(--mono);"/>
+                </div>
+                <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+                  <div style="flex:1;min-width:200px;">
+                    <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;display:block;margin-bottom:8px;">Thời hạn</label>
+                    <select id="keyDurationSelect" style="width:100%;">
+                      <option value="10m">10 Phút</option><option value="30m">30 Phút</option><option value="1h">1 Tiếng</option>
+                      <option value="6h">6 Tiếng</option><option value="24h">24 Tiếng</option><option value="48h">48 Tiếng</option>
+                      <option value="30d">30 Ngày</option><option value="1y">1 Năm</option>
+                    </select>
+                  </div>
+                  <button class="btn-check" style="flex:none;width:auto;padding:12px 24px;" onclick="generateNewKey()">⚡ Tạo Key Mới</button>
+                </div>
+              </div>
+              
+              <div id="newKeyResult" style="display:none;margin-top:24px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.3);border-radius:12px;padding:20px;">
+                <div style="font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px;font-weight:700;">📋 Thông tin Key mới (Gửi cho user)</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div style="display:flex;align-items:center;gap:12px;background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                    <span style="font-size:11px;color:var(--text-muted);width:70px;font-weight:600;">KEY:</span>
+                    <code id="newKeyValue" style="font-family:var(--mono);font-size:14px;color:var(--gold);flex:1;word-break:break-all;font-weight:700;"></code>
+                    <button class="btn-sm" style="padding:6px 12px;" onclick="copyText(this, document.getElementById('newKeyValue').textContent)">📋 Copy</button>
+                  </div>
+                  <div id="newKeyPassRow" style="display:none;align-items:center;gap:12px;background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                    <span style="font-size:11px;color:var(--text-muted);width:70px;font-weight:600;">MẬT KHẨU:</span>
+                    <code id="newKeyPass" style="font-family:var(--mono);font-size:14px;color:var(--green);flex:1;font-weight:700;"></code>
+                  </div>
+                  <div id="newKeyNoPassNote" style="display:none;font-size:12px;color:var(--hold);background:rgba(0,207,255,.05);border:1px solid rgba(0,207,255,.2);border-radius:8px;padding:12px 16px;line-height:1.5;">
+                    ⚡ Key này <strong>chưa có mật khẩu</strong>. User chỉ cần nhập key để đăng nhập, hệ thống sẽ tự sinh mật khẩu tạm và hiển thị ở lần đầu tiên.
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="cfg-group-title">
+                <span>Danh Sách Key Hệ Thống</span>
+                <button class="btn-sm" style="padding: 6px 12px; font-size: 11px;" onclick="loadAdminKeys()">🔄 Làm mới</button>
+              </div>
+              <div id="keysListContainer" style="display:flex;flex-direction:column;gap:12px;margin-top:16px;">
+                <div style="text-align:center;font-size:13px;color:var(--text-muted);padding:40px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px dashed var(--border);">Đang tải danh sách...</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-users" class="tab-panel">
+            <div class="card" style="margin-bottom:24px;">
+              <div class="cfg-group-title">👤 TẠO TÀI KHOẢN ADMIN/USER MỚI</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;margin-top:20px;">
+                <div>
+                  <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;display:block;margin-bottom:8px;">Username</label>
+                  <input type="text" id="newUsername" placeholder="Tên tài khoản" style="width:100%;" spellcheck="false" autocomplete="off"/>
+                </div>
+                <div>
+                  <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;display:block;margin-bottom:8px;">Password</label>
+                  <input type="text" id="newPassword" placeholder="Mật khẩu" style="width:100%;"/>
+                </div>
+                <div>
+                  <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;display:block;margin-bottom:8px;">Thời hạn</label>
+                  <select id="userDurationSelect" style="width:100%;">
+                    <option value="10m">10 Phút</option><option value="30m">30 Phút</option><option value="1h">1 Tiếng</option>
+                    <option value="24h">24 Tiếng</option><option value="30d" selected>30 Ngày</option><option value="1y">1 Năm</option><option value="forever">Vĩnh viễn</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+                <button class="btn-check" style="width:auto;padding:12px 24px;" onclick="createAdminUser()">⚡ Tạo User</button>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="cfg-group-title">
+                <span>Danh Sách User</span>
+                <button class="btn-sm" style="padding: 6px 12px; font-size: 11px;" onclick="loadAdminUsers()">🔄 Làm mới</button>
+              </div>
+              <div id="usersListContainer" style="display:flex;flex-direction:column;gap:12px;margin-top:16px;">
+                <div style="text-align:center;font-size:13px;color:var(--text-muted);padding:40px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px dashed var(--border);">Đang tải...</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-kv" class="tab-panel">
+            <div class="card" style="margin-bottom:24px;">
+              <div class="cfg-group-title">
+                <span>🗄️ Deno KV / CF KV Explorer</span>
+                <div style="display:flex;gap:12px;align-items:center;">
+                  <select id="kvPrefixSelect" style="padding:6px 12px;font-size:12px;">
+                    <option value="">Tất cả</option>
+                    <option value="session">session</option>
+                    <option value="auth">auth (users)</option>
+                    <option value="admin">admin (keys)</option>
+                    <option value="cookies">cookies (cloud)</option>
+                  </select>
+                  <button class="btn-sm" style="padding:6px 12px;font-size:12px;background:var(--blue);color:#fff;border:none;" onclick="loadKvData()">🔄 Tải Dữ Liệu</button>
+                </div>
+              </div>
+              <div id="kvStats" style="font-size:12px;color:var(--blue);margin-top:12px;font-weight:600;font-family:var(--mono);"></div>
+            </div>
+            
+            <div id="kvContainer" style="display:flex;flex-direction:column;gap:12px;">
+              <div style="text-align:center;font-size:13px;color:var(--text-muted);padding:40px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px dashed var(--border);">Chọn Prefix và nhấn Tải để xem dữ liệu.</div>
+            </div>
+          </div>
+          
+        </div>
+      </main>
     </div>
   </div>
-
-  <div class="card">
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('input')">🍪 Cookie</button>
-      <button class="tab" onclick="switchTab('cloud')">☁️ Cloud Storage</button>
-      <button class="tab" onclick="switchTab('config')">⚙ Config</button>
-      <button class="tab" onclick="switchTab('webhook')">🔔 Webhook</button>
-      <button class="tab" id="tabKeyAdmin" style="display:none;" onclick="switchTab('keys')">🔑 Quản lý Key</button>
-      <button class="tab" id="tabUserAdmin" style="display:none;" onclick="switchTab('users')">👤 Quản lý User</button>
-      <button class="tab" id="tabKvAdmin" style="display:none;" onclick="switchTab('kv')">🗄️ KV Viewer</button>
-    </div>
-
-    <div id="tab-input" class="tab-panel active">
-      <div class="drop-zone" id="dropZone">
-        <input type="file" id="fileInput" accept=".txt,.json,.zip" multiple/>
-        <div class="drop-icon">📂</div>
-        <div class="drop-label"><strong>Kéo thả file</strong> hoặc click<br><span style="font-size:10px;color:var(--muted)">.txt · .json · .zip</span></div>
-        <div class="drop-files" id="dropFiles"></div>
-      </div>
-      <div class="or-div">hoặc paste</div>
-      <textarea id="cookieInput" placeholder="Paste cookie..."></textarea>
-      <div class="formats"><span class="fmt">✓ Netscape</span><span class="fmt">✓ JSON array</span></div>
-    </div>
-
-    <div id="tab-cloud" class="tab-panel">
-      <div class="controls" style="margin-top: 0; margin-bottom: 14px; gap: 8px;">
-        <button class="btn-check" onclick="loadCloudCookies()" style="background: var(--blue); padding: 10px;">🔄 Tải Danh Sách</button>
-        <button class="btn-check" onclick="deleteAllDeadCloud()" style="background: var(--red-dim); border:1px solid var(--red); padding: 10px;">🗑️ Xoá Toàn Bộ Dead</button>
-        <button class="btn-check" onclick="recheckAllCloud()" style="background: var(--hold); padding: 10px;">▶ Recheck Toàn Kho</button>
-      </div>
-      <div id="cloudResults" style="display:flex;flex-direction:column;gap:8px">
-        <div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Nhấn "Tải Danh Sách" để đồng bộ dữ liệu.</div>
-      </div>
-    </div>
-
-    <div id="tab-config" class="tab-panel">
-      <div class="cfg-grid">
-        <div class="cfg-group">
-          <div class="cfg-group-title">TXT Fields</div>
-          <div id="txtFieldsGrid"></div>
-        </div>
-        <div class="cfg-group">
-          <div class="cfg-group-title">Features</div>
-          <div class="cfg-row">
-            <div class="cfg-label">NFToken Mode</div>
-            <select id="cfg_nftoken"><option value="both">Both</option><option value="pc">PC</option><option value="mobile">Mobile</option><option value="false">Off</option></select>
-          </div>
-          <div class="cfg-row">
-            <div class="cfg-label">NFToken For Free</div>
-            <label class="toggle"><input type="checkbox" id="cfg_nftoken_for_free"/><span class="toggle-track"></span></label>
-          </div>
-          <div class="cfg-row">
-            <div class="cfg-label">NFToken Attempts</div>
-            <select id="cfg_nftoken_attempts"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
-          </div>
-          <div class="cfg-row" style="margin-top:10px">
-            <div class="cfg-label">Add Emojis</div>
-            <select id="cfg_add_emojis"><option value="webhook">Webhook only</option><option value="txt">TXT only</option><option value="both" selected>Both</option><option value="false">Off</option></select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-webhook" class="tab-panel">
-      <div class="cfg-group">
-        <div class="cfg-row"><div class="cfg-label">Enabled</div><label class="toggle"><input type="checkbox" id="wh_enabled"/><span class="toggle-track"></span></label></div>
-        <div class="webhook-url-row"><input id="wh_url" type="url" placeholder="https://discord.com/api/webhooks/..."/></div>
-        <div class="cfg-row" style="margin-top:8px"><div class="cfg-label">Mode</div><select id="wh_mode"><option value="full">Full</option><option value="cookie">Cookie</option><option value="nftoken">NFToken</option></select></div>
-        <div class="cfg-row"><div class="cfg-label">Plans</div><input id="wh_plans" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;padding:4px 8px;width:130px;outline:none" value="all"/></div>
-      </div>
-    </div>
-
-    <div id="tab-keys" class="tab-panel">
-      <div class="cfg-group" style="margin-bottom: 15px;">
-        <div class="cfg-group-title">🔑 Tạo Key Đăng Nhập Mới</div>
-        
-        <!-- Custom key input -->
-        <div style="margin-top:10px; margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">Key Custom (tuỳ chọn)</div>
-          <input type="text" id="customKeyInput" placeholder="NFNTOC29-CUSTOM... (để trống để tự sinh)" spellcheck="false" autocomplete="off"
-            style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 10px;outline:none;transition:border-color .2s;"
-            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
-          <div style="font-size:9px;color:var(--muted);margin-top:3px;">Nếu không nhập, hệ thống sẽ tự tạo key ngẫu nhiên.</div>
-        </div>
-
-        <!-- Optional password -->
-        <div style="margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">Mật khẩu Key (tuỳ chọn)</div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" id="keyPasswordInput" placeholder="Để trống = tự sinh MK tạm, user thấy sau khi đăng nhập" spellcheck="false" autocomplete="off"
-              style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 10px;outline:none;transition:border-color .2s;"
-              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
-          </div>
-          <div style="font-size:9px;color:var(--muted);margin-top:3px;">Nếu để trống, hệ thống tự sinh MK. User sẽ thấy MK ngay sau khi đăng nhập lần đầu và có thể tự đổi.</div>
-        </div>
-
-        <div class="cfg-row" style="gap: 12px; align-items: center; flex-wrap: wrap;">
-          <div class="cfg-label" style="white-space:nowrap;">Thời hạn:</div>
-          <select id="keyDurationSelect" style="padding: 8px 12px; font-size: 11px; flex: 1; min-width:100px;">
-            <option value="10m">10 Phút</option>
-            <option value="30m">30 Phút</option>
-            <option value="1h">1 Tiếng</option>
-            <option value="6h">6 Tiếng</option>
-            <option value="24h">24 Tiếng</option>
-            <option value="48h">48 Tiếng</option>
-            <option value="30d">30 Ngày</option>
-            <option value="1y">1 Năm</option>
-          </select>
-          <button class="btn-check" style="flex: none; padding: 8px 16px; margin: 0; font-size: 11px;" onclick="generateNewKey()">⚡ Tạo Key</button>
-        </div>
-        <div id="newKeyResult" style="display:none; margin-top:12px; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:12px;">
-          <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">📋 Thông tin Key mới — Copy và gửi cho người dùng</div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:10px;color:var(--muted);width:60px;flex-shrink:0;">KEY:</span>
-              <code id="newKeyValue" style="font-family:var(--mono);font-size:12px;color:var(--gold);flex:1;word-break:break-all;"></code>
-              <button class="btn-sm" style="padding:3px 8px;font-size:9px;" onclick="copyText(this, document.getElementById('newKeyValue').textContent)">📋</button>
-            </div>
-            <div id="newKeyPassRow" style="display:none;align-items:center;gap:8px;">
-              <span style="font-size:10px;color:var(--muted);width:60px;flex-shrink:0;">MẬT KHẨU:</span>
-              <code id="newKeyPass" style="font-family:var(--mono);font-size:12px;color:var(--green);flex:1;"></code>
-            </div>
-            <div id="newKeyNoPassNote" style="display:none;font-size:10px;color:var(--hold);background:rgba(0,207,255,.08);border:1px solid rgba(0,207,255,.3);border-radius:3px;padding:8px 10px;">
-              ⚡ Key này <strong>chưa có mật khẩu</strong>. User chỉ cần nhập key là đăng nhập được. Hệ thống sẽ tự sinh mật khẩu tạm và hiển thị popup ngay khi user đăng nhập lần đầu.
-            </div>
-          </div>
-          <div style="font-size:9px;color:var(--red);margin-top:8px;">⚠ Lưu lại thông tin này! Admin có thể reset mật khẩu sau nếu cần.</div>
-        </div>
-      </div>
-      
-      <div class="cfg-group">
-        <div class="cfg-group-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>Danh Sách Key Hệ Thống</span>
-          <button class="btn-sm" style="padding: 2px 8px; font-size: 9px;" onclick="loadAdminKeys()">🔄 Làm mới</button>
-        </div>
-        <div id="keysListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:400px; overflow-y:auto;">
-          <div style="text-align:center; font-size:11px; color:var(--muted); padding:20px;">Đang tải danh sách...</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-users" class="tab-panel">
-      <div class="cfg-group" style="margin-bottom: 15px;">
-        <div class="cfg-group-title">👤 Tạo Tài Khoản User Mới</div>
-        <div class="cfg-row" style="gap: 10px; align-items: flex-start; margin-top: 10px; flex-wrap: wrap;">
-          <div style="flex:1; min-width:120px;">
-            <div class="cfg-group-title" style="margin-bottom:4px;">Username</div>
-            <input type="text" id="newUsername" placeholder="tên tài khoản" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:7px 10px;outline:none;" spellcheck="false" autocomplete="off"/>
-          </div>
-          <div style="flex:1; min-width:120px;">
-            <div class="cfg-group-title" style="margin-bottom:4px;">Password</div>
-            <input type="text" id="newPassword" placeholder="mật khẩu" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;padding:7px 10px;outline:none;"/>
-          </div>
-          <div style="flex:1; min-width:120px;">
-            <div class="cfg-group-title" style="margin-bottom:4px;">Thời hạn</div>
-            <select id="userDurationSelect" style="width:100%;padding: 8px 10px; font-size: 11px; background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);">
-              <option value="10m">10 Phút</option>
-              <option value="30m">30 Phút</option>
-              <option value="1h">1 Tiếng</option>
-              <option value="6h">6 Tiếng</option>
-              <option value="24h">24 Tiếng</option>
-              <option value="48h">48 Tiếng</option>
-              <option value="30d" selected>30 Ngày</option>
-              <option value="1y">1 Năm</option>
-              <option value="forever">Vĩnh viễn</option>
-            </select>
-          </div>
-          <button class="btn-check" style="flex: none; padding: 8px 16px; margin: 0; font-size: 11px; align-self:flex-end;" onclick="createAdminUser()">⚡ Tạo User</button>
-        </div>
-      </div>
-      <div class="cfg-group">
-        <div class="cfg-group-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>Danh Sách User</span>
-          <button class="btn-sm" style="padding: 2px 8px; font-size: 9px;" onclick="loadAdminUsers()">🔄 Làm mới</button>
-        </div>
-        <div id="usersListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:400px; overflow-y:auto;">
-          <div style="text-align:center; font-size:11px; color:var(--muted); padding:20px;">Đang tải...</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-kv" class="tab-panel">
-      <div class="cfg-group" style="margin-bottom:12px;">
-        <div class="cfg-group-title" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>🗄️ Deno KV Explorer</span>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <select id="kvPrefixSelect" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;padding:4px 8px;">
-              <option value="">Tất cả</option>
-              <option value="session">session</option>
-              <option value="auth">auth (users)</option>
-              <option value="auth_index">auth_index</option>
-              <option value="admin">admin (keys)</option>
-              <option value="cookies">cookies (cloud)</option>
-            </select>
-            <button class="btn-sm" style="padding:3px 10px;font-size:10px;" onclick="loadKvData()">🔄 Tải</button>
-          </div>
-        </div>
-        <div id="kvStats" style="font-size:10px;color:var(--muted);margin-top:6px;"></div>
-      </div>
-      <div id="kvContainer" style="display:flex;flex-direction:column;gap:6px;max-height:500px;overflow-y:auto;">
-        <div style="text-align:center;font-size:11px;color:var(--muted);padding:20px;">Nhấn Tải để xem dữ liệu KV.</div>
-      </div>
-    </div>
-
-    <div id="mainControlsSection">
-      <div class="controls">
-        <button class="btn-check" id="checkBtn" onclick="startCheck()">▶ Check Cookie</button>
-        <button class="btn-clear" onclick="clearAll()">Xoá</button>
-      </div>
-      <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-      <div class="progress-label" id="progressLabel"></div>
-      
-      <div class="stats" id="statsRow">
-        <div class="stat hit"> <div class="stat-num" id="sHit">0</div> <div class="stat-label">HIT</div></div>
-        <div class="stat free"><div class="stat-num" id="sFree">0</div><div class="stat-label">FREE</div></div>
-        <div class="stat hold"><div class="stat-num" id="sHold">0</div><div class="stat-label">ON HOLD</div></div>
-        <div class="stat dead"><div class="stat-num" id="sDead">0</div><div class="stat-label">EXPIRED</div></div>
-        <div class="stat err"> <div class="stat-num" id="sErr">0</div> <div class="stat-label">ERROR</div></div>
-      </div>
-      <div class="export-bar" id="exportBar">
-        <button class="btn-export" onclick="exportTxt('hit')">⬇ HITs .txt</button>
-        <button class="btn-export" onclick="exportTxt('free')">⬇ FREEs .txt</button>
-        <button class="btn-export" onclick="exportTxt('all')">⬇ ALL .txt</button>
-        <button class="btn-export" style="color:var(--gold);border-color:var(--gold)" onclick="exportZip('hit')">📦 HITs .zip</button>
-        <button class="btn-export" style="color:var(--gold);border-color:var(--gold)" onclick="exportZip('all')">📦 ALL .zip</button>
-        <button class="btn-export" onclick="saveAllHitsToCloud()" style="color: var(--blue); border-color: var(--blue);">☁️ LƯU ALL HIT LÊN CLOUD</button>
-      </div>
-      <div id="results"></div>
-    </div>
-  </div>
-  </main>
 </div>
 
 <script>
@@ -814,7 +988,7 @@ function _restorePendingResults(){
     counts = {hit:0,free:0,hold:0,dead:0,err:0};
     pending.forEach(r=>{ counts[r.status]=(counts[r.status]||0)+1; });
     document.getElementById('results').innerHTML='';
-    document.getElementById('statsRow').style.display='flex';
+    document.getElementById('statsRow').style.display='grid';
     document.getElementById('exportBar').style.display='flex';
     pending.forEach(r=>{ renderCard(r); refreshCard(results.findIndex(x=>x.id===r.id)); });
     updateStats();
@@ -840,7 +1014,7 @@ async function startCheck(){
   if(!chunks.length){alert('Chưa có dữ liệu cookie.');return;}
 
   results=[]; counts={hit:0,free:0,hold:0,dead:0,err:0}; document.getElementById('results').innerHTML=''; updateStats();
-  document.getElementById('statsRow').style.display='flex'; document.getElementById('exportBar').style.display='none';
+  document.getElementById('statsRow').style.display='grid'; document.getElementById('exportBar').style.display='none';
   document.getElementById('progressWrap').style.display='block'; document.getElementById('progressLabel').style.display='block';
 
   const btn=document.getElementById('checkBtn'); btn.disabled=true; btn.textContent='Đang check…'; running=true;
