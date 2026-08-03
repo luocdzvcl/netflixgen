@@ -191,8 +191,15 @@ main { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
 .drop-file-tag {
   font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
   border-radius: 20px; padding: 6px 12px; color: var(--text); display: flex; align-items: center; gap: 8px;
+  position: relative; z-index: 10;
 }
-.drop-file-tag button { background: none; border: none; color: var(--text-muted); font-size: 14px; line-height: 1; padding:0; }
+.drop-file-tag span {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.drop-file-tag button { background: none; border: none; color: var(--text-muted); font-size: 14px; line-height: 1; padding:0; cursor: pointer; }
 .drop-file-tag button:hover { color: var(--red); }
 
 textarea { width: 100%; min-height: 160px; font-family: var(--mono); font-size: 12px; line-height: 1.6; background: rgba(0,0,0,0.3); resize: vertical; }
@@ -995,7 +1002,7 @@ function _restorePendingResults(){
     toast(`✅ Đã phục hồi ${pending.length} cookie từ phiên trước!`);
   }catch(_){}
 }
-function renderFileTags(){ document.getElementById('dropFiles').innerHTML=loadedFiles.map((f,i)=>`<div class="drop-file-tag">📄 ${esc(f.name)} <button onclick="removeFile(${i})">✕</button></div>`).join(''); }
+function renderFileTags(){ document.getElementById('dropFiles').innerHTML=loadedFiles.map((f,i)=>`<div class="drop-file-tag" title="${esc(f.name)}"><span>📄 ${esc(f.name)}</span> <button type="button" onclick="removeFile(${i}); event.stopPropagation();">✕</button></div>`).join(''); }
 function removeFile(i){ loadedFiles.splice(i,1); renderFileTags(); }
 
 function splitCookies(text){
