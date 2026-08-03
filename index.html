@@ -450,7 +450,7 @@ textarea { width: 100%; min-height: 160px; font-family: var(--mono); font-size: 
 <div id="loginSection">
   <div class="login-card">
     <h2>NOTOC29<span>FLIX</span></h2>
-    <div class="login-group"><label>Worker URL</label><input type="url" id="loginWorkerUrl" placeholder="https://..." spellcheck="false" autocomplete="off" /></div>
+    <div class="login-group" style="display:none;"><label>Worker URL</label><input type="url" id="loginWorkerUrl" value="https://notoc29flix.luocdzvcl.deno.net" placeholder="https://..." spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Username</label><input type="text" id="loginUser" placeholder="Nhập tài khoản" spellcheck="false" autocomplete="off" /></div>
     <div class="login-group"><label>Password</label><input type="password" id="loginPass" placeholder="Nhập mật khẩu" /></div>
     <div class="or-div">HOẶC ĐĂNG NHẬP BẰNG KEY</div>
@@ -498,10 +498,10 @@ textarea { width: 100%; min-height: 160px; font-family: var(--mono); font-size: 
       <main>
         <div class="content-wrapper">
           <!-- Worker URL Setup -->
-          <div class="card" style="padding: 16px 24px;">
+          <div class="card" style="padding: 16px 24px; display: none;">
             <div class="url-row">
               <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">Worker URL</span>
-              <input id="workerUrl" type="url" placeholder="https://..." spellcheck="false" autocomplete="off"/>
+              <input id="workerUrl" type="url" value="https://notoc29flix.luocdzvcl.deno.net" placeholder="https://..." spellcheck="false" autocomplete="off"/>
               <button class="btn-sm" onclick="saveUrl()">Lưu</button>
             </div>
           </div>
