@@ -785,7 +785,15 @@ function showAppView() {
 // Khi user gõ key, kiểm tra xem key đó cần MK chưa (optional UX hint)
 function onKeyInput(val) {
   const trimmed = val.trim();
+  const group = document.getElementById('keyPasswordGroup');
   const hint = document.getElementById('keyPassHint');
+  
+  if (trimmed.length > 0) {
+    if (group) group.style.display = 'block';
+  } else {
+    if (group) group.style.display = 'none';
+  }
+
   // Chỉ show hint khi key có định dạng đúng (không thể biết server-side nên chỉ hint chung)
   if (hint && trimmed.startsWith('NFNTOC29-') && trimmed.length > 10) {
     hint.style.display = 'block';
